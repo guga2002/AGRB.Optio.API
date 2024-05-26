@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AGRB.Optio.Domain\AGRB.Optio.Domain.csproj" />
+    <ProjectReference Include="..\AGRB.Optio.Persistance\AGRB.Optio.Persistance.csproj" />
   </ItemGroup>
 
 </Project>
