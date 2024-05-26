@@ -1,0 +1,6 @@
+@AGRB.Optio.StreamTest_HostAddress = http://localhost:5097
+
+GET {{AGRB.Optio.StreamTest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
