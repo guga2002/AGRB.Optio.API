@@ -80,11 +80,11 @@ builder.Services.AddScoped<ITransactionRelatedSer, TransactionRelatedSer>();
 builder.Services.AddScoped<ILocationToMerchantRepository, LocationToMerchantRepos>();
 #endregion
 
-var domainAssemblyServices = Assembly.Load("RGBA.Optio.Domain");
-builder.Services.AddInjectServices(domainAssemblyServices);
+//var domainAssemblyServices = Assembly.Load("RGBA.Optio.Domain");
+//builder.Services.AddInjectServices(domainAssemblyServices);
 
-var domainAssemblyRepos = Assembly.Load("RGBA.Optio.Core");
-builder.Services.AddInjectRepositories(domainAssemblyRepos);
+//var domainAssemblyRepos = Assembly.Load("RGBA.Optio.Core");
+//builder.Services.AddInjectRepositories(domainAssemblyRepos);
 
 builder.Services.AddSingleton<CacheService>();
 
