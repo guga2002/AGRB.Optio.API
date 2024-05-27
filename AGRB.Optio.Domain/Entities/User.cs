@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace RGBA.Optio.Core.Entities
 {
     [Table("Users")]
-    [Index(nameof(PersonalNumber),IsDescending =new bool[] { true },IsUnique =true)]
+    [Index(nameof(PersonalNumber),IsDescending = [true])]
     public class User:IdentityUser
     {
         [Column("User_Name")]
@@ -25,10 +25,5 @@ namespace RGBA.Optio.Core.Entities
         [Column("User_BirthDay")]
         [DataType(DataType.Date)]
         public DateTime BirthDate { get; set; }
-
-        public User()
-        {
-                
-        }
     }
 }

@@ -6,7 +6,7 @@ namespace RGBA.Optio.Core.Interfaces
     {
         ICategoryRepo CategoryOfTransactionRepository { get; }
 
-        IChannelRepo ChanellRepository { get; }
+        IChannelRepo ChannelRepository { get; }
 
         ILocationRepo LocationRepository { get; }
 
@@ -18,9 +18,10 @@ namespace RGBA.Optio.Core.Interfaces
         
         ILocationToMerchantRepository LocationToMerchantRepository { get; }
        
-        IValuteCourse ValuteCourse { get; }
+        IExchangeRate ExchangeRate { get; }
 
         ICurrencyRepository CurrencyRepository { get; }
+
         Task CheckAndCommitAsync();
     }
 }
