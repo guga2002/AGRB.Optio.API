@@ -1,6 +1,5 @@
 ﻿using Optio.Core.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Numerics;
 
 namespace RGBA.Optio.Core.Entities
 {
@@ -8,12 +7,12 @@ namespace RGBA.Optio.Core.Entities
     public class LocationToMerchant:AbstractClass
     {
         [ForeignKey("location")]
-        public long LocatrionId { get; set; }
+        public long LocationId { get; set; }
 
         [ForeignKey("merchant")]
-        public long merchantId { get; set; }
-        public Location location { get; set; }
+        public long MerchantId { get; set; }
+        public Location Location { get; set; }
 
-        public Merchant merchant { get; set; }
+        public Merchant Merchant { get; set; }
     }
 }

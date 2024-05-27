@@ -6,7 +6,7 @@ namespace Optio.Core.Interfaces
     {
         Task<IEnumerable<Transaction>> GetAllWithDetailsAsync();
 
-        Task<Transaction> GetByIdWithDetailsAsync(long Id);
+        Task<Transaction> GetByIdWithDetailsAsync(long id);
 
         Task<IEnumerable<Transaction>> GetAllActiveAsync();
     }

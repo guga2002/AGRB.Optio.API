@@ -1,12 +1,12 @@
 ﻿namespace Optio.Core.Interfaces
 {
-    public interface ICrudRepo<T,K> where T : class
+    public interface ICrudRepo<T,TK> where T : class
     {
         Task<long>AddAsync(T entity);   
         Task<bool> RemoveAsync(T entity);
-        Task<bool> UpdateAsync(K id,T entity);
-        Task<bool> SoftDeleteAsync(K id);
+        Task<bool> UpdateAsync(TK id,T entity);
+        Task<bool> SoftDeleteAsync(TK id);
         Task<IEnumerable<T>> GetAllAsync();
-        Task<T> GetByIdAsync(K id);
+        Task<T> GetByIdAsync(TK id);
     }
 }
