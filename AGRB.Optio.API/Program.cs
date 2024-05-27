@@ -21,7 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "OptioManagmentSolution", Version = "v1" });
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "OtoManagementSolution", Version = "v1" });
     opt.AddSecurityDefinition("auth", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.ApiKey,
@@ -121,6 +121,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("RequestPipeline",
         builder =>
         {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
             builder.WithOrigins("https://localhost:44359")
                    .AllowAnyHeader()
                    .AllowAnyMethod();
@@ -134,7 +135,7 @@ var app = builder.Build();
 //    app.UseSwagger();
 //    app.UseSwaggerUI(io =>
 //    {
-//        io.SwaggerEndpoint("/swagger/v1/swagger.json", "OptioManagmentSolution");
+//        io.SwaggerEndpoint("/swagger/v1/swagger.json", "OptionManagementSolution");
 //    });
 //}
 
