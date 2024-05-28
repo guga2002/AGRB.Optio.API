@@ -7,20 +7,18 @@ namespace RGBA.Optio.Domain.LoggerFiles
         private bool disposedValue;
         public ILogger CreateLogger(string categoryName)
         {
-            return new Loggeri();
+            return new Logger();
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    disposing = false;
-                }
-
-                disposedValue = true;
+                disposing = false;
             }
+
+            disposedValue = true;
         }
         public void Dispose()
         {

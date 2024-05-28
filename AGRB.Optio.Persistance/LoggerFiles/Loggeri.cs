@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
+﻿using AGRB.Optio.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using RGBA.Optio.Core.Data;
 
 namespace RGBA.Optio.Domain.LoggerFiles
 {
-    public class Loggeri : ILogger
+    public class Logger : ILogger
     {
         private readonly OptioMongoContext context = new();
+        
 
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         {
@@ -21,13 +22,8 @@ namespace RGBA.Optio.Domain.LoggerFiles
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (logLevel is not (LogLevel.Information or LogLevel.Error or LogLevel.Critical)) return;
-
-            var doc = new BsonDocument
-            {
-                { "LogLevel", logLevel.ToString() },
-                { "Message", formatter(state, exception) }
-            };
-            context.UserLogs.InsertOne(doc);
+            var logs = new Logs(logLevel: logLevel.ToString(), message: formatter(state, exception));
+            context.UserLogs.InsertOne(logs);
         }
     }
 }

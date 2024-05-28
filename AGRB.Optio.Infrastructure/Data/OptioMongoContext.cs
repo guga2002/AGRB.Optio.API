@@ -5,12 +5,12 @@ namespace RGBA.Optio.Core.Data
     public sealed class OptioMongoContext
     {
         private readonly MongoClient client;
-        public IMongoCollection<Log> UserLogs { get; set; }
+        public IMongoCollection<Logs> UserLogs { get; set; }
         public OptioMongoContext()
         {
             client = new MongoClient();
             var database = client.GetDatabase("LogRGBA");
-            UserLogs=database.GetCollection<Log>("LogsUserActions");
+            UserLogs=database.GetCollection<Logs>("LogsUserActions");
         }
     }
 }

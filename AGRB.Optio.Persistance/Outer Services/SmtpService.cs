@@ -7,20 +7,20 @@ namespace RGBA.Optio.Domain.Services.Outer_Services
     {
         public void  SendMessage(string to,string  subject,string text)
         {
-            string senderEmail = "rgbasolution@gmail.com";
-            string senderPassword = "txbq xncu twoj parr";
+            const string senderEmail = "rgbasolution@gmail.com";
+            const string senderPassword = "txbq xncu twoj parr";
 
-            string recipientEmail = to;
+            var recipientEmail = to;
 
-            string smtpAddress = "smtp.gmail.com";
-            int portNumber = 587;
+            const string smtpAddress = "smtp.gmail.com";
+            var portNumber = 587;
 
 
-            SmtpClient smtpClient = new SmtpClient(smtpAddress, portNumber);
+            var smtpClient = new SmtpClient(smtpAddress, portNumber);
             smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
             smtpClient.EnableSsl = true;
 
-            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail);
+            var mailMessage = new MailMessage(senderEmail, recipientEmail);
             mailMessage.Subject = subject;
             mailMessage.Body = text;
             mailMessage.IsBodyHtml = true;
