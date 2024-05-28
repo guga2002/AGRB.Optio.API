@@ -2,17 +2,16 @@
 using Optio.Core.Data;
 using Optio.Core.Entities;
 using Optio.Core.Interfaces;
-using System.Numerics;
 
 namespace Optio.Core.Repositories
 {
     public class TypeOfTransactionRepos : AbstractClass, ITypeOfTransactionRepo
     {
-        private readonly DbSet<TypeOfTransaction> TypeOfTransaction;
+        private readonly DbSet<TypeOfTransaction> typeOfTransaction;
 
         public TypeOfTransactionRepos(OptioDB optioDB) : base(optioDB)
         {
-            TypeOfTransaction=context.Set<TypeOfTransaction>();
+            typeOfTransaction=Context.Set<TypeOfTransaction>();
         }
 
         #region AddAsync
@@ -20,14 +19,12 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                if (!await TypeOfTransaction.AnyAsync(io => io.TransactionName == entity.TransactionName))
-                {
-                    await TypeOfTransaction.AddAsync(entity);
-                    await context.SaveChangesAsync();
-                    var max = await TypeOfTransaction.MaxAsync(io => io.Id);
-                    return max;
-                }
-                return -1;
+                if (await typeOfTransaction.AnyAsync(io => io.TransactionName == entity.TransactionName)) return -1;
+                
+                await typeOfTransaction.AddAsync(entity);
+                await Context.SaveChangesAsync();
+                var max = await typeOfTransaction.MaxAsync(io => io.Id);
+                return max;
             }
             catch (Exception)
             {
@@ -41,7 +38,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                return await TypeOfTransaction.
+                return await typeOfTransaction.
                      AsNoTracking()
                      .ToListAsync();
             }
@@ -59,7 +56,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                return await TypeOfTransaction.
+                return await typeOfTransaction.
                      AsNoTracking().
                      Where(io => io.IsActive)
                      .ToListAsync();
@@ -76,7 +73,8 @@ namespace Optio.Core.Repositories
 
         public async Task<TypeOfTransaction> GetByIdAsync(long id)
         {
-            return await TypeOfTransaction.FindAsync(id)?? throw new ArgumentNullException("Typeoftransaction No Exist");
+            return await typeOfTransaction.FindAsync(id) ??
+                   throw new InvalidOperationException("TypeOfTransaction No Exist");
         }
         #endregion
 
@@ -85,13 +83,9 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                if (entity is not null)
-                {
-                    TypeOfTransaction.Remove(entity);
-                    await context.SaveChangesAsync();
-                    return true;
-                }
-                return false;
+                typeOfTransaction.Remove(entity);
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (Exception)
             {
@@ -105,16 +99,13 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var typ = await TypeOfTransaction
-                    .FirstOrDefaultAsync(io => io.Id == id && io.IsActive);
+                var typ = await typeOfTransaction
+                              .FindAsync(id) ??
+                          throw new InvalidOperationException("TypeOfTransaction No Exist");
 
-                if (typ is not null)
-                {
-                    typ.IsActive = false;
-                    await context.SaveChangesAsync();
-                    return true;
-                }
-                return false;
+                typ.IsActive = false;
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (Exception)
             {
@@ -129,18 +120,14 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-                var existingEntity = await TypeOfTransaction.FindAsync(id);
-                if (existingEntity is null)
-                {
-                    throw new InvalidOperationException("There is no such Type of transaction");
-                }
-                else
-                {
-                    existingEntity.TransactionName = entity.TransactionName;
-                    await context.SaveChangesAsync();
-                    return true;
-                }
+                ArgumentNullException.ThrowIfNull(entity);
+                var existingEntity = await typeOfTransaction.FindAsync(id) ??
+                                     throw new InvalidOperationException("There is no such Type of transaction");
+                
+                existingEntity.TransactionName = entity.TransactionName;
+                await Context.SaveChangesAsync();
+                return true;
+                
             }
             catch (DbUpdateConcurrencyException)
             {

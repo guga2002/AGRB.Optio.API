@@ -13,21 +13,21 @@ namespace RGBA.Optio.Core.Repositories
 
         public LocationToMerchantRepos(OptioDB optioDB) : base(optioDB)
         {
-            locations = context.Set<Location>();
+            locations = Context.Set<Location>();
         }
         #region GetLocationIdByMerchantIdAsync
         public async Task<Location> GetLocationIdByMerchantIdAsync(long merchantId)
         {
             try
             {
-                var merch= await context.LoactionTomerchant.Where(i=>i.merchantId == merchantId).FirstOrDefaultAsync();
+                var merch= await Context.LocationToMerchants.FirstOrDefaultAsync(i=>i.MerchantId == merchantId);
                 if (merch is null)
                 {
                     throw new InvalidOperationException();
                 }
                 else
                 {
-                    var merchLocation=await locations.Where(i=>i.Id==merch.LocatrionId).FirstOrDefaultAsync();
+                    var merchLocation=await locations.Where(i=>i.Id==merch.LocationId).FirstOrDefaultAsync();
                     if (merchLocation is null)
                     {
                         throw new InvalidOperationException();

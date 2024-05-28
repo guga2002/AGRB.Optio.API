@@ -18,7 +18,7 @@ namespace RGBA.Optio.Core.Interfaces
         
         ILocationToMerchantRepository LocationToMerchantRepository { get; }
        
-        IExchangeRate ExchangeRate { get; }
+        IExchangeRate ExchangeRateRepository { get; }
 
         ICurrencyRepository CurrencyRepository { get; }
 
