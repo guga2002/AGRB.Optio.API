@@ -65,7 +65,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         }
         #endregion
 
-        #region AssignLocationtoMerchant
+        #region AssignLocationToMerchant
         public async Task<bool> AssignLocationtoMerchant(long Merchantid, long Locationid)
         {
             try

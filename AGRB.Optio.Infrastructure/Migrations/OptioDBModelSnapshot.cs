@@ -495,7 +495,7 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("RGBA.Optio.Core.Entities.ValuteCourse", b =>
+            modelBuilder.Entity("RGBA.Optio.Core.Entities.ExchangeRateRepository", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -647,7 +647,7 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     b.Navigation("merchant");
                 });
 
-            modelBuilder.Entity("RGBA.Optio.Core.Entities.ValuteCourse", b =>
+            modelBuilder.Entity("RGBA.Optio.Core.Entities.ExchangeRateRepository", b =>
                 {
                     b.HasOne("RGBA.Optio.Core.Entities.Currency", "Currency")
                         .WithMany("Courses")

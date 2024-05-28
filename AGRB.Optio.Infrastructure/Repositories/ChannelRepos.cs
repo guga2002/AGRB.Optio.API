@@ -6,29 +6,22 @@ using RGBA.Optio.Core.PerformanceImprovmentServices;
 
 namespace Optio.Core.Repositories
 {
-    public class ChannelRepos :AbstractClass,IChannelRepo
+    public class ChannelRepos(OptioDB optioDB, CacheService cacheService) : AbstractClass(optioDB), IChannelRepo
     {
       
-        private readonly DbSet<Channels> channels;
-        private readonly CacheService cacheService;
-
-        public ChannelRepos(OptioDB optioDB, CacheService cacheService) :base(optioDB)
-        {
-            channels = optioDB.Set<Channels>();
-            this.cacheService = cacheService;
-        }
+        private readonly DbSet<Channels> channels = optioDB.Set<Channels>();
 
 
         #region AddAsync
         public async Task<long> AddAsync(Channels entity)
         {
             try
-            {
-                 var channel= await channels.AnyAsync(i=>i.ChannelType==entity.ChannelType);
+            { 
+                var channel= await channels.AnyAsync(i=>i.ChannelType==entity.ChannelType);
                 if (!channel)
                 {
                     await channels.AddAsync(entity);
-                    await context.SaveChangesAsync();
+                    await Context.SaveChangesAsync();
                     var res= await channels.MaxAsync(io=>io.Id);
                     return res;
                 }
@@ -56,13 +49,10 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                string cachekey = "all channels";
+                const string cacheKey = "all channels";
                 await Task.Delay(1);
-                IEnumerable<Channels> ch = cacheService.GetOrCreate(cachekey, () =>
-                    {
-                        return CompiledQueryGetAll.Invoke(context) ??
-                        throw new ArgumentException("No channel found");
-                    }, TimeSpan.FromMinutes(30)); 
+                var ch = cacheService.GetOrCreate(cacheKey, () => CompiledQueryGetAll.Invoke(Context) ??
+                                                                  throw new ArgumentException("No channel found"), TimeSpan.FromMinutes(30)); 
                 return ch ?? throw new ArgumentException("No channel found");
             }
             catch (Exception)
@@ -100,13 +90,10 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                string cacheKey = $"channel with {id}";
+                var cacheKey = $"channel with {id}";
                 await Task.Delay(1);
-                Channels channel = cacheService.GetOrCreate(cacheKey, () =>
-                {
-                    return CompiledQueryGetBtId.Invoke(context, id) ??
-                    throw new ArgumentException("No channel found");
-                }, TimeSpan.FromMinutes(15));
+                var channel = cacheService.GetOrCreate(cacheKey, () => CompiledQueryGetBtId.Invoke(Context, id) ??
+                                                                       throw new ArgumentException("No channel found"), TimeSpan.FromMinutes(15));
 
                 return channel ?? throw new ArgumentException("No channel found");
 
@@ -125,7 +112,7 @@ namespace Optio.Core.Repositories
             {
                 ArgumentNullException.ThrowIfNull(entity, nameof(entity));
                 channels.Remove(entity);
-                await context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -145,7 +132,7 @@ namespace Optio.Core.Repositories
                 if (channel is not null)
                 {
                     channel.IsActive = false;
-                    await context.SaveChangesAsync();
+                    await Context.SaveChangesAsync();
                     return true;
                 }
                 else
@@ -172,7 +159,7 @@ namespace Optio.Core.Repositories
                 if (channel is not null)
                 {
                     channel.ChannelType = entity.ChannelType;
-                    await context.SaveChangesAsync();
+                    await Context.SaveChangesAsync();
                     return true;
                 }
                 else

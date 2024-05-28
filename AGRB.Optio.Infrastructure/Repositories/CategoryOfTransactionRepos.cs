@@ -13,7 +13,7 @@ namespace Optio.Core.Repositories
 
         public CategoryOfTransactionRepos(OptioDB optioDB, CacheService cacheService) :base(optioDB)
         {
-            categoriesOfTransactionRepos = context.Set<Category>();
+            categoriesOfTransactionRepos = Context.Set<Category>();
             this.cacheService = cacheService;
         }
 
@@ -25,46 +25,36 @@ namespace Optio.Core.Repositories
             {
 
                 var category = await categoriesOfTransactionRepos.SingleOrDefaultAsync(i=>i.TransactionCategory == entity.TransactionCategory);
-                if (category == null)
-                {
-                    if (await context.Types.AnyAsync(io => io.Id == entity.TransactionTypeID))
-                    {
-                        await categoriesOfTransactionRepos.AddAsync(entity);
-                        await context.SaveChangesAsync();
-                        var  max=await categoriesOfTransactionRepos.MaxAsync(io => io.Id);
-                        return max;
-                    }
-                }
-                throw new ArgumentException("There is a similar category");
-                
+                if (category != null) throw new ArgumentException("There is a similar category");
+                if (!await Context.Types.AnyAsync(io => io.Id == entity.TransactionTypeId))
+                    throw new ArgumentException("There is a similar category");
+                await categoriesOfTransactionRepos.AddAsync(entity);
+                await Context.SaveChangesAsync();
+                var  max=await categoriesOfTransactionRepos.MaxAsync(io => io.Id);
+                return max;
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
         }
         #endregion
 
-        /*  Func<OptioDB, IEnumerable<Category>> CompiledQueryGetAll =
-           EF.CompileQuery(
-               (OptioDB db) =>
-               db.CategoryOfTransactions
-               .AsNoTracking()
-               .ToList()
-              );*/
 
         #region GetAllAsync
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
             try
             {
-                string cash = "All category";
+                var cash = "All category";
                 await Task.Delay(1);
                 IEnumerable<Category> category = cacheService.GetOrCreate(
                     cash, () =>
                     {
-                        return categoriesOfTransactionRepos.Include(io=>io.typeOfTransaction).AsNoTracking().ToList() ??
+                        return categoriesOfTransactionRepos.Include(io=>io.TypeOfTransaction)
+                                   .AsNoTracking().ToList() ??
                         throw new ArgumentException("No category found");
                     }, TimeSpan.FromMinutes(30)
                     ) ;
@@ -78,24 +68,16 @@ namespace Optio.Core.Repositories
         }
         #endregion
 
-        /* Func<OptioDB,Guid, Category?> CompiledQueryGetById =
-          EF.CompileQuery(
-              (OptioDB db,Guid id) =>
-              db.CategoryOfTransactions
-              .AsNoTracking()
-              .SingleOrDefault(i=>i.Id==id)
-             );*/
-
         #region GetByIdAsync
         public async Task<Category> GetByIdAsync(long id)
         {
             try
             {
-                string cashkey= "category by id";
+                const string cakey = "category by id";
                 await Task.Delay(1);
-                Category category = cacheService.GetOrCreate(
-                    cashkey,() => {
-                     return   context.CategoryOfTransactions.Include(io=>io.typeOfTransaction)
+                var category = cacheService.GetOrCreate(
+                    cakey,() => {
+                     return   Context.CategoryOfTransactions.Include(io=>io.TypeOfTransaction)
                     .Single(i => i.Id == id);
                     }
                     ,TimeSpan.FromMinutes(30)
@@ -117,14 +99,14 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var cat = await categoriesOfTransactionRepos.Include(io=>io.typeOfTransaction).AsNoTracking().Where(i => i.IsActive == true).ToListAsync();
+                var cat = await categoriesOfTransactionRepos.Include(io=>io.TypeOfTransaction).AsNoTracking().Where(i => i.IsActive == true).ToListAsync();
                 if (cat != null)
                 {
                     return cat;
                 }
                 else
                 {
-                    throw new InvalidOperationException("No active category founr");
+                    throw new InvalidOperationException("No active category found");
                 }
 
             }
@@ -143,7 +125,7 @@ namespace Optio.Core.Repositories
             {
                 ArgumentNullException.ThrowIfNull(entity,nameof(entity));
                 categoriesOfTransactionRepos.Remove(entity);
-                await context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
                 return true;
 
             }
@@ -163,12 +145,9 @@ namespace Optio.Core.Repositories
             try
             {
                 var category = await categoriesOfTransactionRepos.FindAsync(id);
-                if (category is null)
-                {
-                    throw new InvalidOperationException("There is no such category");
-                }
+                if (category is null) throw new InvalidOperationException("There is no such category");
                 category.IsActive = false;
-                context.SaveChanges();
+                await Context.SaveChangesAsync();
                 return true;
 
             }
@@ -195,8 +174,8 @@ namespace Optio.Core.Repositories
                 else
                 {
                     category.TransactionCategory = entity.TransactionCategory;
-                    category.TransactionTypeID = entity.TransactionTypeID;
-                    await context.SaveChangesAsync();
+                    category.TransactionTypeId = entity.TransactionTypeId;
+                    await Context.SaveChangesAsync();
                     return true;
                 }
             }

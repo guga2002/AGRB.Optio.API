@@ -13,7 +13,7 @@ namespace Optio.Core.Repositories
 
         public TransactionRepos(OptioDB optioDB, CacheService cache) :base(optioDB)
         {
-            transactions=context.Set<Transaction>();
+            transactions=Context.Set<Transaction>();
             this._cache = cache;
         }
 
@@ -22,19 +22,19 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                if (!await context.CategoryOfTransactions.AnyAsync(io => io.Id == entity.CategoryId) ||
-                    !await context.Currencies.AnyAsync(io => io.Id == entity.CurrencyId) ||
-                     !await context.Locations.AnyAsync(io => io.Id == entity.ChannelId) ||
-                      !await context.Merchants.AnyAsync(io => io.Id == entity.MerchantId))
+                if (!await Context.CategoryOfTransactions.AnyAsync(io => io.Id == entity.CategoryId) ||
+                    !await Context.Currencies.AnyAsync(io => io.Id == entity.CurrencyId) ||
+                     !await Context.Locations.AnyAsync(io => io.Id == entity.ChannelId) ||
+                      !await Context.Merchants.AnyAsync(io => io.Id == entity.MerchantId))
                 {
-                    throw new ArgumentException("No related Table exist, Please   Recorect your data");
+                    throw new ArgumentException("No related Table exist, Please fix your data");
                 }
                 if (await transactions.AnyAsync(io => io.Id == entity.Id))
                 {
                     throw new ArgumentException("Such a Transaction Already Exist In Db");
                 }
                 await transactions.AddAsync(entity);
-                await context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
                 var max =await  transactions.MaxAsync(io => io.Id);
                 return max;
             }
@@ -49,14 +49,7 @@ namespace Optio.Core.Repositories
         #region GetAllAsync
         public async Task<IEnumerable<Transaction>> GetAllAsync()
         {
-            try
-            {
-                return await transactions.AsNoTracking().ToListAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return await transactions.AsNoTracking().ToListAsync();
         }
         #endregion
 
@@ -66,7 +59,7 @@ namespace Optio.Core.Repositories
             try
             {
                 return await  transactions.Include(io => io.Category)
-               .Include(io => io.Channel)
+                .Include(io => io.Channel)
                 .Include(io => io.Currency)
                 .ThenInclude(io => io.Courses)
                 .Include(io => io.Merchant)
@@ -84,9 +77,9 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                string cacheKey = $"Transaction_{id}";
+                var cacheKey = $"Transaction_{id}";
                 await Task.Delay(1);
-                Transaction transaction = _cache.GetOrCreate(cacheKey, () =>
+                var transaction = _cache.GetOrCreate(cacheKey, () =>
                 {
                     return transactions.AsNoTracking()
                         .Single(io => io.IsActive && io.Id == id);
@@ -108,13 +101,13 @@ namespace Optio.Core.Repositories
             try
             {
                 var res = await transactions.Include(io => io.Category)
-                 .Include(io => io.Channel)
-                .Include(io => io.Currency)
-                 .ThenInclude(io => io.Courses)
+                    .Include(io => io.Channel)
+                    .Include(io => io.Currency)
+                    .ThenInclude(io => io.Courses)
                     .Include(io => io.Merchant)
-                     .ThenInclude(io => io.Locations)
+                    .ThenInclude(io => io.Locations)
                     .FirstOrDefaultAsync(io => io.Id == ID);
-                return res ?? throw new ArgumentNullException("no  data  exsit, On this ID");
+                return res ?? throw new ArgumentNullException("No  data  exsit, on this id");
             }
             catch (Exception)
             {
@@ -130,7 +123,7 @@ namespace Optio.Core.Repositories
             {
                 ArgumentNullException.ThrowIfNull(entity);
                 transactions.Remove(entity);
-                await context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -145,14 +138,10 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var res = await transactions.FindAsync(id);
-                if (res is not null)
-                {
-                    res.IsActive = false;
-                    await context.SaveChangesAsync();
-                    return true;
-                }
-                return false;
+                var res = await transactions.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
+                res.IsActive = false;
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (Exception)
             {
@@ -166,14 +155,11 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var tran = await transactions.FindAsync(id);
-                if (tran is not null)
-                {
-                    context.Entry(tran).CurrentValues.SetValues(entity);
-                    await context.SaveChangesAsync();
+                var tran = await transactions.FindAsync(id) ??
+                           throw new InvalidOperationException("No merchant found");
+                    Context.Entry(tran).CurrentValues.SetValues(entity);
+                    await Context.SaveChangesAsync();
                     return true;
-                }
-                return false;
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -194,7 +180,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var res = await transactions.AsNoTracking().Where(io => io.IsActive == true).ToListAsync();
+                var res = await transactions.AsNoTracking().Where(io => io.IsActive).ToListAsync();
                 return res;
             }
             catch (Exception)

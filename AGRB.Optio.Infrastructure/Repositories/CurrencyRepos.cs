@@ -7,12 +7,12 @@ using AbstractClass = Optio.Core.Repositories.AbstractClass;
 
 namespace RGBA.Optio.Core.Repositories
 {
-    public class CurrencyReposiotry : AbstractClass, ICurrencyRepository
+    public class CurrencyRepos : AbstractClass, ICurrencyRepository
     {
         private readonly DbSet<Currency> currencies;
-        public CurrencyReposiotry(OptioDB db):base(db)
+        public CurrencyRepos(OptioDB db):base(db)
         {
-            currencies = context.Set<Currency>();
+            currencies = Context.Set<Currency>();
         }
 
         #region AddAsync
@@ -20,10 +20,10 @@ namespace RGBA.Optio.Core.Repositories
         {
             try
             {
-                if (!await currencies.AnyAsync(io => io.NameOfValute == entity.NameOfValute && io.CurrencyCode == entity.CurrencyCode))
+                if (!await currencies.AnyAsync(io => io.NameOfCurrency == entity.NameOfCurrency && io.CurrencyCode == entity.CurrencyCode))
                 {
                     await currencies.AddAsync(entity);
-                    await context.SaveChangesAsync();
+                    await Context.SaveChangesAsync();
                     var max = await currencies.MaxAsync(io => io.Id);
                     return max;
                 }
@@ -51,7 +51,7 @@ namespace RGBA.Optio.Core.Repositories
 
         public async Task<IEnumerable<Currency>> GetAllActiveAsync()
         {
-            return await currencies.AsNoTracking().Where(io=>io.IsActive == true).ToListAsync();
+            return await currencies.AsNoTracking().Where(io=> io.IsActive).ToListAsync();
         }
 
         #endregion
@@ -62,8 +62,7 @@ namespace RGBA.Optio.Core.Repositories
             try
             {
                 var result = await currencies.FindAsync(id);
-                if (result is null) throw new ArgumentException("no entity found!");
-                return result;
+                return result ?? throw new ArgumentException("no entity found!");
             }
             catch (Exception)
             {
@@ -79,7 +78,7 @@ namespace RGBA.Optio.Core.Repositories
             {
                 ArgumentNullException.ThrowIfNull(entity, nameof(entity));
                 currencies.Remove(entity);
-                await context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -95,14 +94,10 @@ namespace RGBA.Optio.Core.Repositories
         {
             try
             {
-                var res = await currencies.FindAsync(id);
-                if (res is not null)
-                {
-                    res.IsActive = false;
-                    await context.SaveChangesAsync();
-                    return true;
-                }
-                throw new ArgumentException("already the data is  soft deleted or no exist");
+                var res = await currencies.FindAsync(id) ?? throw new ArgumentException("already the data is  soft deleted or no exist");
+                res.IsActive = false;
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (Exception)
             {
@@ -118,15 +113,13 @@ namespace RGBA.Optio.Core.Repositories
             {
                 ArgumentNullException.ThrowIfNull(entity,nameof(entity));
                 var res = await currencies.FindAsync(id);
-                if (res is not null)
-                {
-                    res.CurrencyCode= entity.CurrencyCode;
-                    res.NameOfValute= entity.NameOfValute;
-                    res.IsActive = entity.IsActive;
-                    await context.SaveChangesAsync();
-                    return true;
-                }
-                throw new ArgumentException(" no such  currency exist");
+                if (res is null) throw new ArgumentException(" no such  currency exist");
+                res.CurrencyCode = entity.CurrencyCode;
+                res.NameOfCurrency = entity.NameOfCurrency;
+                res.IsActive = entity.IsActive;
+                await Context.SaveChangesAsync();
+                return true;
+
             }
             catch (DbUpdateConcurrencyException)
             {
