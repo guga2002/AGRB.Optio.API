@@ -11,21 +11,19 @@ namespace RGBA.Optio.UI.Reflections
             {
                 throw new ArgumentNullException(nameof(assembly), "Assembly cannot be null");
             }
-            var assemb = assembly.GetTypes().Where(i =>
-            !i.IsInterface&&
-            !i.IsAbstract &&
-            !i.IsGenericTypeDefinition &&
+            var types = assembly.GetTypes().Where(i =>
+            i is { IsInterface: false, IsAbstract: false, IsGenericTypeDefinition: false } &&
             i.Name.Contains("Repos",StringComparison.OrdinalIgnoreCase)
             );
 
-            foreach( var type in assemb )
+            foreach( var type in types)
             {
-                var interfaceRepository = type.GetInterfaces();
-                if(interfaceRepository.Count()==0)
+                var interfaces = type.GetInterfaces().ToList();
+                if(interfaces.Count == 0)
                 {
                     continue;
                 }
-                foreach (var item in interfaceRepository)
+                foreach (var item in interfaces)
                 {
                     collection.AddScoped(item, type);
                 }

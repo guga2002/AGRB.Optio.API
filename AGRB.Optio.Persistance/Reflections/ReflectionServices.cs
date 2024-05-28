@@ -13,9 +13,7 @@ namespace RGBA.Optio.UI.Reflections
             }
 
             var types = assembly.GetTypes().Where(type =>
-                   !type.IsAbstract &&
-                   !type.IsGenericTypeDefinition &&
-                   !type.IsInterface &&
+                   type is { IsAbstract: false, IsGenericTypeDefinition: false, IsInterface: false } &&
                    type.Name.Contains("Service", StringComparison.OrdinalIgnoreCase)).ToList();
 
             foreach (var type in types)
@@ -26,9 +24,9 @@ namespace RGBA.Optio.UI.Reflections
                     continue;
                 }
 
-                foreach (var iface in interfaces)
+                foreach (var iFace in interfaces)
                 {
-                    collection.AddScoped(iface, type);
+                    collection.AddScoped(iFace, type);
                 }
             }
         }
