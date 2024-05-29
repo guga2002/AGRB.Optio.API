@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AGRB.Optio.API.StaticFiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RGBA.Optio.Domain.Custom_Exceptions;
 using RGBA.Optio.Domain.Interfaces;
@@ -8,15 +9,9 @@ namespace RGBA.Optio.UI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "ADMIN")]
-    public class AdminPanellController : ControllerBase
+    public class AdminPanelController(IAdminPanelService panel, ILogger<AdminPanelController> co) : ControllerBase
     {
-        private readonly IAdminPanelService panel;
-        private readonly ILogger<AdminPanellController> log;
-        public AdminPanellController(IAdminPanelService panel,ILogger<AdminPanellController> co)
-        {
-            this.panel = panel;
-            this.log = co;
-        }
+
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> Roles()
@@ -28,8 +23,8 @@ namespace RGBA.Optio.UI.Controllers
             }
             catch (Exception exp)
             {
-                log.LogCritical(exp.Message);
-                return StatusCode(503, "Internal Server Errror");
+                co.LogCritical(exp.Message);
+                return StatusCode(503, ErrorKeys.InternalServerError);
             }
         }
 
@@ -44,8 +39,8 @@ namespace RGBA.Optio.UI.Controllers
             }
             catch (Exception exp)
             {
-                log.LogCritical(exp.Message);
-                return StatusCode(503, "Internal Server Errror");
+                co.LogCritical(exp.Message);
+                return StatusCode(503, ErrorKeys.InternalServerError);
             }
         }
 
@@ -64,8 +59,8 @@ namespace RGBA.Optio.UI.Controllers
             }
             catch (Exception exp)
             {
-                log.LogCritical(exp.Message);
-                return StatusCode(503, "Internal Server Errror");
+                co.LogCritical(exp.Message);
+                return StatusCode(503, ErrorKeys.InternalServerError);
             }
         }
 
@@ -84,8 +79,8 @@ namespace RGBA.Optio.UI.Controllers
             }
             catch (Exception exp)
             {
-                log.LogCritical(exp.Message);
-                return StatusCode(503, "Internal Server Errror");
+                co.LogCritical(exp.Message);
+                return StatusCode(503, ErrorKeys.InternalServerError);
             }
         }
 
@@ -104,8 +99,8 @@ namespace RGBA.Optio.UI.Controllers
             }
             catch (Exception exp)
             {
-                log.LogCritical(exp.Message);
-                return StatusCode(503, "Internal Server Errror");
+                co.LogCritical(exp.Message);
+                return StatusCode(503, ErrorKeys.InternalServerError);
             }
         }
 
@@ -124,8 +119,8 @@ namespace RGBA.Optio.UI.Controllers
             }
             catch (Exception exp)
             {
-                log.LogCritical(exp.Message);
-                return StatusCode(503, "Internal Server Errror");
+                co.LogCritical(exp.Message);
+                return StatusCode(503, ErrorKeys.InternalServerError);
             }
         }
     }

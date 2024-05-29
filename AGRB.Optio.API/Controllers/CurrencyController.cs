@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AGRB.Optio.API.StaticFiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RGBA.Optio.Domain.Custom_Exceptions;
 using RGBA.Optio.Domain.Interfaces;
@@ -12,8 +13,8 @@ namespace RGBA.Optio.UI.Controllers
     public class CurrencyController(ICurrencyRelatedService se, ILogger<CurrencyController> log) : ControllerBase 
     {
         [HttpPost]
-        [Route("currency")]
-        public async Task<IActionResult> Add([FromBody]CurrencyModel entity)
+        [Route(nameof(AddCurrency))]
+        public async Task<IActionResult> AddCurrency([FromBody]CurrencyModel entity)
         {
             try
             {
@@ -26,7 +27,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     return Ok(entity);
                 }
-                return BadRequest("bad request");
+                return BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
             {
@@ -34,9 +35,10 @@ namespace RGBA.Optio.UI.Controllers
                 return BadRequest(exp.Message);
             }
         }
+
         [HttpPost]
-        [Route(nameof(AddCurrency))] 
-        public async  Task<IActionResult> AddCurrency([FromBody]ExchangeRateModel entity)
+        [Route(nameof(AddExchangeRate))] 
+        public async  Task<IActionResult> AddExchangeRate([FromBody]ExchangeRateModel entity)
         {
             try
             {
@@ -49,7 +51,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     return Ok(entity.DateOfExchangeRate.ToShortTimeString());
                 }
-                return BadRequest("bad request");
+                return BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
             {
@@ -59,8 +61,8 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpGet]
-        [Route("currency/active")]
-        public async Task<IActionResult> GetAllActiveAsync()
+        [Route(nameof(GetAllActiveCurrencyAsync))]
+        public async Task<IActionResult> GetAllActiveCurrencyAsync()
         {
             try
             {
@@ -75,8 +77,8 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpGet]
-        [Route("Currency/active")]
-        public async Task<IActionResult> AllActiveCurrency()
+        [Route(nameof(AllActiveExchangeRate))]
+        public async Task<IActionResult> AllActiveExchangeRate()
         {
             try
             {
@@ -91,8 +93,8 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpGet]
-        [Route("currency")]
-        public async Task<IActionResult> GetAllAsync()
+        [Route(nameof(GetAllCurrencyAsync))]
+        public async Task<IActionResult> GetAllCurrencyAsync()
         {
             try
             {
@@ -107,8 +109,8 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpGet]
-        [Route("valute")]
-        public async Task<IActionResult> GetAllValuteAsync()
+        [Route(nameof(GetAllExchangeRateAsync))]
+        public async Task<IActionResult> GetAllExchangeRateAsync()
         {
             try
             {
@@ -123,7 +125,7 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpGet()]
-        [Route("currency/{id:int}")]
+        [Route("Currency/{id:int}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
         {
             try
@@ -139,7 +141,7 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpGet]
-        [Route("valute/{id:long}")]
+        [Route("ExchangeRate/{id:long}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute]long id)
         {
             try
@@ -155,7 +157,7 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpDelete]
-        [Route("currency/{id:int}")]
+        [Route("Currency/{id:int}")]
         public async Task<IActionResult> RemoveCurrencyAsync([FromRoute]int id )
         {
             try
@@ -175,8 +177,8 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpDelete]
-        [Route("valute/{id:long}")]
-        public  async Task<IActionResult> RemoveValuteAsync([FromRoute] long id)
+        [Route("ExchangeRate/{id:long}")]
+        public  async Task<IActionResult> RemoveExchangeRateAsync([FromRoute] long id)
         {
             try
             {
@@ -195,7 +197,7 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpPatch]
-        [Route("currency/{id:int}/[action]")]
+        [Route("Currency/{id:int}/[action]")]
         public async Task<IActionResult> SoftDelete([FromRoute]int id)
         {
             try
@@ -211,7 +213,7 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpPatch]
-        [Route("valute/{id:long}/[action]")]
+        [Route("ExchangeRate/{id:long}/[action]")]
         public async Task<IActionResult> SoftDelete([FromRoute] long id)
         {
             try
@@ -230,8 +232,9 @@ namespace RGBA.Optio.UI.Controllers
                 return BadRequest(exp.Message);
             }
         }
+
         [HttpPut]
-        [Route("currency/{id:int}")]
+        [Route("Currency/{id:int}")]
         public async Task<IActionResult> UpdateAsync([FromRoute] int id,[FromBody]CurrencyModel entity)
         {
             try
@@ -247,7 +250,7 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpPut]
-        [Route("valute/{id:long}")]
+        [Route("ExchangeRate/{id:long}")]
         public async Task<IActionResult> UpdateAsync([FromRoute] long id,[FromBody]ExchangeRateModel mod)
         {
             try
@@ -261,5 +264,7 @@ namespace RGBA.Optio.UI.Controllers
                 return BadRequest(exp.Message);
             }
         }
+
     }
 }
+

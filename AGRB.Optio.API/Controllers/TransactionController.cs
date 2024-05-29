@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AGRB.Optio.API.StaticFiles;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using RGBA.Optio.Domain.Interfaces;
 using RGBA.Optio.Domain.Models;
@@ -7,26 +8,20 @@ namespace RGBA.Optio.UI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TransactionController : ControllerBase
+    public class TransactionController(
+        ITransactionService transactionService,
+        ILogger<TransactionController> logger,
+        IMemoryCache memoryCache)
+        : ControllerBase
     {
-        private readonly ITransactionService transactionService;
-        private readonly ILogger<TransactionController> logger;
-        private readonly IMemoryCache memoryCache;
-
-        public TransactionController(ITransactionService transactionService, ILogger<TransactionController> logger, IMemoryCache memoryCache)
-        {
-            this.transactionService = transactionService;
-            this.logger = logger;
-            this.memoryCache = memoryCache;
-        }
-
         [HttpGet]
-        public async Task<IActionResult> Get()
+        [Route(nameof(GetTransaction))]
+        public async Task<IActionResult> GetTransaction()
         {
             try
             {
-                string cachekey = "GetAllTransaction";
-                if (memoryCache.TryGetValue(cachekey, out IEnumerable<TransactionModel>? value))
+                const string cacheKey = "GetAllTransaction";
+                if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
                 {
                     return Ok(value);
                 }
@@ -45,9 +40,9 @@ namespace RGBA.Optio.UI.Controllers
 
                     if (!res.Any())
                     {
-                        return NotFound("data no exist");
+                        return NotFound(ErrorKeys.NotFound);
                     }
-                    memoryCache.Set(cachekey, res, TimeSpan.FromMinutes(20));
+                    memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
                     return Ok(res);
                 }
             }
@@ -60,11 +55,11 @@ namespace RGBA.Optio.UI.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> AllActive()
+        public async Task<IActionResult> AllActiveTransaction()
         {
             try
             {
-                string cacheKey = "AllActiveTransaction";
+                const string cacheKey = "AllActiveTransaction";
                 if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
                 {
                     return Ok(value);
@@ -83,7 +78,7 @@ namespace RGBA.Optio.UI.Controllers
                     });
                     if (res is null)
                     {
-                        return NotFound();
+                        return NotFound(ErrorKeys.NotFound);
                     }
                     memoryCache.Set(res, cacheKey, TimeSpan.FromMinutes(20));
                     return Ok(res);
@@ -102,30 +97,28 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                string cachekey = $"TransactionById: {id}";
-                if (memoryCache.TryGetValue(cachekey, out var value))
+                var cacheKey = $"TransactionById: {id}";
+                if (memoryCache.TryGetValue(cacheKey, out var value))
                 {
                     return Ok(value);
                 }
-                else
+
+                var res = await transactionService.GetByIdAsync(id, new TransactionModel
                 {
-                    var res = await transactionService.GetByIdAsync(id, new TransactionModel
-                    {
-                        Amount = 0,
-                        CategoryId = 0,
-                        ChannelId = 0,
-                        MerchantId = 0,
-                        CurrencyNameId = 0,
-                        Date = DateTime.Now,
-                        EquivalentInGel = 0
-                    });
-                    if (res is null)
-                    {
-                        return NotFound();
-                    }
-                    memoryCache.Set(cachekey, res, TimeSpan.FromMinutes(20));
-                    return Ok(res);
+                    Amount = 0,
+                    CategoryId = 0,
+                    ChannelId = 0,
+                    MerchantId = 0,
+                    CurrencyNameId = 0,
+                    Date = DateTime.Now,
+                    EquivalentInGel = 0
+                });
+                if (res is null)
+                {
+                    return NotFound();
                 }
+                memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
+                return Ok(res);
             }
             catch (Exception ex)
             {
@@ -135,20 +128,18 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insert([FromBody]TransactionModel model)
+        [Route(nameof(InsertTransaction))]
+        public async Task<IActionResult> InsertTransaction([FromBody]TransactionModel model)
         {
             try
             {
-                if (ModelState.IsValid && model is not null)
+                if (!ModelState.IsValid || model is null) return BadRequest(model);
+                var res=await transactionService.AddAsync(model);
+                if (res != -1)
                 {
-                    var res=await transactionService.AddAsync(model);
-                    if (res != -1)
-                    {
-                        return Ok(res);
-                    }
-                    return StatusCode(405);
+                    return Ok(res);
                 }
-                return BadRequest(model);
+                return StatusCode(405);
             }
             catch (Exception ex)
             {
@@ -158,8 +149,8 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpDelete]
-        [Route("transaction/{id:long}")]
-        public async Task<IActionResult> Delete([FromRoute]long id)
+        [Route("[action]/{id:long}")]
+        public async Task<IActionResult> DeleteTransaction([FromRoute]long id)
         {
             try
             {
@@ -173,7 +164,7 @@ namespace RGBA.Optio.UI.Controllers
                     EquivalentInGel = 4,
                     MerchantId = 0
                 });
-                return rek == true ? Ok("succesfully deleted") : BadRequest("warumatebeli");
+                return rek ? Ok(SuccessKeys.Success) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception ex)
             {
@@ -188,25 +179,22 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid) return BadRequest();
+                var res =await transactionService.SoftDeleteAsync(id, new TransactionModel
                 {
-                    var res =await transactionService.SoftDeleteAsync(id, new TransactionModel
-                    {
-                        Amount = 0,
-                        CategoryId = 0,
-                        ChannelId = 0,
-                        MerchantId = 0,
-                        CurrencyNameId = 0,
-                        Date = DateTime.Now,
-                        EquivalentInGel = 0
-                    });
-                    if (res)
-                    {
-                        return Ok(res);
-                    }
-                    return StatusCode(405);
+                    Amount = 0,
+                    CategoryId = 0,
+                    ChannelId = 0,
+                    MerchantId = 0,
+                    CurrencyNameId = 0,
+                    Date = DateTime.Now,
+                    EquivalentInGel = 0
+                });
+                if (res)
+                {
+                    return Ok(res);
                 }
-                return BadRequest();
+                return StatusCode(405);
             }
             catch (Exception ex)
             {
@@ -216,21 +204,18 @@ namespace RGBA.Optio.UI.Controllers
         }
 
         [HttpPut]
-        [Route("Transaction/{id:long}/[action]")]
-        public async Task<IActionResult> Update([FromRoute]long id, [FromBody]TransactionModel transactionModel)
+        [Route("[action]/{id:long}/[action]")]
+        public async Task<IActionResult> UpdateTransaction([FromRoute]long id, [FromBody]TransactionModel transactionModel)
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid) return BadRequest(transactionModel);
+                var res = await transactionService.UpdateAsync(id, transactionModel);
+                if (res)
                 {
-                    var res = await transactionService.UpdateAsync(id, transactionModel);
-                    if (res)
-                    {
-                        return Ok(res);
-                    }
-                    return StatusCode(405);
+                    return Ok(res);
                 }
-                return BadRequest(transactionModel);
+                return StatusCode(405);
             }
             catch (Exception ex)
             {

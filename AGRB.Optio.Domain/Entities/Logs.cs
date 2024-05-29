@@ -1,8 +1,9 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace AGRB.Optio.Domain.Entities
 {
-    public class Logs:BsonDocument
+    public class Logs
     {
         public Logs()
         {
@@ -14,6 +15,8 @@ namespace AGRB.Optio.Domain.Entities
             Message = message;
         }
 
+        [BsonId]
+        public ObjectId Id { get; set; }    
         public string? LogLevel { get; set; }
 
         public string? Message { get; set; }

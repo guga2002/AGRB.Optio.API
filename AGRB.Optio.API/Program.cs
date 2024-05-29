@@ -14,6 +14,13 @@ using Microsoft.OpenApi.Models;
 using RGBA.Optio.Domain.Services.Outer_Services;
 using RGBA.Optio.UI.Reflections;
 using System.Reflection;
+using Optio.Core.Interfaces;
+using Optio.Core.Repositories;
+using RGBA.Optio.Domain.Interfaces;
+using RGBA.Optio.Domain.Interfaces.StatisticInterfaces;
+using RGBA.Optio.Domain.Services;
+using RGBA.Optio.Domain.Services.StatisticServices;
+using RGBA.Optio.Domain.Services.TransactionRelated;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,22 +57,22 @@ builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 builder.Services.AddScoped<IUniteOfWork, UniteOfWork>();
 #region addScoppedManually
-/*builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
+builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
 builder.Services.AddScoped<IChannelRepo, ChannelRepos>();
 builder.Services.AddScoped<ILocationRepo, LocationRepos>();
 builder.Services.AddScoped<IMerchantRepo, MerchantRepos>();
 builder.Services.AddScoped<ITransactionRepo, TransactionRepos>();
-builder.Services.AddScoped<ITypeOfTransactionRepo, TypeOfTransactionRepos>();*/
+builder.Services.AddScoped<ITypeOfTransactionRepo, TypeOfTransactionRepos>();
 
 
-/*builder.Services.AddScoped<IAdminPanelService, AdminPanelService>();
+builder.Services.AddScoped<IAdminPanelService, AdminPanelService>();
 builder.Services.AddScoped<IStatisticMerchantRelatedService, StatisticMerchantRelatedService>();
 builder.Services.AddScoped<IStatisticTransactionRelatedService, StatisticTransactionRelatedService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICurrencyRelatedService,CurrencyRelatedService>();
 builder.Services.AddScoped<IMerchantRelatedService, MerchantRelatedService>();
 builder.Services.AddScoped<ITransactionRelatedService, TransactionRelatedService>();
-builder.Services.AddScoped<ILocationToMerchantRepository,LocationToMerchantRepos>();*/
+builder.Services.AddScoped<ILocationToMerchantRepository,LocationToMerchantRepos>();
 
 #endregion
 
