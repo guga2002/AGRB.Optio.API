@@ -1,8 +1,12 @@
 ﻿using AGRB.Optio.API.StaticFiles;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RGBA.Optio.Domain.Custom_Exceptions;
 using RGBA.Optio.Domain.Interfaces;
+using RGBA.Optio.Domain.Models;
+using RGBA.Optio.Domain.Models.RequestModels;
+using RGBA.Optio.Domain.Responses;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -14,39 +18,39 @@ namespace RGBA.Optio.UI.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> Roles()
+        public async Task<Response<IEnumerable<RoleModel>>> Roles()
         {
             try
             {
                var res= await panel.GetAllRoles();
-                return Ok(res);
+                return  Response<IEnumerable<RoleModel>>.Ok(res);
             }
             catch (Exception exp)
             {
                 co.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response < IEnumerable < RoleModel >>.Error(exp.Message,exp.StackTrace,ErrorKeys.InternalServerError);
             }
         }
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> Users()
+        public async Task<Response<IEnumerable<UserModel>>> Users()
         {
             try
             {
                 var res = await panel.GetAllUser();
-                return Ok(res);
+                return Response<IEnumerable<UserModel>>.Ok (res);
             }
             catch (Exception exp)
             {
                 co.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<IEnumerable<UserModel>>.Error(exp.Message,exp.StackTrace,ErrorKeys.InternalServerError);
             }
         }
 
         [HttpDelete]
         [Route("Role/{role:alpha}/[action]")]
-        public async Task<IActionResult> Delete([FromRoute]string role)
+        public async Task<Response<IdentityResult>> Delete([FromRoute]string role)
         {
             try
             {
@@ -55,18 +59,18 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(role);
                 }
                 var res=await panel.DeleteRole(role);
-                return Ok(res);
+                return Response<IdentityResult>.Ok(res);
             }
             catch (Exception exp)
             {
                 co.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+              return  Response<IdentityResult>.Error(exp.Message, exp.StackTrace);
             }
         }
 
         [HttpPost]
         [Route("Role/{role:alpha}/[action]")]
-        public async Task<IActionResult> Add([FromRoute]string role)
+        public async Task<Response<IdentityResult>> Add([FromRoute]string role)
         {
             try
             {
@@ -75,18 +79,18 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(role);
                 }
                 var res = await panel.AddRolesAsync(role);
-                return Ok(res);
+                return Response<IdentityResult>.Ok(res);
             }
             catch (Exception exp)
             {
                 co.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<IdentityResult>.Error(exp.Message,exp.StackTrace, ErrorKeys.InternalServerError);
             }
         }
 
         [HttpDelete]
         [Route("User/{id}/[action]")]
-        public async Task<IActionResult> DeleteUser([FromRoute]string id)
+        public async Task<Response<IdentityResult>> DeleteUser([FromRoute]string id)
         {
             try
             {
@@ -95,18 +99,18 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(id);
                 }
                 var res = await panel.DeleteUser(id);
-                return Ok(res);
+                return Response<IdentityResult>.Ok(res);
             }
             catch (Exception exp)
             {
                 co.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<IdentityResult>.Error(exp.Message, exp.StackTrace, ErrorKeys.InternalServerError);
             }
         }
 
         [HttpPost]
         [Route("User/{userid}[action]/{role:alpha}")]
-        public async Task<IActionResult> Role([FromRoute] string userid,[FromRoute]string role)
+        public async Task<Response<IdentityResult>> Role([FromRoute] string userid,[FromRoute]string role)
         {
             try
             {
@@ -115,12 +119,12 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(role);
                 }
                 var res = await panel.AssignRoleToUserAsync(userid,role);
-                return Ok(res);
+                return Response<IdentityResult>.Ok(res);
             }
             catch (Exception exp)
             {
                 co.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<IdentityResult>.Error(exp.Message,exp.StackTrace, ErrorKeys.InternalServerError);
             }
         }
     }
