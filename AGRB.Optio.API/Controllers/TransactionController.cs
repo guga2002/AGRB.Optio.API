@@ -38,7 +38,7 @@ namespace RGBA.Optio.UI.Controllers
                         CategoryId = 0,
                         ChannelId = 0,
                         MerchantId = 0,
-                        CurencyNameId = 0,
+                        CurrencyNameId = 0,
                         Date = DateTime.Now,
                         EquivalentInGel = 0
                     });
@@ -77,7 +77,7 @@ namespace RGBA.Optio.UI.Controllers
                         CategoryId = 0,
                         ChannelId = 0,
                         MerchantId = 0,
-                        CurencyNameId = 0,
+                        CurrencyNameId = 0,
                         Date = DateTime.Now,
                         EquivalentInGel = 0
                     });
@@ -115,7 +115,7 @@ namespace RGBA.Optio.UI.Controllers
                         CategoryId = 0,
                         ChannelId = 0,
                         MerchantId = 0,
-                        CurencyNameId = 0,
+                        CurrencyNameId = 0,
                         Date = DateTime.Now,
                         EquivalentInGel = 0
                     });
@@ -169,7 +169,7 @@ namespace RGBA.Optio.UI.Controllers
                     Date = DateTime.Now,
                     CategoryId = 0,
                     ChannelId = 0,
-                    CurencyNameId = 0,
+                    CurrencyNameId = 0,
                     EquivalentInGel = 4,
                     MerchantId = 0
                 });
@@ -196,7 +196,7 @@ namespace RGBA.Optio.UI.Controllers
                         CategoryId = 0,
                         ChannelId = 0,
                         MerchantId = 0,
-                        CurencyNameId = 0,
+                        CurrencyNameId = 0,
                         Date = DateTime.Now,
                         EquivalentInGel = 0
                     });

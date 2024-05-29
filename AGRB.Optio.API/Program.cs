@@ -49,7 +49,6 @@ builder.Services.AddScoped<RoleManager<IdentityRole>>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 builder.Services.AddScoped<IUniteOfWork, UniteOfWork>();
-
 #region addScoppedManually
 /*builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
 builder.Services.AddScoped<IChannelRepo, ChannelRepos>();

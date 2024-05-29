@@ -36,18 +36,18 @@ namespace RGBA.Optio.UI.Controllers
         }
         [HttpPost]
         [Route(nameof(AddCurrency))] 
-        public async  Task<IActionResult> AddCurrency([FromBody]ValuteModel entity)
+        public async  Task<IActionResult> AddCurrency([FromBody]ExchangeRateModel entity)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    throw new OptioGeneralException(entity.DateOfValuteCourse.ToShortDateString());
+                    throw new OptioGeneralException(entity.DateOfExchangeRate.ToShortDateString());
                 }
                 var res = await se.AddAsync(entity);
                 if (res != -1)
                 {
-                    return Ok(entity.DateOfValuteCourse.ToShortTimeString());
+                    return Ok(entity.DateOfExchangeRate.ToShortTimeString());
                 }
                 return BadRequest("bad request");
             }
@@ -64,7 +64,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res =await se.GetAllActiveAsync(new CurrencyModel() { CurrencyCode="Undefined",NameOfValute="Undefined"});
+                var res =await se.GetAllActiveAsync(new CurrencyModel() { CurrencyCode="Undefined",NameOfCurrency="Undefined"});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -80,7 +80,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new ValuteModel() { DateOfValuteCourse=DateTime.Now,ExchangeRate=0,CurrencyID=0});
+                var res = await se.GetAllActiveAsync(new ExchangeRateModel() { DateOfExchangeRate=DateTime.Now,ExchangeRate=0,CurrencyId=0});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -96,7 +96,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new CurrencyModel() {CurrencyCode="Undefined",NameOfValute="Undefined"});
+                var res = await se.GetAllAsync(new CurrencyModel() {CurrencyCode="Undefined",NameOfCurrency="Undefined"});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -112,7 +112,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new ValuteModel() { CurrencyID = 0, ExchangeRate = 0, DateOfValuteCourse = DateTime.Now });
+                var res = await se.GetAllAsync(new ExchangeRateModel() { CurrencyId = 0, ExchangeRate = 0, DateOfExchangeRate = DateTime.Now });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -128,7 +128,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new CurrencyModel() { CurrencyCode = "Undefined",NameOfValute="Undefined"});
+                var res = await se.GetByIdAsync(id, new CurrencyModel() { CurrencyCode = "Undefined",NameOfCurrency="Undefined"});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -144,7 +144,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new ValuteModel() {CurrencyID=0,ExchangeRate=0,DateOfValuteCourse=DateTime.Now});
+                var res = await se.GetByIdAsync(id, new ExchangeRateModel() {CurrencyId=0,ExchangeRate=0,DateOfExchangeRate=DateTime.Now});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -160,7 +160,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var rek = await se.RemoveAsync(id, new CurrencyModel() { CurrencyCode = "Undefined", NameOfValute = "Undefined" });
+                var rek = await se.RemoveAsync(id, new CurrencyModel() { CurrencyCode = "Undefined", NameOfCurrency = "Undefined" });
                 if (rek)
                 {
                     return Ok(rek);
@@ -180,7 +180,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new ValuteModel());
+                var res = await se.RemoveAsync(id, new ExchangeRateModel());
                 if (res)
                 {
                     return Ok(res);
@@ -200,7 +200,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.SoftDeleteAsync(id,new CurrencyModel() { CurrencyCode="undefined",NameOfValute="undefined"});
+                var res = await se.SoftDeleteAsync(id,new CurrencyModel() { CurrencyCode="undefined",NameOfCurrency="undefined"});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -216,7 +216,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.SoftDeleteAsync(id, new ValuteModel() {CurrencyID=0,ExchangeRate=0,DateOfValuteCourse=DateTime.Now});
+                var res = await se.SoftDeleteAsync(id, new ExchangeRateModel() {CurrencyId=0,ExchangeRate=0,DateOfExchangeRate=DateTime.Now});
                 if (res)
                 {
                     return Ok(res);
@@ -248,7 +248,7 @@ namespace RGBA.Optio.UI.Controllers
 
         [HttpPut]
         [Route("valute/{id:long}")]
-        public async Task<IActionResult> UpdateAsync([FromRoute] long id,[FromBody]ValuteModel mod)
+        public async Task<IActionResult> UpdateAsync([FromRoute] long id,[FromBody]ExchangeRateModel mod)
         {
             try
             {

@@ -7,21 +7,21 @@ namespace RGBA.Optio.Domain.Interfaces
     public interface IAdminPanelService
     {
         Task<IdentityResult> DeleteRole(string role);
-        Task<UserModel> Info(string Username);  
+        Task<UserModel> Info(string username);  
         Task<bool> ForgetPassword(string email, string newPassword); 
-        Task<bool> RefreshToken(string Username,string token);
-        Task<IdentityResult> RegisterUserAsync(UserModel User, string Password);
+        Task<bool> RefreshToken(string username,string token);
+        Task<IdentityResult> RegisterUserAsync(UserModel user, string password);
         Task<(SignInResult, string)> SignInAsync(SignInModel mod);
-        Task<IdentityResult> AddRolesAsync(string RoleName);
-        Task<IdentityResult> AssignRoleToUserAsync(string UserId, string Role);
+        Task<IdentityResult> AddRolesAsync(string roleName);
+        Task<IdentityResult> AssignRoleToUserAsync(string userId, string role);
         Task<IdentityResult> ResetPasswordAsync(PasswordResetModel arg,string username);
-        Task<bool> SignOutAsync(string Username);
+        Task<bool> SignOutAsync(string username);
         Task<IdentityResult> DeleteUser(string id);
         Task<IEnumerable<RoleModel>> GetAllRoles();
         Task<IEnumerable<UserModel>> GetAllUser();
-        Task<bool> isEmailConfirmed(string email);
-        Task<bool> ConfirmMail(string Username,string mail);
-        Task<bool> sendlinktouser(string name, string link);
+        Task<bool> IsEmailConfirmed(string email);
+        Task<bool> ConfirmMail(string username,string mail);
+        Task<bool> SendLinkToUser(string name, string link);
         Task<bool> IsUserExist(string email);
     }
 }

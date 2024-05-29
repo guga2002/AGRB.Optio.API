@@ -1,13 +1,12 @@
 ﻿using RGBA.Optio.Domain.Interfaces.InterfacesForTransaction;
 using RGBA.Optio.Domain.Models;
-using System.Numerics;
 
 namespace RGBA.Optio.Domain.Interfaces
 {
-    public interface ICurrencyRelatedService:IAddInfo<CurrencyModel>,IAddInfo<ValuteModel>,
-        IGetInfo<CurrencyModel, int>,IGetInfo<ValuteModel, long>,
-        IRemoveInfo<CurrencyModel,int>,IRemoveInfo<ValuteModel, long>,
-        IUpdateInfo<CurrencyModel,int>,IUpdateInfo<ValuteModel, long>
+    public interface ICurrencyRelatedService:IAddInfo<CurrencyModel>,IAddInfo<ExchangeRateModel>,
+        IGetInfo<CurrencyModel, int>,IGetInfo<ExchangeRateModel, long>,
+        IRemoveInfo<CurrencyModel,int>,IRemoveInfo<ExchangeRateModel, long>,
+        IUpdateInfo<CurrencyModel,int>,IUpdateInfo<ExchangeRateModel, long>
     {
 
     }

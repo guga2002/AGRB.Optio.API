@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace RGBA.Optio.Domain.Models.RequestModels
 {
     public class DateRangeRequestModel
     {
-        public DateTime start { get; set; }
+        public DateTime Start { get; set; }
 
-        public DateTime end { get; set; }
+        public DateTime End { get; set; }
     }
 }

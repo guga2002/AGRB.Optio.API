@@ -16,35 +16,27 @@ using System.Text;
 
 namespace RGBA.Optio.Domain.Services
 {
-    public class AdminPanelService : IAdminPanelService
+    public class AdminPanelService(
+        IHttpContextAccessor _httpContextAccessor,
+        IMapper map,
+        SignInManager<User> signin,
+        UserManager<User> userManager,
+        RoleManager<IdentityRole> role,
+        SmtpService smtp)
+        : IAdminPanelService
     {
-        private readonly RoleManager<IdentityRole> role;
-        private readonly SignInManager<User> signin;
-        private readonly UserManager<User> userManager;
-        private readonly IMapper map;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly SmtpService smtp;
-        public AdminPanelService(IHttpContextAccessor _httpContextAccessor, IMapper map, SignInManager<User> signin, UserManager<User> userManager,RoleManager<IdentityRole> rol, SmtpService smtp)
-        {
-            this.signin = signin;
-            this.userManager = userManager;
-            role = rol;
-            this.map = map;
-            this._httpContextAccessor = _httpContextAccessor;
-            this.smtp = smtp;
-        }
-
         #region AddRolesAsync
 
-        public async Task<IdentityResult> AddRolesAsync(string RoleName)
+        public async Task<IdentityResult> AddRolesAsync(string roleName)
         {
             try
             {
-                if(string.IsNullOrEmpty(RoleName)||RoleName.Length<=3)
+                if (string.IsNullOrEmpty(roleName) || roleName.Length <= 3)
                 {
-                    throw new OptioGeneralException(RoleName);
+                    throw new OptioGeneralException(roleName);
                 }
-                var res = await role.CreateAsync(new IdentityRole(RoleName));
+
+                var res = await role.CreateAsync(new IdentityRole(roleName));
                 return res;
             }
             catch (Exception)
@@ -53,18 +45,22 @@ namespace RGBA.Optio.Domain.Services
                 throw;
             }
         }
+
         #endregion
 
         #region isEmailConfirmed
-        public async Task<bool> isEmailConfirmed(string email)
+
+        public async Task<bool> IsEmailConfirmed(string email)
         {
             var res = await userManager.FindByNameAsync(email);
-            if(res is not null)
+            if (res is not null)
             {
                 return await userManager.IsEmailConfirmedAsync(res);
             }
+
             return false;
         }
+
         #endregion
 
         #region IsUserExist
@@ -72,30 +68,30 @@ namespace RGBA.Optio.Domain.Services
         public async Task<bool> IsUserExist(string email)
         {
             var res = await userManager.FindByEmailAsync(email);
-          
-            if(res is not null)
-            {
-                return true;
-            }
-            return false;
+
+            return res is not null;
         }
+
         #endregion
 
         #region ConfirmMail
-        public async Task<bool> ConfirmMail(string Username, string mail)
+
+        public async Task<bool> ConfirmMail(string username, string mail)
         {
             try
             {
-                var user = await userManager.FindByNameAsync(Username);
-                if (user is not null&&user.UserName is not null)
+                var user = await userManager.FindByNameAsync(username);
+                if (user is not null && user.UserName is not null)
                 {
-                    if (await isEmailConfirmed(user.UserName))
+                    if (await IsEmailConfirmed(user.UserName))
                     {
                         return false;
                     }
+
                     await userManager.ConfirmEmailAsync(user, mail);
                     return true;
                 }
+
                 return false;
             }
             catch (Exception)
@@ -104,12 +100,14 @@ namespace RGBA.Optio.Domain.Services
                 throw;
             }
         }
+
         #endregion
 
         #region sendlinktouser
-        public async Task<bool> sendlinktouser(string name, string link)
+
+        public async Task<bool> SendLinkToUser(string name, string link)
         {
-            var res=await userManager.FindByNameAsync(name);
+            var res = await userManager.FindByNameAsync(name);
             if (res == null || res.Email is null) return false;
             var body = $@"
                   <div align='center' style='font-family: Arial, sans-serif;'>
@@ -123,159 +121,131 @@ namespace RGBA.Optio.Domain.Services
                   <h2 style='font-size: 16px;color:red;'>თუ თქვენ  არ გამოგიგზავნიათ მოთხოვნა, გთხოვთ დაგვიკავშირდეთ!</h2>
                 </div>";
 
-            smtp.SendMessage(res.Email, "დაადასტურე მეილი"+' '+DateTime.Now.Hour+':'+DateTime.Now.Minute, body);
+            smtp.SendMessage(res.Email, "დაადასტურე მეილი" + ' ' + DateTime.Now.Hour + ':' + DateTime.Now.Minute, body);
             return true;
         }
+
         #endregion
 
         #region AssignRoleToUserAsync
 
-        public async Task<IdentityResult> AssignRoleToUserAsync(string UserId, string Role)
+        public async Task<IdentityResult> AssignRoleToUserAsync(string userId, string roleAsync)
         {
-            try
+
+            if (!await role.RoleExistsAsync(roleAsync)) return new IdentityResult();
+            var res = userManager.Users.FirstOrDefault(io => io.Id == userId);
+            if (res is null)
             {
-                if (await role.RoleExistsAsync(Role))
-                {
-                    var res = userManager.Users.Where(io => io.Id == UserId).FirstOrDefault();
-                    if (res is null)
-                    {
-                        return new IdentityResult();
-                    }
-                    var rek = await userManager.AddToRoleAsync(res, Role);
-                    return rek;
-                }
                 return new IdentityResult();
             }
-            catch (Exception)
-            {
-                throw;
-            }
+
+            var rek = await userManager.AddToRoleAsync(res, roleAsync);
+            return rek;
         }
+
         #endregion
 
         #region DeleteRole
+
         public async Task<IdentityResult> DeleteRole(string rol)
         {
-            try
-            {
-                if(await role.RoleExistsAsync(rol))
-                {
-                    var res = await role.DeleteAsync(new IdentityRole(rol));
-                    return res;
-                }
-                return new IdentityResult();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            if (!await role.RoleExistsAsync(rol)) return new IdentityResult();
+            var res = await role.DeleteAsync(new IdentityRole(rol));
+            return res;
         }
+
         #endregion
 
         #region DeleteUser
+
         public async Task<IdentityResult> DeleteUser(string id)
         {
             var res = userManager.Users.FirstOrDefault(io => io.Id == id);
-            if(res is not null)
-            {
-                var rek=await userManager.DeleteAsync(res);
-                return rek;
-            }
-            return new IdentityResult();
+            if (res is null) return new IdentityResult();
+
+            var rek = await userManager.DeleteAsync(res);
+            return rek;
         }
+
         #endregion
 
         #region ForgetPassword
-        public async Task<bool> ForgetPassword(string Email,string NewPassword)
+
+        public async Task<bool> ForgetPassword(string email, string newPassword)
         {
-            var user=await userManager.FindByEmailAsync(Email);
-          
-            if ((user is not null))
+            var user = await userManager.FindByEmailAsync(email);
+
+            if ((user is null)) throw new ArgumentException("Such User no exist");
+            var rej = await userManager.CheckPasswordAsync(user, newPassword);
+            if (rej)
             {
-                var rej =await  userManager.CheckPasswordAsync(user, NewPassword);
-                if(rej)
-                {
-                    return false;
-                }
-                var res = await userManager.GeneratePasswordResetTokenAsync(user);
-                if (res is not null)
-                {
-                   var rek=await userManager.ResetPasswordAsync(user,res, NewPassword);
-                   if(rek.Succeeded)
-                    {
-                        return true;
-                    }
-                }
                 return false;
             }
-            throw new ArgumentException("Such User no exist");
+
+            var res = await userManager.GeneratePasswordResetTokenAsync(user);
+            if (res is null) return false;
+            var rek = await userManager.ResetPasswordAsync(user, res, newPassword);
+            return rek.Succeeded;
         }
+
         #endregion
 
         #region Info
 
         public async Task<UserModel> Info(string Username)
         {
-            try
-            {
-                var res = await userManager.Users.FirstOrDefaultAsync(io => io.UserName == Username);
-                if (res is not null)
-                {
-                    var mapped = map.Map<UserModel>(res);
-                    return mapped;
-                }
-                return null;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
 
+            var res = await userManager.Users.FirstOrDefaultAsync(io => io.UserName == Username);
+            if (res is null) return null;
+            var mapped = map.Map<UserModel>(res);
+            return mapped;
         }
+
         #endregion
 
         #region RefreshToken
 
-        public async Task<bool> RefreshToken(string Username, string token)
+        public async Task<bool> RefreshToken(string username, string token)
         {
-            var user = await userManager.FindByNameAsync(Username);
+            var user = await userManager.FindByNameAsync(username);
             if (user == null)
             {
                 return false;
             }
 
-            var isValidToken = await signin.UserManager.VerifyUserTokenAsync(user, userManager.Options.Tokens.PasswordResetTokenProvider, "RefreshToken", token);
+            var isValidToken = await signin.UserManager.VerifyUserTokenAsync(user,
+                userManager.Options.Tokens.PasswordResetTokenProvider, "RefreshToken", token);
             if (!isValidToken)
             {
                 return false;
             }
 
-            var result = await signin.UpdateExternalAuthenticationTokensAsync(new ExternalLoginInfo(new System.Security.Claims.ClaimsPrincipal(),"JWT Bearer", "65E255FF-F399-42D4-9C7F-D5D08B0EC285","Auth")
-            {
-                ProviderKey = user.Id,
-                AuthenticationTokens = new AuthenticationToken[]
+            var result = await signin.UpdateExternalAuthenticationTokensAsync(
+                new ExternalLoginInfo(new System.Security.Claims.ClaimsPrincipal(), "JWT Bearer",
+                    "65E255FF-F399-42D4-9C7F-D5D08B0EC285", "Auth")
                 {
-                new AuthenticationToken { Name = "access_token", Value = token },
-                }
-            });
+                    ProviderKey = user.Id,
+                    AuthenticationTokens =
+                    [
+                        new AuthenticationToken { Name = "access_token", Value = token },
+                    ]
+                });
 
             return result.Succeeded;
         }
+
         #endregion
 
         #region RegisterUserAsync
-        public async Task<IdentityResult> RegisterUserAsync(UserModel User, string Password)
-        {
-            try
-            {
 
-                if (await userManager.FindByEmailAsync(User.Email) is null)
-                {
-                    var maped = map.Map<User>(User);
-                    var res = await userManager.CreateAsync(maped, Password);
-                    if (res.Succeeded)
-                    {
-                        var body = @"
+        public async Task<IdentityResult> RegisterUserAsync(UserModel user, string password)
+        {
+            if (await userManager.FindByEmailAsync(user.Email) is not null)
+                throw new ArgumentException(" User already exist in db");
+            var mapped = map.Map<User>(user);
+            var res = await userManager.CreateAsync(mapped, password);
+            if (!res.Succeeded) throw new ArgumentException("somethings wrong");
+            var body = @"
                     <!DOCTYPE html>
                     <html lang='en'>
                     <head>
@@ -348,36 +318,25 @@ namespace RGBA.Optio.Domain.Services
 </html>
 ";
 
-                        smtp.SendMessage(User.Email, "Welcome to RGBASOLUTION! Get Started Today", body);
+            smtp.SendMessage(user.Email, "Welcome to RGBASOLUTION! Get Started Today", body);
 
 
-                        return res;
-                    }
-
-                    throw new ArgumentException("somethings unucual");
-
-                }
-                throw new ArgumentException(" User already exist in db");
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return res;
         }
+
         #endregion
 
         #region ResetPasswordAsync
 
         public async Task<IdentityResult> ResetPasswordAsync(PasswordResetModel arg, string username)
         {
-            var res =await userManager.FindByNameAsync(username);
-            if(res is not null)
-            {
-               var rek=await userManager.ChangePasswordAsync(res, arg.oldPassword, arg.newPassword);
-                return rek;
-            }
-            return new IdentityResult();
+            var res = await userManager.FindByNameAsync(username);
+            if (res is null) return new IdentityResult();
+            var rek = await userManager.ChangePasswordAsync(res, arg.OldPassword, arg.NewPassword);
+            return rek;
+
         }
+
         #endregion
 
         #region SignInAsync
@@ -389,18 +348,20 @@ namespace RGBA.Optio.Domain.Services
                 throw new OptioGeneralException("Username or password is empty.");
             }
 
-            var result = await signin.PasswordSignInAsync(mod.Username, mod.Password, mod.SetCookie, lockoutOnFailure: false);
+            var result = await signin.PasswordSignInAsync(mod.Username, mod.Password, mod.SetCookie,
+                lockoutOnFailure: false);
 
-            if (result.Succeeded)
+            switch (result.Succeeded)
             {
-                await SetPersistentCookieAsync(_httpContextAccessor.HttpContext.User);
-                var token = GenerateJwtToken(mod.Username);
-                await Console.Out.WriteLineAsync(token);
-                var usr = await userManager.FindByNameAsync(mod.Username);
-                if (usr != null)
+                case true:
                 {
-                    string recipientName = usr.Name+' '+usr.Surname;
-                    string emailContent = $@"
+                    await SetPersistentCookieAsync(_httpContextAccessor.HttpContext.User);
+                    var token = GenerateJwtToken(mod.Username);
+                    await Console.Out.WriteLineAsync(token);
+                    var usr = await userManager.FindByNameAsync(mod.Username);
+                    if (usr == null) return (result, token);
+                    var recipientName = usr.Name + ' ' + usr.Surname;
+                    var emailContent = $@"
                       <html>
                      <body style='font-family: Arial, sans-serif;'>
                      <p>Dear <span style='color: #3366cc;'>{recipientName}</span>,</p>
@@ -411,22 +372,26 @@ namespace RGBA.Optio.Domain.Services
                      </body>
                      </html>";
 
-                    smtp.SendMessage(usr.Email, $"Security Alert: New Sign-in to Your RGBASOLUTION Account {DateTime.Now.ToShortTimeString()}", emailContent);
+                    smtp.SendMessage(usr.Email,
+                        $"Security Alert: New Sign-in to Your RGBASOLUTION Account {DateTime.Now.ToShortTimeString()}",
+                        emailContent);
                     await userManager.AddClaimAsync(usr, new Claim("Name", usr.Name));
                     await userManager.AddClaimAsync(usr, new Claim("Surname", usr.Surname));
                     await userManager.AddClaimAsync(usr, new Claim("PersonalNumber", usr.PersonalNumber));
                     await userManager.AddClaimAsync(usr, new Claim("BirthDay", usr.BirthDate.ToShortDateString()));
-                    await userManager.AddLoginAsync(usr,new UserLoginInfo("JWT",GenerateJwtToken(usr.UserName),"Authorization"));
+                    await userManager.AddLoginAsync(usr,
+                        new UserLoginInfo("JWT", GenerateJwtToken(usr.UserName), "Authorization"));
+
+                    return (result, token);
                 }
-                return (result, token);
-            }
-            else if (!result.Succeeded && !mod.SetCookie)
-            {
-                //await ClearPersistentCookieAsync();
+                case false when !mod.SetCookie:
+                    //await ClearPersistentCookieAsync();
+                    break;
             }
 
             return (null, null);
         }
+
         #endregion
 
         #region GenerateJwtToken
@@ -435,97 +400,107 @@ namespace RGBA.Optio.Domain.Services
         {
             var claims = new[]
             {
-              new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Name, username),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E="));
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E="));
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: "https://localhost:44359/",
                 audience: "https://localhost:44359/",
                 claims: claims,
                 expires: DateTime.Now.AddHours(6),
-                signingCredentials: creds);
+                signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
         #endregion
 
         #region SetPersistentCookieAsync&&SetPersistentCookieAsync
 
         private async Task SetPersistentCookieAsync(ClaimsPrincipal principal)
         {
-            await _httpContextAccessor.HttpContext.SignInAsync(IdentityConstants.ApplicationScheme,principal, new AuthenticationProperties { IsPersistent = true });
+            await _httpContextAccessor.HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal,
+                new AuthenticationProperties { IsPersistent = true });
         }
 
         private async Task SetPersistentCookieAsync()
         {
             await _httpContextAccessor.HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
         }
+
         #endregion
 
         #region SignOutAsync
+
         public async Task<bool> SignOutAsync(string Username)
         {
             try
             {
                 var user = await userManager.FindByNameAsync(Username);
-                if (user is not null)
+                if (user is null) return false;
+                await userManager.RemoveClaimsAsync(user, await userManager.GetClaimsAsync(user));
+                await signin.SignOutAsync();
+                var login = await userManager.GetLoginsAsync(user);
+                if (login is not null)
                 {
-                    await userManager.RemoveClaimsAsync(user, await userManager.GetClaimsAsync(user));
-                    await signin.SignOutAsync();
-                   var login=await  userManager.GetLoginsAsync(user);
-                    if (login is not null)
+                    var first = login.FirstOrDefault();
+                    if (first is not null)
                     {
-                        var first = login.FirstOrDefault();
-                        if (first is not null)
-                        {
-                            await userManager.RemoveLoginAsync(user, first.LoginProvider, first.ProviderKey);
-                        }
+                        await userManager.RemoveLoginAsync(user, first.LoginProvider, first.ProviderKey);
                     }
-                    return true;
                 }
-                return false;
+
+                return true;
+
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
         #endregion
 
         #region GetAllRoles
 
         public async Task<IEnumerable<RoleModel>> GetAllRoles()
         {
-            var res=await role.Roles.Where(io=>io.Name!=null&&io.NormalizedName!=null)
-             .Select(io=>new RoleModel
-            {
-               Name=io.Name,
-               NormalizedName=io.NormalizedName,
-            }).ToListAsync();
+            var res = await role.Roles.Where(io => io.Name != null && io.NormalizedName != null)
+                .Select(io => new RoleModel
+                {
+                    Name = io.Name,
+                    NormalizedName = io.NormalizedName,
+                }).ToListAsync();
             return res;
         }
+
         #endregion
 
         #region GetAllUser
+
         public async Task<IEnumerable<UserModel>> GetAllUser()
         {
-            var res =await userManager.Users.Select(io=>new UserModel
+            var res = await userManager.Users.Select(io => new UserModel
             {
-                Name= io.Name,
-                Email=io.Email,
-                Surname=io.Surname,
-                Password="***********",
-                BirthDate=io.BirthDate,
-                PersonalNumber=io.PersonalNumber,
-                Username=io.UserName
+                Name = io.Name,
+                Email = io.Email,
+                Surname = io.Surname,
+                Password = "***********",
+                BirthDate = io.BirthDate,
+                PersonalNumber = io.PersonalNumber,
+                Username = io.UserName
             }).ToListAsync();
 
             return res;
         }
+
         #endregion
     }
 }
+
+

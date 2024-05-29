@@ -2,7 +2,7 @@
 
 namespace RGBA.Optio.Domain.Models
 {
-    public class locationModel
+    public class LocationModel
     {
         [Required(ErrorMessage ="Location Name is Required!")]
         [StringLength(50,ErrorMessage ="Location Name is not Valid!",MinimumLength =2)]
