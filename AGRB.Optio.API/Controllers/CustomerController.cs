@@ -9,6 +9,8 @@ using RGBA.Optio.Domain.Models.RequestModels;
 using RGBA.Optio.Domain.Services.Outer_Services;
 using System.Net.Http.Headers;
 using AGRB.Optio.API.StaticFiles;
+using RGBA.Optio.Domain.Responses;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -27,33 +29,34 @@ namespace RGBA.Optio.UI.Controllers
         [Route(nameof(GetEmailVerificationMessage))]
         [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetEmailVerificationMessage([FromQuery] string? securitySchema)
+        public async Task<Response<IActionResult>> GetEmailVerificationMessage([FromQuery] string? securitySchema)
         {
             try
             {
                 if (User?.Identity is not null && securitySchema is not null && User.Identity.Name is not null)
                 {
                     var res = await se.ConfirmMail(User.Identity.Name, securitySchema);
-                    return Content(
+                    return Response<IActionResult>.Ok( 
+                        Content(
                         res
                             ? "<div style='text-align: center;'><h1 style='color: green; font-weight: bold; font-size: 24px;'>Congratulations!</h1><p style='font-size: 16px;'>Your email has been verified successfully.</p></div>"
-                            : "<h1>somethings strange</h1>", "text/html");
+                            : "<h1>somethings strange</h1>", "text/html"));
                 }
 
-                return Content(
+                return Response<IActionResult>.Ok(Content(
                     "<div style='text-align: center;'><h1 style='color: red; font-weight: bold; font-size: 24px;'>The link has expired!</h1><p style='font-size: 16px;'>Please contact support for assistance.</p></div>",
-                    "text/html");
+                    "text/html"));
             }
             catch (Exception exp)
             {
-                return Content($"Error: {exp.Message}", "text/html");
+                return Response < IActionResult >.Ok(Content($"Error: {exp.Message}", "text/html"));
             }
         }
 
         [HttpPost]
         [Route(nameof(SignIn))]
         [AllowAnonymous]
-        public async Task<IActionResult> SignIn([FromBody]SignInModel mod)
+        public async Task<Response<(SignInResult,string)>> SignIn([FromBody]SignInModel mod)
         {
             try
             {
@@ -62,19 +65,19 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(mod.Username);
                 }
                 var res = await se.SignInAsync(mod);
-                return Ok(res.Item2);
+                return Response<(SignInResult,string)>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<(SignInResult, string)>.Error(ErrorKeys.InternalServerError);
             }
         }
 
         [HttpPost]
         [Route(nameof(Registration))]
         [AllowAnonymous]
-        public async Task<IActionResult> Registration([FromBody]UserModel user)
+        public async Task<Response<IdentityResult>> Registration([FromBody]UserModel user)
         {
 
             try
@@ -84,19 +87,19 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(user.Username);
                 }
                 var res = await se.RegisterUserAsync(user,user.Password);
-                return Ok(res);
+                return Response<IdentityResult>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<IdentityResult>.Error(ErrorKeys.InternalServerError);
             }
         }
 
         [HttpPost]
         [Route("[action]")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> RefreshToken([FromQuery] string token)
+        public async Task<Response<bool>> RefreshToken([FromQuery] string token)
         {
             try
             {
@@ -107,33 +110,33 @@ namespace RGBA.Optio.UI.Controllers
                 if (User.Identity is { Name: not null, IsAuthenticated: true })
                 {
                     var res = await se.RefreshToken(User.Identity.Name,token);
-                    return Ok(res);
+                    return Response<bool>.Ok(res);
                 }
                 else
                 {
-                    return Unauthorized(new AuthenticationHeaderValue("Bearer"));
+                    return Response<bool>.Error(ErrorKeys.BadRequest);
                 }
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<bool>.Error(ErrorKeys.BadRequest);
             }
         }
 
         [HttpGet]
         [Route(nameof(ResetPasswordNow))]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPasswordNow(string email,string newPassword)
+        public async Task<Response<string>> ResetPasswordNow(string email,string newPassword)
         {
             try
             {
                 if (!await se.IsUserExist(email))
                 {
-                    return BadRequest(ErrorKeys.NoUser);
+                    return Response<string>.Error(ErrorKeys.NoUser);
                 }
                 var link = Url.ActionLink(nameof(ForgetPassword), "Customer", new { Email = email, Password = newPassword }, Request.Scheme);
-                if (link is null) return BadRequest(ErrorKeys.BadRequest);
+                if (link is null) return Response<string>.Ok(ErrorKeys.BadRequest);
                 var body = $@"
                   <div align='center' style='font-family: Arial, sans-serif;'>
                   <p style='font-size: 16px;'>გადადი ლინკზე რათა შეცვალო პაროლი:</p>
@@ -146,13 +149,12 @@ namespace RGBA.Optio.UI.Controllers
                   <h2 style='font-size: 16px;color:red;'>თუ თქვენ  არ გამოგიგზავნიათ მოთხოვნა, გთხოვთ დაგვიკავშირდეთ!</h2>
                 </div>";
                 smtp.SendMessage(email, "პაროლის შეცვლის მოთხოვნა" + '_' + DateTime.Now.Hour + ':' + DateTime.Now.Minute, body);
-                return Ok(SuccessKeys.EmailSent);
-
+                return Response<string>.Ok(SuccessKeys.EmailSent);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message,exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<string>.Error(exp.Message,exp.Message);
             }
         }
 
@@ -161,7 +163,7 @@ namespace RGBA.Optio.UI.Controllers
         [Route(nameof(ForgetPassword))]
         [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
-        public async Task<IActionResult> ForgetPassword([FromQuery] string email,[FromQuery]string password)
+        public async Task<Response<IActionResult>> ForgetPassword([FromQuery] string email,[FromQuery]string password)
         {
             try
             {
@@ -170,19 +172,19 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(email);
                 }
                 var res = await se.ForgetPassword(email,password);
-                return Content(res ? "<html><body><h1>Password Reset Successfully!</h1></body></html>" : "<html><body><h1>Password Reset Failed</h1></body></html>", "text/html");
+                return Response<IActionResult>.Ok(Content(res ? "<html><body><h1>Password Reset Successfully!</h1></body></html>" : "<html><body><h1>Password Reset Failed</h1></body></html>", "text/html"));
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<IActionResult>.Error(ErrorKeys.InternalServerError, exp.Message);
             }
         }
 
 
         [HttpPost]
         [Route(nameof(ResetPassword))]
-        public async Task<IActionResult> ResetPassword([FromBody] PasswordResetModel arg)
+        public async Task<Response<IdentityResult>> ResetPassword([FromBody] PasswordResetModel arg)
         {
             try
             {
@@ -192,40 +194,40 @@ namespace RGBA.Optio.UI.Controllers
                 }
 
                 if (User.Identity is not { Name: not null, IsAuthenticated: true })
-                    return Unauthorized(new AuthenticationHeaderValue("Bearer"));
+                    return Response<IdentityResult>.Error(ErrorKeys.BadRequest);
 
                 var res = await se.ResetPasswordAsync(arg, User.Identity.Name);
-                return Ok(res);
+                return Response<IdentityResult>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<IdentityResult>.Error(exp.Message, exp.StackTrace, ErrorKeys.InternalServerError);
             }
         }
 
         [HttpGet]
         [Route(nameof(Info))]
-        public async Task<IActionResult> Info()
+        public async Task<Response<UserModel>> Info()
         {
             try
             {
                 if (User?.Identity is not { Name: not null, IsAuthenticated: true })
-                    return Unauthorized(new AuthenticationHeaderValue("Bearer"));
+                    return Response<UserModel>.Error(ErrorKeys.BadRequest);
                 var res = await se.Info(User.Identity.Name);
-                return Ok(res);
+                return Response<UserModel>.Ok(res);
 
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return StatusCode(503, ErrorKeys.InternalServerError);
+                return Response<UserModel>.Error(exp.Message,exp.StackTrace, ErrorKeys.InternalServerError);
             }
         }
 
         [HttpGet]
         [Route(nameof(ConfirmEmail))]
-        public async Task<IActionResult> ConfirmEmail()
+        public async Task<Response<string>> ConfirmEmail()
         {
             try
             {
@@ -242,39 +244,40 @@ namespace RGBA.Optio.UI.Controllers
                     }
 
                     var user = await userManager.FindByNameAsync(User.Identity.Name);
-                    if (user == null) return BadRequest(ErrorKeys.BadRequest);
+                    if (user == null) return Response<string>.Error(ErrorKeys.BadRequest);
 
                     var rek = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     var link = Url.ActionLink(nameof(GetEmailVerificationMessage), "Customer",
                         new { SecuritySchema = rek }, Request.Scheme);
-                    if (link == null) return Unauthorized(new AuthenticationHeaderValue("Bearer"));
+                    if (link == null) return Response<string>.Error(ErrorKeys.NotFound);
                     await se.SendLinkToUser(User.Identity.Name, link);
-                    return Ok(link);
+                    return Response<string>.Ok(link);
                 }
 
-                return Unauthorized(new AuthenticationHeaderValue("Bearer"));
+                return Response<string>.Error(ErrorKeys.BadRequest);
+
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<string>.Error(exp.Message,exp.StackTrace,ErrorKeys.InternalServerError);
             }
         }
 
         [HttpPost]
         [Route(nameof(SignOutNow))]
-        public async Task<IActionResult> SignOutNow()
+        public async Task<Response<bool>> SignOutNow()
         {
             try
             {
                 if (User.Identity is null || !User.Identity.IsAuthenticated || User.Identity.Name is null)
-                    return Unauthorized(new AuthenticationHeaderValue("Bearer"));
+                    return Response<bool>.Error(ErrorKeys.BadRequest);
                 var res=await se.SignOutAsync(User.Identity.Name);
-                return Ok(res);
+                return Response<bool>.Ok(res);
             }
-            catch (Exception)
+            catch (Exception exp)
             {
-                return StatusCode(500, ErrorKeys.InternalServerError);
+                return Response<bool>.Error(exp.Message,exp.StackTrace,ErrorKeys.BadRequest);
             }
         }
     }

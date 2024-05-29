@@ -150,12 +150,12 @@ if (app.Environment.IsDevelopment() ||app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 };
-
-app.UseHttpsRedirection();
 app.UseRouting();
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("RequestPipeline");
+//app.UseCors("RequestPipeline");
 app.MapControllers();
 
 app.Run();
