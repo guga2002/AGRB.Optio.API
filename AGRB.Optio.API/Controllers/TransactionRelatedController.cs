@@ -372,8 +372,6 @@ namespace RGBA.Optio.UI.Controllers
             }
         }
 
-        
-
         [HttpPut]
         [Route("[action]/{id:long}")]
         public async Task<IActionResult> UpdateTransactionTypeAsync([FromRoute] long id, [FromBody] TransactionTypeModel entity)
