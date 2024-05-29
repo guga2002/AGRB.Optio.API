@@ -1,7 +1,6 @@
 ﻿using RGBA.Optio.Domain.Validation.VallidationAttributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace RGBA.Optio.Domain.Models
 {
@@ -21,7 +20,7 @@ namespace RGBA.Optio.Domain.Models
 
         [Required(ErrorMessage = "Birth date is required.")]
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
-        [DatatimeValidate]
+        [DataTimeValidate]
         [Display(Name = "Birthday of user")]
         public required DateTime BirthDate { get; set; }
 

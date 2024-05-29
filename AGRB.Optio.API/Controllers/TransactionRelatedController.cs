@@ -14,7 +14,7 @@ namespace RGBA.Optio.UI.Controllers
     {
         [HttpPost]
         [Route("channel")] 
-        public async Task<IActionResult> AddAsync([FromBody] ChanellModel entity)
+        public async Task<IActionResult> AddAsync([FromBody] ChannelModel entity)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new ChanellModel() { ChannelType = "Undefined" }); return Ok(res);
+                var res = await se.GetAllActiveAsync(new ChannelModel() { ChannelType = "Undefined" }); return Ok(res);
             }
             catch (Exception exp)
             {
@@ -99,7 +99,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new CategoryModel() { TransactionCategory = "Undefined", TransactionTypeID = 0 });
+                var res = await se.GetAllActiveAsync(new CategoryModel() { TransactionCategory = "Undefined", TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -131,7 +131,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new ChanellModel() { ChannelType = "Undefined" });
+                var res = await se.GetAllAsync(new ChannelModel() { ChannelType = "Undefined" });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -147,7 +147,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new CategoryModel() { TransactionCategory = "undefined", TransactionTypeID = 0 });
+                var res = await se.GetAllAsync(new CategoryModel() { TransactionCategory = "undefined", TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -175,19 +175,19 @@ namespace RGBA.Optio.UI.Controllers
 
         [HttpGet]
         [Route(nameof(GetChannelByIdAsync))]
-        public async Task<Response<ChanellModel>> GetChannelByIdAsync([FromRoute] long id)
+        public async Task<Response<ChannelModel>> GetChannelByIdAsync([FromRoute] long id)
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new ChanellModel() { ChannelType = "UNDEFINED" });
+                var res = await se.GetByIdAsync(id, new ChannelModel() { ChannelType = "UNDEFINED" });
 
 
-                return Response<ChanellModel>.Ok(res);
+                return Response<ChannelModel>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return Response<ChanellModel>.Error("Error", "r");
+                return Response<ChannelModel>.Error("Error", "r");
             } 
         }
 
@@ -197,7 +197,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new CategoryModel() { TransactionCategory = "UNDEFINED", TransactionTypeID = 0 });
+                var res = await se.GetByIdAsync(id, new CategoryModel() { TransactionCategory = "UNDEFINED", TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -229,7 +229,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new ChanellModel() { ChannelType = "undefined" });
+                var res = await se.RemoveAsync(id, new ChannelModel() { ChannelType = "undefined" });
                 return res == true ? Ok(res) : BadRequest("Data do not exist");
             }
             catch (Exception exp)
@@ -245,7 +245,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new CategoryModel() { TransactionCategory = "undefined", TransactionTypeID = 34, });
+                var res = await se.RemoveAsync(id, new CategoryModel() { TransactionCategory = "undefined", TransactionTypeId = 34, });
                 return res == true ? Ok(res) : BadRequest("Data do not exist");
             }
             catch (Exception exp)
@@ -288,7 +288,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException("shecdoma gvaqvs");
                 }
-                var res = await se.SoftDeleteAsync(id, new ChanellModel() { ChannelType = "UNDEFINED" });
+                var res = await se.SoftDeleteAsync(id, new ChannelModel() { ChannelType = "UNDEFINED" });
                 return res == true ? Ok(res) : BadRequest("No  data exist on this Id");
             }
             catch (Exception exp)
@@ -308,7 +308,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException("shecdoma gvaqvs");
                 }
-                var res = await se.SoftDeleteAsync(id, new CategoryModel() { TransactionTypeID = 0, TransactionCategory = "UNDEFINED" });
+                var res = await se.SoftDeleteAsync(id, new CategoryModel() { TransactionTypeId = 0, TransactionCategory = "UNDEFINED" });
                 return res == true ? Ok(res) : BadRequest("No  data exist on this Id");
             }
             catch (Exception exp)
@@ -340,7 +340,7 @@ namespace RGBA.Optio.UI.Controllers
 
         [HttpPut]
         [Route("chanell/{id:long}/update")]
-        public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] ChanellModel entity)
+        public async Task<IActionResult> UpdateAsync([FromRoute] long id, [FromBody] ChannelModel entity)
         {
             try
             {

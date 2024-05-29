@@ -7,12 +7,12 @@ namespace RGBA.Optio.Domain.Models
     public class TransactionModel
     {
         [Required(ErrorMessage = "Date is required.")]
-        [DatatimeValidate]
+        [DataTimeValidate]
         [Display(Name ="Date of transaction")]
         public required DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Currency ID is required.")]
-        public required int CurencyNameId { get; set; }
+        public required int CurrencyNameId { get; set; }
 
         [Required(ErrorMessage = "Amount is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
@@ -21,7 +21,7 @@ namespace RGBA.Optio.Domain.Models
 
         [Required(ErrorMessage = "Equivalent in GEL is required.")]
         [Range(0.01,double.MaxValue, ErrorMessage = "Equivalent in GEL must be greater than 0.")]
-        [Display(Name = "Equvalent in GEL")]
+        [Display(Name = "Equivalent in GEL")]
         public required double EquivalentInGel { get; set; }
 
         [Required(ErrorMessage = "Category ID is required.")]

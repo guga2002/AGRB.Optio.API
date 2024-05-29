@@ -57,7 +57,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await ser.AssignLocationtoMerchant(Merchantid, Locationid);
+                var res = await ser.AssignLocationToMerchant(Merchantid, Locationid);
                 if(res)
                 {
                     return Ok(res);
@@ -212,7 +212,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res =await ser.RemoveAsync(id,new locationModel() { LocationName="undefined"});
+                var res =await ser.RemoveAsync(id,new LocationModel() { LocationName="undefined"});
                 return res == true ? Ok("success") : BadRequest("somethings went wrong");
             }
             catch (Exception exp)
@@ -230,7 +230,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await ser.RemoveAsync(id,new locationModel() { LocationName="Undefined"});
+                var res = await ser.RemoveAsync(id,new LocationModel() { LocationName="Undefined"});
                 return res == true ? Ok("succesfully deleted") : BadRequest("soemthings went wrong");
             }
             catch (Exception exp)
@@ -248,13 +248,13 @@ namespace RGBA.Optio.UI.Controllers
             try
             {
                 string cashedkey = "GetLocation";
-                if (cache.TryGetValue(cashedkey, out IEnumerable<locationModel>? mod))
+                if (cache.TryGetValue(cashedkey, out IEnumerable<LocationModel>? mod))
                 {
                     return Ok(mod);
                 }
                 else
                 {
-                    var res = await ser.GetAllAsync(new locationModel() { LocationName = "Undefined" });
+                    var res = await ser.GetAllAsync(new LocationModel() { LocationName = "Undefined" });
                     if (!res.Any())
                     {
                         return NotFound();
@@ -279,13 +279,13 @@ namespace RGBA.Optio.UI.Controllers
             {
                 var cashed = "GetAllActiveLocation";
 
-                if (cache.TryGetValue(cashed, out IEnumerable<locationModel>? loc))
+                if (cache.TryGetValue(cashed, out IEnumerable<LocationModel>? loc))
                 {
                     return Ok(loc);
                 }
                 else
                 {
-                    var res = await ser.GetAllActiveAsync(new locationModel() { LocationName = "Undefined" });
+                    var res = await ser.GetAllActiveAsync(new LocationModel() { LocationName = "Undefined" });
                     if (!res.Any())
                     {
                         return NotFound();
@@ -309,13 +309,13 @@ namespace RGBA.Optio.UI.Controllers
             try
             {
                 var cashedkey = $"getalllocationbyid{id}";
-                if (cache.TryGetValue(cashedkey, out locationModel? mod))
+                if (cache.TryGetValue(cashedkey, out LocationModel? mod))
                 {
                     return Ok(mod);
                 }
                 else
                 {
-                    var res = await ser.GetByIdAsync(id, new locationModel() { LocationName = "Undefined" });
+                    var res = await ser.GetByIdAsync(id, new LocationModel() { LocationName = "Undefined" });
                     if (res is not null)
                     {
                         return NotFound();
@@ -334,7 +334,7 @@ namespace RGBA.Optio.UI.Controllers
 
         [HttpPost]
         [Route("Location")]
-        public async Task<IActionResult> Insert([FromBody] locationModel value)
+        public async Task<IActionResult> Insert([FromBody] LocationModel value)
         {
             try
             {
@@ -359,7 +359,7 @@ namespace RGBA.Optio.UI.Controllers
 
         [HttpPut]
         [Route("Location/{id:long}")]
-        public async Task<IActionResult> Update([FromRoute]long id, [FromBody] locationModel value)
+        public async Task<IActionResult> Update([FromRoute]long id, [FromBody] LocationModel value)
         {
             try
             {
@@ -389,7 +389,7 @@ namespace RGBA.Optio.UI.Controllers
 
             try
             {
-                var res = await ser.SoftDeleteAsync(id, new locationModel() { LocationName = "Undefined" });
+                var res = await ser.SoftDeleteAsync(id, new LocationModel() { LocationName = "Undefined" });
                 if (res)
                 {
                     return Ok(res);

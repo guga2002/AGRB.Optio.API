@@ -3,11 +3,11 @@ using RGBA.Optio.Domain.Models;
 
 namespace RGBA.Optio.Domain.Interfaces
 {
-    public interface IMerchantRelatedService:IAddInfo<MerchantModel>,IAddInfo<locationModel>,
-        IGetInfo<locationModel, long>,IGetInfo<MerchantModel,long>,
-        IRemoveInfo<locationModel, long>,IRemoveInfo<MerchantModel, long>,
-        IUpdateInfo<locationModel, long>,IUpdateInfo<MerchantModel, long>
+    public interface IMerchantRelatedService:IAddInfo<MerchantModel>,IAddInfo<LocationModel>,
+        IGetInfo<LocationModel, long>,IGetInfo<MerchantModel,long>,
+        IRemoveInfo<LocationModel, long>,IRemoveInfo<MerchantModel, long>,
+        IUpdateInfo<LocationModel, long>,IUpdateInfo<MerchantModel, long>
     {
-        Task<bool> AssignLocationtoMerchant(long Merchantid, long Locationid);
+        Task<bool> AssignLocationToMerchant(long merchantId, long locationId);
     }
 }

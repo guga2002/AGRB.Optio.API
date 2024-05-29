@@ -8,29 +8,23 @@ using RGBA.Optio.Domain.Models;
 
 namespace RGBA.Optio.Domain.Services.TransactionRelated
 {
-    public class CurrencyRelatedService : AbstractService<CurrencyRelatedService>, ICurrencyRelatedService
+    public class CurrencyRelatedService(IUniteOfWork work, IMapper map, ILogger<CurrencyRelatedService> log)
+        : AbstractService<CurrencyRelatedService>(work, map, log), ICurrencyRelatedService
     {
-        public CurrencyRelatedService(IUniteOfWork work, IMapper map, ILogger<CurrencyRelatedService> log) : base(work, map, log)
-        {
-        }
-
         #region AddAsync
         public async Task<long> AddAsync(CurrencyModel entity)
         {
             try
             {
-                if (entity is null || string.IsNullOrWhiteSpace(entity.CurrencyCode) || string.IsNullOrEmpty(entity.NameOfValute))
+                if (entity is null || string.IsNullOrWhiteSpace(entity.CurrencyCode) || string.IsNullOrEmpty(entity.NameOfCurrency))
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp = mapper.Map<Currency>(entity);
-                if (mapp is not null)
-                {
-                    var res = await work.CurrencyRepository.AddAsync(mapp);
-                    logger.LogInformation($"{entity.NameOfValute} is successfully added", DateTime.Now.ToShortDateString());
-                    return res;
-                }
-                return -1;
+                var mapCurrency = mapper.Map<Currency>(entity);
+                if (mapCurrency is null) return -1;
+                var res = await work.CurrencyRepository.AddAsync(mapCurrency);
+                logger.LogInformation($"{entity.NameOfCurrency} is successfully added", DateTime.Now.ToShortDateString());
+                return res;
             }
             catch (Exception ex)
             {
@@ -40,22 +34,19 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         }
 
 
-        public async Task<long> AddAsync(ValuteModel entity)
+        public async Task<long> AddAsync(ExchangeRateModel entity)
         {
             try
             {
-                if (entity is null || entity.CurrencyID < 0 || entity.ExchangeRate < 0 || string.IsNullOrEmpty(entity.DateOfValuteCourse.ToString()))
+                if (entity is null || entity.CurrencyId < 0 || entity.ExchangeRate < 0 || string.IsNullOrEmpty(entity.DateOfExchangeRate.ToString()))
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp = mapper.Map<ValuteCourse>(entity);
-                if (mapp is not null)
-                {
-                    var res = await work.ValuteCourse.AddAsync(mapp);
-                    logger.LogInformation($"{entity.CurrencyID} is successfully added", DateTime.Now.ToShortDateString());
-                    return res;
-                }
-                return -1;
+                var mapExchangeRate = mapper.Map<ExchangeRate>(entity);
+                if (mapExchangeRate is null) return -1;
+                var res = await work.ExchangeRateRepository.AddAsync(mapExchangeRate);
+                logger.LogInformation($"{entity.CurrencyId} is successfully added", DateTime.Now.ToShortDateString());
+                return res;
             }
             catch (Exception ex)
             {
@@ -66,20 +57,13 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region GetAllActiveAsync
-        public async Task<IEnumerable<CurrencyModel>> GetAllActiveAsync(CurrencyModel Identify)
+        public async Task<IEnumerable<CurrencyModel>> GetAllActiveAsync(CurrencyModel identify)
         {
             try
             {
                 var res = await work.CurrencyRepository.GetAllActiveAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<CurrencyModel>>(res);
-                    return mapp;
-                }
-                else
-                {
-                    return Enumerable.Empty<CurrencyModel>();
-                }
+                var mapCurrencyModels = mapper.Map<IEnumerable<CurrencyModel>>(res);
+                return mapCurrencyModels;
             }
             catch (Exception ex)
             {
@@ -88,17 +72,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<IEnumerable<ValuteModel>> GetAllActiveAsync(ValuteModel Identify)
+        public async Task<IEnumerable<ExchangeRateModel>> GetAllActiveAsync(ExchangeRateModel identify)
         {
             try
             {
-                var res = await work.ValuteCourse.GetAllActiveValuteAsync();
-                if(res is not null)
-                {
-                    var mapp=mapper.Map<IEnumerable<ValuteModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<ValuteModel>();
+                var res = await work.ExchangeRateRepository.GetAllActiveRateAsync();
+                if (res is null) return Enumerable.Empty<ExchangeRateModel>();
+                var mapExchangeRateModel = mapper.Map<IEnumerable<ExchangeRateModel>>(res);
+                return mapExchangeRateModel;
             }
             catch (Exception ex)
             {
@@ -109,17 +90,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region GetAllAsync
-        public async Task<IEnumerable<CurrencyModel>> GetAllAsync(CurrencyModel Identify)
+        public async Task<IEnumerable<CurrencyModel>> GetAllAsync(CurrencyModel identify)
         {
             try
             {
                 var res = await work.CurrencyRepository.GetAllAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<CurrencyModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<CurrencyModel>();
+                if (res is null) return Enumerable.Empty<CurrencyModel>();
+                var mapCurrencyModel = mapper.Map<IEnumerable<CurrencyModel>>(res);
+                return mapCurrencyModel;
             }
             catch (Exception ex)
             {
@@ -128,21 +106,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<IEnumerable<ValuteModel>> GetAllAsync(ValuteModel Identify)
+        public async Task<IEnumerable<ExchangeRateModel>> GetAllAsync(ExchangeRateModel identify)
         {
             try
             {
-                var res = await work.ValuteCourse.GetAllAsync();
-                if(res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<ValuteModel>>(res);
-                    return mapp;
-                }
-                else
-                {
-                    return Enumerable.Empty<ValuteModel>();
-                }
-
+                var res = await work.ExchangeRateRepository.GetAllAsync();
+                if(res is null) return Enumerable.Empty<ExchangeRateModel>();
+                var mapExchangeRateModel = mapper.Map<IEnumerable<ExchangeRateModel>>(res); 
+                return mapExchangeRateModel;
             }
             catch (Exception ex)
             {
@@ -154,20 +125,13 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
 
         #region GetByIdAsync
 
-        public async Task<CurrencyModel> GetByIdAsync(int id, CurrencyModel Identify)
+        public async Task<CurrencyModel> GetByIdAsync(int id, CurrencyModel identify)
         {
             try
             {
                 var res = await work.CurrencyRepository.GetByIdAsync(id);
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<CurrencyModel>(res);
-                    return mapp;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Currency with ID {id} not found.");
-                }
+                return mapper.Map<CurrencyModel>(res) ??
+                           throw new ItemNotFoundException($"Currency with ID {id} not found.");
             }
             catch (Exception ex)
             {
@@ -176,19 +140,19 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<ValuteModel> GetByIdAsync(long id, ValuteModel Identify)
+        public async Task<ExchangeRateModel> GetByIdAsync(long id, ExchangeRateModel identify)
         {
             try
             {
-                var res =await work.ValuteCourse.GetByIdAsync(id);
+                var res =await work.ExchangeRateRepository.GetByIdAsync(id);
                 if (res is not null)
                 {
-                    var mapp=mapper.Map<ValuteModel>(res);
-                    return mapp;
+                    var mapExchangeRateModel = mapper.Map<ExchangeRateModel>(res);
+                    return mapExchangeRateModel;
                 }
                 else
                 {
-                    throw new ItemNotFoundException($"Valute with ID {id} not found.");
+                    throw new ItemNotFoundException($"Exchange rate with ID {id} not found.");
                 }
 
             }
@@ -202,22 +166,17 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
 
         #region RemoveAsync
 
-        public async Task<bool> RemoveAsync(int Id,CurrencyModel identity)
+        public async Task<bool> RemoveAsync(int id,CurrencyModel identity)
         {
             try
             {
-                var currency = await work.CurrencyRepository.GetByIdAsync(Id);
+                var currency = await work.CurrencyRepository.GetByIdAsync(id);
 
-                if (currency is not null)
-                {
-                    var mapp = mapper.Map<Currency>(currency);
-                    if (mapp is not null)
-                    {
-                        var res = await work.CurrencyRepository.RemoveAsync(mapp);
-                        return res;
-                    }
-                }
-                throw new ArgumentException("no such entity exist");
+                if (currency is null) throw new ArgumentException("no such entity exist");
+                var mapCurrency = mapper.Map<Currency>(currency);
+                if (mapCurrency is null) throw new ArgumentException("no such entity exist");
+                var res = await work.CurrencyRepository.RemoveAsync(mapCurrency);
+                return res;
             }
             catch (Exception ex)
             {
@@ -226,21 +185,16 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<bool> RemoveAsync(long Id,ValuteModel identity)
+        public async Task<bool> RemoveAsync(long Id,ExchangeRateModel identity)
         {
             try
             {
-                var valute = await work.ValuteCourse.GetByIdAsync(Id);
-                if (valute is not null)
-                {
-                    var mapp = mapper.Map<ValuteCourse>(valute);
-                    if (mapp is not null)
-                    {
-                        var res = await work.ValuteCourse.RemoveAsync(mapp);
-                        return res;
-                    }
-                }
-                return false;
+                var exchange = await work.ExchangeRateRepository.GetByIdAsync(Id);
+                if (exchange is null) return false;
+                var mapExchangeRate = mapper.Map<ExchangeRate>(exchange);
+                if (mapExchangeRate is null) return false;
+                var res = await work.ExchangeRateRepository.RemoveAsync(mapExchangeRate);
+                return res;
             }
             catch (Exception ex)
             {
@@ -252,7 +206,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region SoftDeleteAsync
-        public async Task<bool> SoftDeleteAsync(int id, CurrencyModel Identify)
+        public async Task<bool> SoftDeleteAsync(int id, CurrencyModel identify)
         {
             try
             {
@@ -266,11 +220,11 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<bool> SoftDeleteAsync(long id, ValuteModel Identify)
+        public async Task<bool> SoftDeleteAsync(long id, ExchangeRateModel identify)
         {
             try
             {
-                var res = await work.ValuteCourse.SoftDeleteAsync(id);
+                var res = await work.ExchangeRateRepository.SoftDeleteAsync(id);
                 return res;
             }
             catch (Exception ex)
@@ -287,21 +241,12 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                if(entity == null || string.IsNullOrWhiteSpace(entity.NameOfValute) || string.IsNullOrWhiteSpace(entity.CurrencyCode))
+                if(entity == null || string.IsNullOrWhiteSpace(entity.NameOfCurrency) || string.IsNullOrWhiteSpace(entity.CurrencyCode))
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp=mapper.Map<Currency> (entity);
-                if (mapp != null)
-                {
-                    var res=work.CurrencyRepository.UpdateAsync(id,mapp);
-                    return res;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Currency {entity.NameOfValute} not found");
-                }
-
+                var mapCurrency = mapper.Map<Currency> (entity) ?? throw new ItemNotFoundException($"Currency {entity.NameOfCurrency} not found");
+                var res =work.CurrencyRepository.UpdateAsync(id, mapCurrency); return res;
             }
             catch (Exception ex)
             {
@@ -310,25 +255,19 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public Task<bool> UpdateAsync(long id, ValuteModel entity)
+        public Task<bool> UpdateAsync(long id, ExchangeRateModel entity)
         {
             try
             {
-                if (entity == null || string.IsNullOrWhiteSpace(entity.DateOfValuteCourse.ToString()) || entity.CurrencyID<0||entity.ExchangeRate<0)
+                if (entity == null || string.IsNullOrWhiteSpace(entity.DateOfExchangeRate.ToString()) || entity.CurrencyId<0||entity.ExchangeRate<0)
                 {
                     throw new OptioGeneralException("Entity can not be null and currency id must be > 0 and  exchange rate must be > 0");
                 }
-                var mapp = mapper.Map<ValuteCourse>(entity);
-                if (mapp != null)
-                {
-                    var res = work.ValuteCourse.UpdateAsync(id,mapp);
-                    return res;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Valute with currecny id {entity.CurrencyID} not found");
-                }
-
+                var mapExchangeRate = mapper.Map<ExchangeRate>(entity);
+                if (mapExchangeRate is null) throw new ItemNotFoundException($"Exchange rate with currency id {entity.CurrencyId} not found");
+                
+                var res = work.ExchangeRateRepository.UpdateAsync(id,mapExchangeRate);
+                return res;
             }
             catch (Exception ex)
             {

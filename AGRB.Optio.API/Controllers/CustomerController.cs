@@ -210,7 +210,7 @@ namespace RGBA.Optio.UI.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    throw new OptioGeneralException(arg.newPassword);
+                    throw new OptioGeneralException(arg.NewPassword);
                 }
                 if (User is not null&&User.Identity!=null&&User.Identity.Name!=null &&User.Identity.IsAuthenticated)
                 {
@@ -263,7 +263,7 @@ namespace RGBA.Optio.UI.Controllers
                 }
                 if (User.Identity is not null&&User.Identity.Name!=null&&User.Identity.IsAuthenticated)
                 {
-                    if (await ser.isEmailConfirmed(User.Identity.Name))
+                    if (await ser.IsEmailConfirmed(User.Identity.Name))
                     {
                         throw new ArgumentException("Email is already  Verified");
                     }
@@ -272,7 +272,7 @@ namespace RGBA.Optio.UI.Controllers
 
                        var rek= await usermanager.GenerateEmailConfirmationTokenAsync(user);
                         var link = Url.ActionLink("GetEmailVerificationMessage", "Customer", new { SecuritySchema = rek}, Request.Scheme);
-                        await ser.sendlinktouser(User.Identity.Name, link);
+                        await ser.SendLinkToUser(User.Identity.Name, link);
                         return Ok(link);
                     }
                     return BadRequest("somethings is bad");

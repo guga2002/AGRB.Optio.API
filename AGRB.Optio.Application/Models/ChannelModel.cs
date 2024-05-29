@@ -2,7 +2,7 @@
 
 namespace RGBA.Optio.Domain.Models
 {
-    public class ChanellModel
+    public class ChannelModel
     {
         [Required(ErrorMessage = "Channel Name is required.")]
         [StringLength(50, ErrorMessage = "Channel Name is not valid", MinimumLength = 3)]

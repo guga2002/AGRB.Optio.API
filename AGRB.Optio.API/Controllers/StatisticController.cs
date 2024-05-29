@@ -24,7 +24,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-               var result = await transactionrelatedstatistic.GetMostPopularCategoryAsync(date.start,date.end);
+               var result = await transactionrelatedstatistic.GetMostPopularCategoryAsync(date.Start,date.End);
                 if(!result.Any())
                 {
                     return NotFound("No data exist on this range");
@@ -43,7 +43,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var result = await transactionrelatedstatistic.GetTransactionQuantityWithDateAsync(date.start, date.end);
+                var result = await transactionrelatedstatistic.GetTransactionQuantityWithDateAsync(date.Start, date.End);
                 if (!result.Any())
                 {
                     return NotFound("No data exist on this range");
@@ -62,7 +62,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var result = await transactionrelatedstatistic.GetAllTransactionBetweenDate(date.start, date.end);
+                var result = await transactionrelatedstatistic.GetAllTransactionBetweenDate(date.Start, date.End);
                 if (!result.Any())
                 {
                     return NotFound("No data exist on this range");
@@ -81,7 +81,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var result = await merchantrelatedstatistic.GetMostPopularChannelAsync(date.start, date.end);
+                var result = await merchantrelatedstatistic.GetMostPopularChannelAsync(date.Start, date.End);
                 if (!result.Any())
                 {
                     return NotFound("No data exist on this range");
@@ -100,7 +100,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var result = await merchantrelatedstatistic.GetMostPopularLocationAsync(date.start, date.end);
+                var result = await merchantrelatedstatistic.GetMostPopularLocationAsync(date.Start, date.End);
                 if (!result.Any())
                 {
                     return NotFound("No data exist on this range");
@@ -119,7 +119,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var result = await merchantrelatedstatistic.GetMostPopularMerchantsAsync(date.start, date.end);
+                var result = await merchantrelatedstatistic.GetMostPopularMerchantsAsync(date.Start, date.End);
                 if (!result.Any())
                 {
                     return NotFound("No data exist on this range");

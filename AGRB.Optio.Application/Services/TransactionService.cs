@@ -24,26 +24,23 @@ namespace RGBA.Optio.Domain.Services
                 {
                     throw new OptioGeneralException("Such Category no exist");
                 }
-                if (await work.ChanellRepository.GetByIdAsync(entity.ChannelId) is null)
+                if (await work.ChannelRepository.GetByIdAsync(entity.ChannelId) is null)
                 {
-                    throw new OptioGeneralException("CHanell  no exist while adding Transaction");
+                    throw new OptioGeneralException("Channel  no exist while adding Transaction");
                 }
                 if (await work.MerchantRepository.GetByIdAsync(entity.MerchantId) is null)
                 {
                     throw new OptioGeneralException("Merchant  no exist while adding Transaction");
                 }
-                if (await work.CurrencyRepository.GetByIdAsync(entity.CurencyNameId) is null)
+                if (await work.CurrencyRepository.GetByIdAsync(entity.CurrencyNameId) is null)
                 {
                     throw new OptioGeneralException("Such Currency no exist while adding Transaction");
                 }
                 var mapped = mapper.Map<Transaction>(entity);
-                if (mapped is not null)
-                {
-                    var res=await work.TransactionRepository.AddAsync(mapped);
-                    await work.CheckAndCommitAsync();
-                    return res;
-                }
-                return -1;
+                if (mapped is null) return -1;
+                var res=await work.TransactionRepository.AddAsync(mapped);
+                await work.CheckAndCommitAsync();
+                return res;
             }
             catch (Exception exp)
             {
@@ -55,21 +52,15 @@ namespace RGBA.Optio.Domain.Services
         #endregion
 
         #region GetAllActiveAsync
-        public async Task<IEnumerable<TransactionModel>> GetAllActiveAsync(TransactionModel Identify)
+        public async Task<IEnumerable<TransactionModel>> GetAllActiveAsync(TransactionModel identify)
         {
             try
             {
-            var res = await work.TransactionRepository.GetAllActiveAsync();
+                var res = await work.TransactionRepository.GetAllActiveAsync();
 
-                if(res is  not null)
-                {
-                    var mapped = mapper.Map<IEnumerable<TransactionModel>>(res);
-                    if(mapped is not null)
-                    {
-                        return mapped;
-                    }
-                }
-                return new List<TransactionModel>();
+                if (res is null) return new List<TransactionModel>();
+                var mapped = mapper.Map<IEnumerable<TransactionModel>>(res);
+                return mapped ?? new List<TransactionModel>();
             }
             catch (Exception exp)
             {
@@ -80,21 +71,15 @@ namespace RGBA.Optio.Domain.Services
         #endregion
 
         #region GetAllAsync
-        public async Task<IEnumerable<TransactionModel>> GetAllAsync(TransactionModel Identify)
+        public async Task<IEnumerable<TransactionModel>> GetAllAsync(TransactionModel identify)
         {
             try
             {
                 var res = await work.TransactionRepository.GetAllWithDetailsAsync();
 
-                if (res is not null)
-                {
-                    var mapped = mapper.Map<IEnumerable<TransactionModel>>(res);
-                    if (mapped is not null)
-                    {
-                        return mapped;
-                    }
-                }
-                return new List<TransactionModel>();
+                if (res is null) return new List<TransactionModel>();
+                var mapped = mapper.Map<IEnumerable<TransactionModel>>(res);
+                return mapped ?? new List<TransactionModel>();
             }
             catch (Exception exp)
             {
@@ -105,20 +90,15 @@ namespace RGBA.Optio.Domain.Services
         #endregion
 
         #region GetByIdAsync
-        public async Task<TransactionModel> GetByIdAsync(long id, TransactionModel Identify)
+        public async Task<TransactionModel> GetByIdAsync(long id, TransactionModel identify)
         {
             try
             {
-                var res = await work.TransactionRepository.GetByIdAsync(id);
-                if(res is not null)
-                {
-                    var mapped = mapper.Map<TransactionModel>(res);
-                    if(mapped is not null)
-                    {
-                        return mapped;
-                    }
-                }
-                throw new ItemNotFoundException(" No transavtion Exist");
+                var res = await work.TransactionRepository.GetByIdAsync(id)
+                          ?? throw new ItemNotFoundException(" No transaction Exist");
+                var mapped = mapper.Map<TransactionModel>(res)
+                             ?? throw new ItemNotFoundException(" No transaction Exist");
+                return mapped;
             }
             catch (Exception exp)
             {
@@ -130,22 +110,17 @@ namespace RGBA.Optio.Domain.Services
 
         #region RemoveAsync
 
-        public async Task<bool> RemoveAsync(long Id, TransactionModel Identity)
+        public async Task<bool> RemoveAsync(long id, TransactionModel identity)
         {
             try
             {
-                var transac = await work.TransactionRepository.GetByIdAsync(Id);
-                if (transac is not null)
-                {
-                    var mapped = mapper.Map<Transaction>(transac);
-                    if (mapped is not null)
-                    {
-                        var res = await work.TransactionRepository.RemoveAsync(mapped);
-                        await work.CheckAndCommitAsync();
-                        return res;
-                    }
-                }
-                return false;
+                var transaction = await work.TransactionRepository.GetByIdAsync(id);
+                if (transaction is null) return false;
+                var mapped = mapper.Map<Transaction>(transaction);
+                if (mapped is null) return false;
+                var res = await work.TransactionRepository.RemoveAsync(mapped);
+                await work.CheckAndCommitAsync();
+                return res;
             }
             catch (Exception exp)
             {
@@ -156,7 +131,7 @@ namespace RGBA.Optio.Domain.Services
         #endregion
 
         #region SoftDeleteAsync
-        public async Task<bool> SoftDeleteAsync(long id, TransactionModel Identify)
+        public async Task<bool> SoftDeleteAsync(long id, TransactionModel identify)
         {
             try
             {
@@ -178,17 +153,12 @@ namespace RGBA.Optio.Domain.Services
         {
             try
             {
-                if (entity is not null)
-                {
-                    var mapped = mapper.Map<Transaction>(entity);
-                    if (mapped is not null)
-                    {
-                        var res = await work.TransactionRepository.UpdateAsync(id,mapped);
-                        await work.CheckAndCommitAsync();
-                        return res;
-                    }
-                }
-                throw new ResourceNotFoundException("No data exist  on this transaction in DB");
+                if (entity is null) throw new ResourceNotFoundException("No data exist  on this transaction in DB");
+                var mapped = mapper.Map<Transaction>(entity) 
+                             ?? throw new ResourceNotFoundException("No data exist  on this transaction in DB");
+                var res = await work.TransactionRepository.UpdateAsync(id,mapped);
+                await work.CheckAndCommitAsync();
+                return res;
             }
             catch (Exception exp)
             {

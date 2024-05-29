@@ -10,6 +10,6 @@ namespace RGBA.Optio.Domain.Models
         [RegularExpression(@"^[a-zA-Z\u10D0-\u10F6\s]*$", ErrorMessage = "Transaction Type should contain only letters (Latin or Georgian) and spaces.")]
         public required string TransactionCategory { get; set; }
 
-        public required long TransactionTypeID { get; set; }
+        public required long TransactionTypeId { get; set; }
     }
 }
