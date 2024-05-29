@@ -66,7 +66,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res =await se.GetAllActiveAsync(new CurrencyModel() { CurrencyCode="Undefined",NameOfCurrency="Undefined"});
+                var res =await se.GetAllActiveAsync(new CurrencyModel() { CurrencyCode=DefaultText.notDefined,NameOfCurrency=DefaultText.noValue});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -98,7 +98,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new CurrencyModel() {CurrencyCode="Undefined",NameOfCurrency="Undefined"});
+                var res = await se.GetAllAsync(new CurrencyModel() {CurrencyCode=DefaultText.noText,NameOfCurrency=DefaultText.notDefined});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -130,7 +130,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new CurrencyModel() { CurrencyCode = "Undefined",NameOfCurrency="Undefined"});
+                var res = await se.GetByIdAsync(id, new CurrencyModel() { CurrencyCode = DefaultText.noValue, NameOfCurrency = DefaultText.noValue });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -162,7 +162,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var rek = await se.RemoveAsync(id, new CurrencyModel() { CurrencyCode = "Undefined", NameOfCurrency = "Undefined" });
+                var rek = await se.RemoveAsync(id, new CurrencyModel() { CurrencyCode = DefaultText.noText, NameOfCurrency = DefaultText.notDefined });
                 if (rek)
                 {
                     return Ok(rek);
@@ -202,7 +202,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.SoftDeleteAsync(id,new CurrencyModel() { CurrencyCode="undefined",NameOfCurrency="undefined"});
+                var res = await se.SoftDeleteAsync(id,new CurrencyModel() { CurrencyCode=DefaultText.noText,NameOfCurrency=DefaultText.noText});
                 return Ok(res);
             }
             catch (Exception exp)
