@@ -80,7 +80,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new ChannelModel() { ChannelType = DefaultText.noValue }); return Ok(res);
+                var res = await se.GetAllActiveAsync(new ChannelModel() { ChannelType = DefaultText.NoValue }); return Ok(res);
             }
             catch (Exception exp)
             {
@@ -95,7 +95,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new CategoryModel() { TransactionCategory = DefaultText.notDefined, TransactionTypeId = 0 });
+                var res = await se.GetAllActiveAsync(new CategoryModel() { TransactionCategory = DefaultText.NotDefined, TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -111,7 +111,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new TransactionTypeModel() { TransactionName = DefaultText.noText });
+                var res = await se.GetAllActiveAsync(new TransactionTypeModel() { TransactionName = DefaultText.NoText });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -127,7 +127,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new ChannelModel() { ChannelType = DefaultText.notDefined });
+                var res = await se.GetAllAsync(new ChannelModel() { ChannelType = DefaultText.NotDefined });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -143,7 +143,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new CategoryModel() { TransactionCategory = DefaultText.noText, TransactionTypeId = 0 });
+                var res = await se.GetAllAsync(new CategoryModel() { TransactionCategory = DefaultText.NoText, TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -159,7 +159,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new TransactionTypeModel() { TransactionName =DefaultText.notDefined});
+                var res = await se.GetAllAsync(new TransactionTypeModel() { TransactionName =DefaultText.NotDefined});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -175,7 +175,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new ChannelModel() { ChannelType = DefaultText.noText });
+                var res = await se.GetByIdAsync(id, new ChannelModel() { ChannelType = DefaultText.NoText });
 
 
                 return Response<ChannelModel>.Ok(res);
@@ -193,7 +193,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new CategoryModel() { TransactionCategory = DefaultText.noValue, TransactionTypeId = 0 });
+                var res = await se.GetByIdAsync(id, new CategoryModel() { TransactionCategory = DefaultText.NoValue, TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -209,7 +209,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.noValue });
+                var res = await se.GetByIdAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.NoValue });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -225,7 +225,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new ChannelModel() { ChannelType = DefaultText.noText });
+                var res = await se.RemoveAsync(id, new ChannelModel() { ChannelType = DefaultText.NoText });
                 return res  ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -241,7 +241,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new CategoryModel() { TransactionCategory = DefaultText.notDefined, TransactionTypeId = 34, });
+                var res = await se.RemoveAsync(id, new CategoryModel() { TransactionCategory = DefaultText.NotDefined, TransactionTypeId = 34, });
                 return res  ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -257,7 +257,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.noValue });
+                var res = await se.RemoveAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.NoValue });
                 if (res)
                 {
                     return Ok(res);
@@ -282,7 +282,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException(ErrorKeys.BadRequest);
                 }
-                var res = await se.SoftDeleteAsync(id, new ChannelModel() { ChannelType =DefaultText.noValue});
+                var res = await se.SoftDeleteAsync(id, new ChannelModel() { ChannelType =DefaultText.NoValue});
                 return res ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -302,7 +302,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException(ErrorKeys.BadRequest);
                 }
-                var res = await se.SoftDeleteAsync(id, new CategoryModel() { TransactionTypeId = 0, TransactionCategory =DefaultText.notDefined });
+                var res = await se.SoftDeleteAsync(id, new CategoryModel() { TransactionTypeId = 0, TransactionCategory =DefaultText.NotDefined });
                 return res ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -322,7 +322,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException(ErrorKeys.BadRequest);
                 }
-                var res = await se.SoftDeleteAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.noValue });
+                var res = await se.SoftDeleteAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.NoValue });
                 return res ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)

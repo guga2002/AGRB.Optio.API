@@ -26,14 +26,14 @@ namespace RGBA.Optio.UI.Controllers
                 var res = await se.AddAsync(entity);
                 if(res!=-1)
                 {
-                    return Response <CurrencyModel>.Ok(entity);
+                    return Response<CurrencyModel>.Ok(entity);
                 }
                 return Response<CurrencyModel>.Error(ErrorKeys.BadRequest,nameof(entity));
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return Response<CurrencyModel>.Error(exp.Message, value: exp.StackTrace);
+                return Response<CurrencyModel>.Error(exp.Message,exp.StackTrace);
             }
         }
 
@@ -67,7 +67,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res =await se.GetAllActiveAsync(new CurrencyModel() { CurrencyCode=DefaultText.notDefined,NameOfCurrency=DefaultText.noValue});
+                var res =await se.GetAllActiveAsync(new CurrencyModel() { CurrencyCode=DefaultText.NotDefined,NameOfCurrency=DefaultText.NoValue});
                 return Response<IEnumerable<CurrencyModel>>.Ok(res);
             }
             catch (Exception exp)
@@ -99,7 +99,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new CurrencyModel() {CurrencyCode=DefaultText.noText,NameOfCurrency=DefaultText.notDefined});
+                var res = await se.GetAllAsync(new CurrencyModel() {CurrencyCode=DefaultText.NoText,NameOfCurrency=DefaultText.NotDefined});
                 return Response<IEnumerable<CurrencyModel>>.Ok(res);
             }
             catch (Exception exp)
@@ -131,7 +131,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new CurrencyModel() { CurrencyCode = DefaultText.noValue, NameOfCurrency = DefaultText.noValue });
+                var res = await se.GetByIdAsync(id, new CurrencyModel() { CurrencyCode = DefaultText.NoValue, NameOfCurrency = DefaultText.NoValue });
                 return Response<CurrencyModel>.Ok(res);
             }
             catch (Exception exp)
@@ -163,7 +163,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var rek = await se.RemoveAsync(id, new CurrencyModel() { CurrencyCode = DefaultText.noText, NameOfCurrency = DefaultText.notDefined });
+                var rek = await se.RemoveAsync(id, new CurrencyModel() { CurrencyCode = DefaultText.NoText, NameOfCurrency = DefaultText.NotDefined });
                 if (rek)
                 {
                     return Response<bool>.Ok(rek);
@@ -203,7 +203,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.SoftDeleteAsync(id,new CurrencyModel() { CurrencyCode=DefaultText.noText,NameOfCurrency=DefaultText.noText});
+                var res = await se.SoftDeleteAsync(id,new CurrencyModel() { CurrencyCode=DefaultText.NoText,NameOfCurrency=DefaultText.NoText});
                 return Response<bool>.Ok(res);
             }
             catch (Exception exp)

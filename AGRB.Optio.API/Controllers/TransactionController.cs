@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using RGBA.Optio.Domain.Interfaces;
 using RGBA.Optio.Domain.Models;
+using RGBA.Optio.Domain.Responses;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -16,14 +17,14 @@ namespace RGBA.Optio.UI.Controllers
     {
         [HttpGet]
         [Route(nameof(GetTransaction))]
-        public async Task<IActionResult> GetTransaction()
+        public async Task<Response<IEnumerable<TransactionModel>>> GetTransaction()
         {
             try
             {
                 const string cacheKey = "GetAllTransaction";
                 if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
                 {
-                    return Ok(value);
+                    if (value != null) return Response<IEnumerable<TransactionModel>>.Ok(value);
                 }
                 else
                 {
@@ -40,29 +41,32 @@ namespace RGBA.Optio.UI.Controllers
 
                     if (!res.Any())
                     {
-                        return NotFound(ErrorKeys.NotFound);
+                        return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
                     }
                     memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
-                    return Ok(res);
+                    return Response<IEnumerable<TransactionModel>>.Ok(res);
                 }
+
+                return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.InternalServerError);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Ok(ex.Message);
+                return Response<IEnumerable<TransactionModel>>.Error(ex.Message, ex.StackTrace);
             }
         }
 
+
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> AllActiveTransaction()
+        public async Task<Response<IEnumerable<TransactionModel>>> AllActiveTransaction()
         {
             try
             {
                 const string cacheKey = "AllActiveTransaction";
                 if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
                 {
-                    return Ok(value);
+                    if (value != null) return Response<IEnumerable<TransactionModel>>.Ok(value);
                 }
                 else
                 {
@@ -78,29 +82,32 @@ namespace RGBA.Optio.UI.Controllers
                     });
                     if (res is null)
                     {
-                        return NotFound(ErrorKeys.NotFound);
+                        return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
                     }
                     memoryCache.Set(res, cacheKey, TimeSpan.FromMinutes(20));
-                    return Ok(res);
+                    return Response<IEnumerable<TransactionModel>>.Ok(res);
                 }
+
+                return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return BadRequest(ex.Message);
+                return Response<IEnumerable<TransactionModel>>.Error(ex.Message, ex.StackTrace);
             }
         }
 
+
         [HttpGet]
         [Route("{id:long}")]
-        public async Task<IActionResult>Get([FromRoute]long id)
+        public async Task<Response<TransactionModel>>Get([FromRoute]long id)
         {
             try
             {
                 var cacheKey = $"TransactionById: {id}";
-                if (memoryCache.TryGetValue(cacheKey, out var value))
+                if (memoryCache.TryGetValue(cacheKey, out TransactionModel? value))
                 {
-                    return Ok(value);
+                    if (value != null) return Response<TransactionModel>.Ok(value);
                 }
 
                 var res = await transactionService.GetByIdAsync(id, new TransactionModel
@@ -115,42 +122,40 @@ namespace RGBA.Optio.UI.Controllers
                 });
                 if (res is null)
                 {
-                    return NotFound();
+                    return Response<TransactionModel>.Error(ErrorKeys.BadRequest);
                 }
                 memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
-                return Ok(res);
+                return Response<TransactionModel>.Ok(res);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return BadRequest(ex.Message);
+                return Response<TransactionModel>.Error(ex.Message,ex.StackTrace);
             }
         }
+
 
         [HttpPost]
         [Route(nameof(InsertTransaction))]
-        public async Task<IActionResult> InsertTransaction([FromBody]TransactionModel model)
+        public async Task<Response<long>> InsertTransaction([FromBody]TransactionModel model)
         {
             try
             {
-                if (!ModelState.IsValid || model is null) return BadRequest(model);
+                if (!ModelState.IsValid || model is null) return Response<long>.Error(ErrorKeys.BadRequest);
                 var res=await transactionService.AddAsync(model);
-                if (res != -1)
-                {
-                    return Ok(res);
-                }
-                return StatusCode(405);
+                return res != -1 ? Response<long>.Ok(res) : Response<long>.Error(ErrorKeys.NotFound);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return BadRequest(ex.Message);
+                return Response<long>.Error(ex.Message, ex.StackTrace);
             }
         }
 
+
         [HttpDelete]
         [Route("[action]/{id:long}")]
-        public async Task<IActionResult> DeleteTransaction([FromRoute]long id)
+        public async Task<Response<bool>> DeleteTransaction([FromRoute]long id)
         {
             try
             {
@@ -164,22 +169,23 @@ namespace RGBA.Optio.UI.Controllers
                     EquivalentInGel = 4,
                     MerchantId = 0
                 });
-                return rek ? Ok(SuccessKeys.Success) : BadRequest(ErrorKeys.BadRequest);
+                return rek ? Response<bool>.Ok(rek) : Response<bool>.Error(ErrorKeys.NotFound);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return BadRequest(ex.Message);
+                return Response<bool>.Error(ex.Message, ex.StackTrace);
             }
         }
 
+
         [HttpPost]
         [Route("[action]/{id:long}")]
-        public async Task<IActionResult> DeleteSoft([FromRoute]long id)
+        public async Task<Response<bool>> DeleteSoft([FromRoute]long id)
         {
             try
             {
-                if (!ModelState.IsValid) return BadRequest();
+                if (!ModelState.IsValid) return Response<bool>.Error(ErrorKeys.BadRequest);
                 var res =await transactionService.SoftDeleteAsync(id, new TransactionModel
                 {
                     Amount = 0,
@@ -190,37 +196,30 @@ namespace RGBA.Optio.UI.Controllers
                     Date = DateTime.Now,
                     EquivalentInGel = 0
                 });
-                if (res)
-                {
-                    return Ok(res);
-                }
-                return StatusCode(405);
+                return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.NotFound);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return BadRequest(ex.Message);
+                return Response<bool>.Error(ex.Message, ex.StackTrace);
             }
         }
 
+
         [HttpPut]
         [Route("[action]/{id:long}/[action]")]
-        public async Task<IActionResult> UpdateTransaction([FromRoute]long id, [FromBody]TransactionModel transactionModel)
+        public async Task<Response<bool>> UpdateTransaction([FromRoute]long id, [FromBody]TransactionModel transactionModel)
         {
             try
             {
-                if (!ModelState.IsValid) return BadRequest(transactionModel);
+                if (!ModelState.IsValid) return Response<bool>.Error(ErrorKeys.BadRequest);
                 var res = await transactionService.UpdateAsync(id, transactionModel);
-                if (res)
-                {
-                    return Ok(res);
-                }
-                return StatusCode(405);
+                return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.NotFound);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return BadRequest(ex.Message);
+                return Response<bool>.Error(ex.Message, ex.StackTrace);
             }
         }
     }

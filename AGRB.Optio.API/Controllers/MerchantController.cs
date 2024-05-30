@@ -1,9 +1,9 @@
 ﻿using AGRB.Optio.API.StaticFiles;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using RGBA.Optio.Domain.Interfaces;
 using RGBA.Optio.Domain.Models;
+using RGBA.Optio.Domain.Responses;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -17,7 +17,7 @@ namespace RGBA.Optio.UI.Controllers
     {
         [HttpGet]
         [Route(nameof(GetAllMerchants))]
-        public async Task<IActionResult> GetAllMerchants()
+        public async Task<Response<IEnumerable<MerchantModel>>> GetAllMerchants()
         {
             try
             {
@@ -25,51 +25,50 @@ namespace RGBA.Optio.UI.Controllers
 
                 if (cashMemoryCache.TryGetValue(cacheKey, out IEnumerable<MerchantModel>? cachedData))
                 {
-                    return Ok(cachedData);
+                    if (cachedData != null) return Response<IEnumerable<MerchantModel>>.Ok(cachedData);
                 }
                 else
                 {
-                    var res = await se.GetAllAsync(new MerchantModel() { Name = "Undefined", });
+                    var res = await se.GetAllAsync(new MerchantModel() { Name = DefaultText.NoText });
                     if (!res.Any())
                     {
-                        return NotFound();
+                        return Response<IEnumerable<MerchantModel>>.Error(ErrorKeys.BadRequest);
                     }
+
                     cashMemoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
-                    return Ok(res);
+                    return Response<IEnumerable<MerchantModel>>.Ok(res);
                 }
+
+                return Response<IEnumerable<MerchantModel>>.Error(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<IEnumerable<MerchantModel>>.Error(ErrorKeys.BadRequest, exp.Message, exp.StackTrace);
             }
         }
-
+        
 
         [HttpPost]
         [Route("Merchant/{merchantId:long}/Location/{locationId:long}")]
-        public async Task<IActionResult> AssignLocationToMerchant([FromRoute]long merchantId,[FromRoute] long locationId)
+        public async Task<Response<bool>> AssignLocationToMerchant([FromRoute]long merchantId,[FromRoute] long locationId)
         {
             try
             {
                 var res = await se.AssignLocationToMerchant(merchantId, locationId);
-                if(res)
-                {
-                    return Ok(res);
-                }
-                return StatusCode(404);
+                return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.NotFound);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<bool>.Error(exp.Message,exp.StackTrace);
             }
         }
 
 
         [HttpGet]
         [Route(nameof(AllActiveMerchant))]
-        public async Task<IActionResult> AllActiveMerchant()
+        public async Task<Response<IEnumerable<MerchantModel>>> AllActiveMerchant()
         {
             try
             {
@@ -77,30 +76,31 @@ namespace RGBA.Optio.UI.Controllers
 
                 if (cashMemoryCache.TryGetValue(cacheKey, out IEnumerable<MerchantModel>? cachedData))
                 {
-                    return Ok(cachedData);
+                    if (cachedData != null) return Response<IEnumerable<MerchantModel>>.Ok(cachedData);
                 }
                 else
                 {
-                    var res = await se.GetAllActiveAsync(new MerchantModel() { Name = "Undefined" });
+                    var res = await se.GetAllActiveAsync(new MerchantModel() { Name = DefaultText.NoText });
                     if (!res.Any())
                     {
-                        return NotFound();
+                        return Response<IEnumerable<MerchantModel>>.Error(ErrorKeys.NotFound);
                     }
                     cashMemoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
-                    return Ok(res);
+                    return Response<IEnumerable<MerchantModel>>.Ok(res);
                 }
+                return Response<IEnumerable<MerchantModel>>.Error(ErrorKeys.InternalServerError);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<IEnumerable<MerchantModel>>.Error(exp.Message, exp.StackTrace);
             }
         }
 
 
         [HttpGet]
         [Route("Merchant/{id:long}")]
-        public async Task<IActionResult> GetMerchant([FromRoute] long id)
+        public async Task<Response<MerchantModel>> GetMerchant([FromRoute] long id)
         {
             try
             {
@@ -109,94 +109,96 @@ namespace RGBA.Optio.UI.Controllers
 
                 if (cashMemoryCache.TryGetValue(cacheKey, out MerchantModel? value))
                 {
-                    return Ok(value);
+                    if (value != null) return Response<MerchantModel>.Ok(value);
                 }
                 else
                 {
-                    var res = await se.GetByIdAsync(id, new MerchantModel() { Name = "Undefined" });
+                    var res = await se.GetByIdAsync(id, new MerchantModel() { Name = DefaultText.NoText });
                     if (res is null)
                     {
-                        return NotFound();
+                        return Response<MerchantModel>.Error(ErrorKeys.NotFound);
                     }
+
                     cashMemoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
-                    return Ok(res);
+                    return Response<MerchantModel>.Ok(res);
                 }
+
+                return Response<MerchantModel>.Error(ErrorKeys.InternalServerError);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<MerchantModel>.Error(exp.Message, exp.StackTrace);
             }
         }
 
 
         [HttpPost]
         [Route(nameof(InsertMerchant))]
-        public async Task<IActionResult> InsertMerchant([FromBody] MerchantModel value)
+        public async Task<Response<long>> InsertMerchant([FromBody] MerchantModel value)
         {
             try
             {
-                if (!ModelState.IsValid || value is null) return BadRequest(value);
+                if (!ModelState.IsValid || value is null) return Response<long>.Error(ErrorKeys.BadRequest);
                 var res= await se.AddAsync(value);
-                return res != -1 ? Ok(res) : StatusCode(405,ErrorKeys.BadRequest);
+                return res != -1 ? Response<long>.Ok(res) : Response<long>.Error(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-               return BadRequest(exp.Message);
+               return Response<long>.Error(exp.Message,exp.StackTrace);
             }
         }
 
 
         [HttpPut]
         [Route("Merchant/{id:long}")]
-        public async Task<IActionResult> UpdateMerchant([FromRoute] long id, [FromBody] MerchantModel value)
+        public async Task<Response<bool>> UpdateMerchant([FromRoute] long id, [FromBody] MerchantModel value)
         {
             try
             {
-                if (!ModelState.IsValid || value is null) return BadRequest(value);
+                if (!ModelState.IsValid || value is null) return Response<bool>.Error(ErrorKeys.BadRequest);
                 var res = await se.UpdateAsync(id,value);
-                return res ? Ok(res) : StatusCode(405, ErrorKeys.BadRequest);
+                return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<bool>.Error(exp.Message, exp.StackTrace);
             }
         }
 
 
         [HttpPost]
         [Route("[action]/{id:long}")]
-        public async Task<IActionResult>  Delete([FromRoute] long id)
+        public async Task<Response<bool>>  Delete([FromRoute] long id)
         {
-
             try
             {
-                var res = await se.SoftDeleteAsync(id, new MerchantModel() { Name = "Undefined" });
-                return res ? Ok(res) : StatusCode(405, ErrorKeys.BadRequest);
+                var res = await se.SoftDeleteAsync(id, new MerchantModel() { Name = DefaultText.NoText });
+                return Response<bool>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<bool>.Error(exp.Message, exp.StackTrace);
             }
         }
 
 
         [HttpDelete]
         [Route("merchant/{id:long}")]
-        public async Task<IActionResult> DeleteMerchant([FromRoute]long id)
+        public async Task<Response<bool>> DeleteMerchant([FromRoute]long id)
         {
             try
             {
-                var res =await se.RemoveAsync(id,new LocationModel() { LocationName="undefined"});
-                return res ? Ok(SuccessKeys.Success) : BadRequest(ErrorKeys.BadRequest);
+                var res =await se.RemoveAsync(id,new LocationModel() { LocationName=DefaultText.NoText});
+                return Response<bool>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<bool>.Error(exp.Message,exp.StackTrace);
             }
         }
 
@@ -204,52 +206,52 @@ namespace RGBA.Optio.UI.Controllers
         //locationEndpoints
         [HttpDelete]
         [Route("location/{id:long}")]
-        public async Task<IActionResult> DeleteLocation([FromRoute]long id)
+        public async Task<Response<bool>> DeleteLocation([FromRoute]long id)
         {
             try
             {
-                var res = await se.RemoveAsync(id,new LocationModel() { LocationName="Undefined"});
-                return res ? Ok(SuccessKeys.Success) : BadRequest(ErrorKeys.BadRequest);
+                var res = await se.RemoveAsync(id,new LocationModel() { LocationName=DefaultText.NoText});
+                return Response<bool>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<bool>.Error(exp.Message,exp.StackTrace);
             }
         }
 
 
         [HttpGet]
         [Route(nameof(GetLocation))]
-        public async Task<IActionResult> GetLocation()
+        public async Task<Response<IEnumerable<LocationModel>>> GetLocation()
         {
             try
             {
                 const string cacheKey = "GetLocation";
                 if (cashMemoryCache.TryGetValue(cacheKey, out IEnumerable<LocationModel>? mod))
                 {
-                    return Ok(mod);
+                    if (mod != null) return Response<IEnumerable<LocationModel>>.Ok(mod);
                 }
 
-                var res = await se.GetAllAsync(new LocationModel() { LocationName = "Undefined" });
+                var res = await se.GetAllAsync(new LocationModel() { LocationName = DefaultText.NoText });
                 if (!res.Any())
                 {
-                    return NotFound();
+                    return Response<IEnumerable<LocationModel>>.Error(ErrorKeys.BadRequest);
                 }
                 cashMemoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(15));
-                return Ok(res);
+                return Response<IEnumerable<LocationModel>>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<IEnumerable<LocationModel>>.Error(exp.Message, exp.Message);
             }
         }
 
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> AllActiveLocation()
+        public async Task<Response<IEnumerable<LocationModel>>> AllActiveLocation()
         {
             try
             {
@@ -257,103 +259,103 @@ namespace RGBA.Optio.UI.Controllers
 
                 if (cashMemoryCache.TryGetValue(cashed, out IEnumerable<LocationModel>? loc))
                 {
-                    return Ok(loc);
+                    if (loc != null) return Response<IEnumerable<LocationModel>>.Ok(loc);
                 }
 
-                var res = await se.GetAllActiveAsync(new LocationModel() { LocationName = "Undefined" });
+                var res = await se.GetAllActiveAsync(new LocationModel() { LocationName = DefaultText.NoText });
                 if (!res.Any())
                 {
-                    return NotFound();
+                    return Response<IEnumerable<LocationModel>>.Error(ErrorKeys.BadRequest);
                 }
-                cashMemoryCache.Set(cashed, res, TimeSpan.FromMinutes(15));
-                return Ok(res);
+                cashMemoryCache.Set(cashed, res, TimeSpan.FromMinutes(15)); 
+                return Response<IEnumerable<LocationModel>>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<IEnumerable<LocationModel>>.Error(exp.Message,exp.StackTrace);
             }
         }
 
 
         [HttpGet]
         [Route("Location/{id:long}")]
-        public async Task<IActionResult> GetLocation([FromRoute] long id)
+        public async Task<Response<LocationModel>> GetLocation([FromRoute] long id)
         {
             try
             {
                 var cacheKey = $"getAllLocationById{id}";
                 if (cashMemoryCache.TryGetValue(cacheKey, out LocationModel? mod))
                 {
-                    return Ok(mod);
+                    if (mod != null) return Response<LocationModel>.Ok(mod);
                 }
 
-                var res = await se.GetByIdAsync(id, new LocationModel() { LocationName = "Undefined" });
+                var res = await se.GetByIdAsync(id, new LocationModel() { LocationName = DefaultText.NoText });
                 if (res is not null)
                 {
-                    return NotFound();
+                    return Response<LocationModel>.Error(ErrorKeys.BadRequest);
                 }
                 cashMemoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(15));
-                return Ok(res);
+                return Response<LocationModel>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return BadRequest(exp.Message);
+                return Response<LocationModel>.Error(exp.Message,exp.StackTrace);
             }
         }
 
 
         [HttpPost]
         [Route(nameof(InsertLocation))]
-        public async Task<IActionResult> InsertLocation([FromBody] LocationModel value)
+        public async Task<Response<long>> InsertLocation([FromBody] LocationModel value)
         {
             try
             {
-                if (!ModelState.IsValid || value is null) return BadRequest(value);
+                if (!ModelState.IsValid || value is null) return Response<long>.Error(ErrorKeys.BadRequest);
                 var res = await se.AddAsync(value);
-                return res != -1 ? Ok(res) : StatusCode(405, ErrorKeys.BadRequest);
+                return Response<long>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<long>.Error(exp.Message,exp.StackTrace);
             }
         }
 
 
         [HttpPut]
         [Route("Location/{id:long}")]
-        public async Task<IActionResult> Update([FromRoute]long id, [FromBody] LocationModel value)
+        public async Task<Response<bool>> Update([FromRoute]long id, [FromBody] LocationModel value)
         {
             try
             {
-                if (!ModelState.IsValid || value is null) return BadRequest(value);
+                if (!ModelState.IsValid || value is null) return Response<bool>.Error(ErrorKeys.BadRequest);
                 var res = await se.UpdateAsync(id, value);
-                return res ? Ok(res) : StatusCode(405, ErrorKeys.BadRequest);
+                return Response<bool>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<bool>.Error(exp.Message,exp.StackTrace);
             }
         }
 
 
         [HttpPost]
         [Route("[action]/{id:long}")]
-        public async Task<IActionResult> DeleteLocationSoft([FromRoute]long id)
+        public async Task<Response<bool>> DeleteLocationSoft([FromRoute]long id)
         {
 
             try
             {
-                var res = await se.SoftDeleteAsync(id, new LocationModel() { LocationName = "Undefined" });
-                return res ? Ok(res) : StatusCode(405, ErrorKeys.BadRequest);
+                var res = await se.SoftDeleteAsync(id, new LocationModel() { LocationName = DefaultText.NoText });
+                return Response<bool>.Ok(res);
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message, exp.StackTrace);
-                return BadRequest(exp.Message);
+                return Response<bool>.Error(exp.Message,exp.StackTrace);
             }
         }
     }

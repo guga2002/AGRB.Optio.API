@@ -2,8 +2,8 @@
 {
     public static class DefaultText
     {
-       public const  string notDefined = "This field is not defined";
-       public const string noText = "This field  do ot contain any  valuable value";
-       public const string noValue = " This is empty string, whith no Valuable value";
+       public const  string NotDefined = "This field is not defined";
+       public const string NoText = "This field  do not contain any  valuable value";
+       public const string NoValue = " This is empty string, whith no Valuable value";
     }
 }
