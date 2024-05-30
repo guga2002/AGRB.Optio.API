@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGRB.Optio.Domain", "AGRB.O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGRB.Optio.Infrastructure", "AGRB.Optio.Infrastructure\AGRB.Optio.Infrastructure.csproj", "{53F27F44-4685-42EB-8059-2E7B47F0C1FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGRB.Optio.Application", "AGRB.Optio.Application\AGRB.Optio.Application.csproj", "{D640AE85-AB4B-4D9D-B399-81F10055F825}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGRB.Optio.Persistance", "AGRB.Optio.Persistance\AGRB.Optio.Persistance.csproj", "{BADFD255-9C86-49A4-8178-53B87F48217A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{53F27F44-4685-42EB-8059-2E7B47F0C1FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53F27F44-4685-42EB-8059-2E7B47F0C1FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53F27F44-4685-42EB-8059-2E7B47F0C1FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D640AE85-AB4B-4D9D-B399-81F10055F825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D640AE85-AB4B-4D9D-B399-81F10055F825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D640AE85-AB4B-4D9D-B399-81F10055F825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D640AE85-AB4B-4D9D-B399-81F10055F825}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BADFD255-9C86-49A4-8178-53B87F48217A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BADFD255-9C86-49A4-8178-53B87F48217A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BADFD255-9C86-49A4-8178-53B87F48217A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BADFD255-9C86-49A4-8178-53B87F48217A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

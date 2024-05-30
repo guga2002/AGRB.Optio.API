@@ -5,21 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Optio.Core.Entities
 {
     [Table("Channels")]
-    [Index(nameof(ChannelType),IsDescending =new bool[] {true})]
+    [Index(nameof(ChannelType),IsDescending = [true])]
     public class Channels:AbstractClass
     {
         [Column("Channel_Type")]
-        [StringLength(50,ErrorMessage ="Such  a  CHanell Name  is not Valid",MinimumLength =2)]
+        [StringLength(50,ErrorMessage ="Such  a  channel Name  is not Valid",MinimumLength =2)]
         public required string ChannelType { get; set; }
 
-        public bool IsActive { get; set; }=true;
+        public bool IsActive { get; set; } = true;
 
         public virtual IEnumerable<Transaction> Transactions { get; set;}
 
-        public Channels()
-        {
-            IsActive = true;
-        }
 
     }
 }
