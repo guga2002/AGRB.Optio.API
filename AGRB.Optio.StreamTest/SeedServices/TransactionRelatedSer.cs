@@ -284,10 +284,10 @@ namespace RGBA.Optio.Stream.SeedServices
                     i--;
                     continue;
                 }
-
+                Random randomi=new Random();
                 var trans = new Transaction
                 {
-                    Date = DateTime.Now,
+                    Date = DateTime.Now.AddDays(-randomi.Next(3,200)),
                     Amount = rand1.Next(10000),
                     AmountEquivalent = 0,
                     CurrencyId = currencyIndex,
