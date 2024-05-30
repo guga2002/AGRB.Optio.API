@@ -26,7 +26,7 @@ namespace RGBA.Optio.Core.Repositories
 
         public IMerchantRepo MerchantRepository => new MerchantRepos(db,configuration);
 
-        public ITransactionRepo TransactionRepository => new TransactionRepos(db,cash);
+        public ITransactionRepo TransactionRepository => new TransactionRepos(db);
 
         public ITypeOfTransactionRepo TypeOfTransactionRepository => new TypeOfTransactionRepos(db);
 
