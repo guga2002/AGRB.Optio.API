@@ -7,8 +7,6 @@ using RGBA.Optio.Domain.Responses;
 
 namespace RGBA.Optio.UI.Controllers
 {
-
-
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionRelatedController(ITransactionRelatedService se, ILogger<TransactionRelatedController> log) : ControllerBase
@@ -82,7 +80,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new ChannelModel() { ChannelType = "Undefined" }); return Ok(res);
+                var res = await se.GetAllActiveAsync(new ChannelModel() { ChannelType = DefaultText.noValue }); return Ok(res);
             }
             catch (Exception exp)
             {
@@ -97,7 +95,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new CategoryModel() { TransactionCategory = "Undefined", TransactionTypeId = 0 });
+                var res = await se.GetAllActiveAsync(new CategoryModel() { TransactionCategory = DefaultText.notDefined, TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -113,7 +111,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllActiveAsync(new TransactionTypeModel() { TransactionName = "Undefined" });
+                var res = await se.GetAllActiveAsync(new TransactionTypeModel() { TransactionName = DefaultText.noText });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -129,7 +127,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new ChannelModel() { ChannelType = "Undefined" });
+                var res = await se.GetAllAsync(new ChannelModel() { ChannelType = DefaultText.notDefined });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -145,7 +143,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new CategoryModel() { TransactionCategory = "undefined", TransactionTypeId = 0 });
+                var res = await se.GetAllAsync(new CategoryModel() { TransactionCategory = DefaultText.noText, TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -161,7 +159,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetAllAsync(new TransactionTypeModel() { TransactionName = "UNDEFINED" });
+                var res = await se.GetAllAsync(new TransactionTypeModel() { TransactionName =DefaultText.notDefined});
                 return Ok(res);
             }
             catch (Exception exp)
@@ -177,7 +175,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new ChannelModel() { ChannelType = "UNDEFINED" });
+                var res = await se.GetByIdAsync(id, new ChannelModel() { ChannelType = DefaultText.noText });
 
 
                 return Response<ChannelModel>.Ok(res);
@@ -195,7 +193,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new CategoryModel() { TransactionCategory = "UNDEFINED", TransactionTypeId = 0 });
+                var res = await se.GetByIdAsync(id, new CategoryModel() { TransactionCategory = DefaultText.noValue, TransactionTypeId = 0 });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -211,7 +209,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.GetByIdAsync(id, new TransactionTypeModel() { TransactionName = "UNDEFINED" });
+                var res = await se.GetByIdAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.noValue });
                 return Ok(res);
             }
             catch (Exception exp)
@@ -227,7 +225,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new ChannelModel() { ChannelType = "undefined" });
+                var res = await se.RemoveAsync(id, new ChannelModel() { ChannelType = DefaultText.noText });
                 return res  ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -243,7 +241,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new CategoryModel() { TransactionCategory = "undefined", TransactionTypeId = 34, });
+                var res = await se.RemoveAsync(id, new CategoryModel() { TransactionCategory = DefaultText.notDefined, TransactionTypeId = 34, });
                 return res  ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -259,7 +257,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             try
             {
-                var res = await se.RemoveAsync(id, new TransactionTypeModel() { TransactionName = "undefined" });
+                var res = await se.RemoveAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.noValue });
                 if (res)
                 {
                     return Ok(res);
@@ -284,7 +282,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException(ErrorKeys.BadRequest);
                 }
-                var res = await se.SoftDeleteAsync(id, new ChannelModel() { ChannelType = "UNDEFINED" });
+                var res = await se.SoftDeleteAsync(id, new ChannelModel() { ChannelType =DefaultText.noValue});
                 return res ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -304,7 +302,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException(ErrorKeys.BadRequest);
                 }
-                var res = await se.SoftDeleteAsync(id, new CategoryModel() { TransactionTypeId = 0, TransactionCategory = "UNDEFINED" });
+                var res = await se.SoftDeleteAsync(id, new CategoryModel() { TransactionTypeId = 0, TransactionCategory =DefaultText.notDefined });
                 return res ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -324,7 +322,7 @@ namespace RGBA.Optio.UI.Controllers
                 {
                     throw new OptioGeneralException(ErrorKeys.BadRequest);
                 }
-                var res = await se.SoftDeleteAsync(id, new TransactionTypeModel() { TransactionName = "UNDEFINED" });
+                var res = await se.SoftDeleteAsync(id, new TransactionTypeModel() { TransactionName =DefaultText.noValue });
                 return res ? Ok(res) : BadRequest(ErrorKeys.BadRequest);
             }
             catch (Exception exp)
@@ -373,8 +371,6 @@ namespace RGBA.Optio.UI.Controllers
                 return BadRequest(exp.Message);
             }
         }
-
-        
 
         [HttpPut]
         [Route("[action]/{id:long}")]
