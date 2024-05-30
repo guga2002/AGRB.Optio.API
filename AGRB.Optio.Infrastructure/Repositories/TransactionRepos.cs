@@ -11,9 +11,9 @@ namespace Optio.Core.Repositories
         private readonly DbSet<Transaction> transactions;
         private readonly CacheService _cache;
 
-        public TransactionRepos(OptioDB optioDB, CacheService cache) :base(optioDB)
+        public TransactionRepos(OptioDB optioDB, CacheService cache) : base(optioDB)
         {
-            transactions=context.Set<Transaction>();
+            transactions = context.Set<Transaction>();
             this._cache = cache;
         }
 
@@ -22,25 +22,34 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                if (!await context.CategoryOfTransactions.AnyAsync(io => io.Id == entity.CategoryId) ||
-                    !await context.Currencies.AnyAsync(io => io.Id == entity.CurrencyId) ||
-                     !await context.Locations.AnyAsync(io => io.Id == entity.ChannelId) ||
-                      !await context.Merchants.AnyAsync(io => io.Id == entity.MerchantId))
+                var tasks = new Task<bool>[]
                 {
-                    throw new ArgumentException("No related Table exist, Please   Recorect your data");
+                    context.CategoryOfTransactions.AnyAsync(io => io.Id == entity.CategoryId),
+                    context.Currencies.AnyAsync(io => io.Id == entity.CurrencyId),
+                    context.Locations.AnyAsync(io => io.Id == entity.ChannelId),
+                    context.Merchants.AnyAsync(io => io.Id == entity.MerchantId),
+                    transactions.AnyAsync(io => io.Id == entity.Id)
+                };
+
+                var results = await Task.WhenAll(tasks);
+
+                if (results.Take(4).Any(e => !e))
+                {
+                    throw new ArgumentException("No related Table exist, Please correct your data");
                 }
-                if (await transactions.AnyAsync(io => io.Id == entity.Id))
+
+                if (results[4])
                 {
                     throw new ArgumentException("Such a Transaction Already Exist In Db");
                 }
+
                 await transactions.AddAsync(entity);
                 await context.SaveChangesAsync();
-                var max =await  transactions.MaxAsync(io => io.Id);
-                return max;
+
+                return entity.Id;
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -65,12 +74,15 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                return await  transactions.Include(io => io.Category)
-               .Include(io => io.Channel)
-                .Include(io => io.Currency)
-                .ThenInclude(io => io.Courses)
-                .Include(io => io.Merchant)
-                .ThenInclude(io => io.Locations).ToListAsync();
+                var transactionsWithDetails = await transactions
+                    .Include(io => io.Category)
+                    .Include(io => io.Channel)
+                    .Include(io => io.Currency).ThenInclude(io => io.Courses)
+                    .Include(io => io.Merchant).ThenInclude(io => io.Locations)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return transactionsWithDetails;
             }
             catch (Exception)
             {
@@ -84,37 +96,31 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                string cacheKey = $"Transaction_{id}";
-                await Task.Delay(1);
-                Transaction transaction = _cache.GetOrCreate(cacheKey, () =>
-                {
-                    return transactions.AsNoTracking()
-                        .Single(io => io.IsActive && io.Id == id);
-                }, TimeSpan.FromMinutes(15));
-
-                return transaction ?? throw new ArgumentException("No transaction found");
+                return await transactions.AsNoTracking()
+                    .FirstOrDefaultAsync(io => io.IsActive && io.Id == id)
+                    ?? throw new ArgumentNullException("Transaction not found");
             }
             catch (Exception)
             {
                 throw;
             }
         }
-
         #endregion
 
         #region GetByIdWithDetailsAsync
-        public async Task<Transaction> GetByIdWithDetailsAsync(long ID)
+        public async Task<Transaction> GetByIdWithDetailsAsync(long id)
         {
             try
             {
-                var res = await transactions.Include(io => io.Category)
-                 .Include(io => io.Channel)
-                .Include(io => io.Currency)
-                 .ThenInclude(io => io.Courses)
-                    .Include(io => io.Merchant)
-                     .ThenInclude(io => io.Locations)
-                    .FirstOrDefaultAsync(io => io.Id == ID);
-                return res ?? throw new ArgumentNullException("no  data  exsit, On this ID");
+                var transactionWithDetails = await transactions
+                    .Include(io => io.Category)
+                    .Include(io => io.Channel)
+                    .Include(io => io.Currency).ThenInclude(io => io.Courses)
+                    .Include(io => io.Merchant).ThenInclude(io => io.Locations)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(io => io.Id == id);
+
+                return transactionWithDetails ?? throw new ArgumentNullException("Transaction not found");
             }
             catch (Exception)
             {
@@ -145,10 +151,10 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var res = await transactions.FindAsync(id);
-                if (res is not null)
+                var transaction = await transactions.FindAsync(id);
+                if (transaction != null)
                 {
-                    res.IsActive = false;
+                    transaction.IsActive = false;
                     await context.SaveChangesAsync();
                     return true;
                 }
@@ -162,14 +168,14 @@ namespace Optio.Core.Repositories
         #endregion
 
         #region UpdateAsync
-        public async Task<bool> UpdateAsync(long id,Transaction entity)
+        public async Task<bool> UpdateAsync(long id, Transaction entity)
         {
             try
             {
-                var tran = await transactions.FindAsync(id);
-                if (tran is not null)
+                var transaction = await transactions.FindAsync(id);
+                if (transaction != null)
                 {
-                    context.Entry(tran).CurrentValues.SetValues(entity);
+                    context.Entry(transaction).CurrentValues.SetValues(entity);
                     await context.SaveChangesAsync();
                     return true;
                 }
@@ -177,9 +183,9 @@ namespace Optio.Core.Repositories
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                var en = ex.Entries.Single();
-                var value = (Transaction)en.Entity;
-                en.CurrentValues.SetValues(value);
+                var entry = ex.Entries.Single();
+                var databaseEntity = (Transaction)entry.Entity;
+                entry.CurrentValues.SetValues(databaseEntity);
                 throw;
             }
             catch (Exception)
@@ -194,8 +200,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var res = await transactions.AsNoTracking().Where(io => io.IsActive == true).ToListAsync();
-                return res;
+                return await transactions.AsNoTracking().Where(io => io.IsActive).ToListAsync();
             }
             catch (Exception)
             {
