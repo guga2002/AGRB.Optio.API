@@ -98,7 +98,7 @@ namespace RGBA.Optio.Stream.SeedServices
                         var randLocat = rand1.Next((int)minLocationId.Id, (int)maxLocationId.Id);
                         if (await optioDB.Merchants.AnyAsync(i=>i.Id==randMerch) || await optioDB.Locations.AnyAsync(i=>i.Id==randLocat))
                         {
-                            await _uniteOfWork.MerchantRepository.AssignLocationtoMerchant(randMerch, randLocat);
+                            await _uniteOfWork.MerchantRepository.AssignLocationToMerchant(randMerch, randLocat);
                         }
                         else
                         {

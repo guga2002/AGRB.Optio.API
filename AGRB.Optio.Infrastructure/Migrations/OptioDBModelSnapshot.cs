@@ -366,16 +366,12 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("Status_Of_Currency");
 
-
                     b.Property<string>("NameOfCurrency")
-
                         .IsRequired()
                         .HasMaxLength(30)
                         .IsUnicode(false)
                         .HasColumnType("varchar(30)")
-                   
                         .HasColumnName("Name_Of_Currency");
-
 
                     b.HasKey("Id");
 
@@ -422,7 +418,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .IsDescending();
 
                     b.ToTable("ExchangeRates");
-
                 });
 
             modelBuilder.Entity("RGBA.Optio.Core.Entities.LocationToMerchant", b =>
@@ -433,12 +428,10 @@ namespace AGRB.Optio.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-
                     b.Property<long>("LocationId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("MerchantId")
-
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -446,7 +439,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("MerchantId");
-
 
                     b.ToTable("LocationToMerchants");
                 });
@@ -536,7 +528,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.HasIndex("PersonalNumber")
-
                         .IsDescending();
 
                     b.ToTable("AspNetUsers", (string)null);
@@ -602,7 +593,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("TypeOfTransaction");
-
                 });
 
             modelBuilder.Entity("Optio.Core.Entities.Transaction", b =>
@@ -640,7 +630,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     b.Navigation("Merchant");
                 });
 
-
             modelBuilder.Entity("RGBA.Optio.Core.Entities.ExchangeRate", b =>
                 {
                     b.HasOne("RGBA.Optio.Core.Entities.Currency", "Currency")
@@ -669,7 +658,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     b.Navigation("Location");
 
                     b.Navigation("Merchant");
-
                 });
 
             modelBuilder.Entity("Optio.Core.Entities.Category", b =>

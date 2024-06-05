@@ -31,12 +31,12 @@ namespace RGBA.Optio.Stream.SeedServices
         #region channel
         public async Task<bool> fillChannel()
         {
-            await _uniteOfWork.ChanellRepository.AddAsync(new Channels { ChannelType="ფილიალი" });
-            await _uniteOfWork.ChanellRepository.AddAsync(new Channels { ChannelType = "მობილური ინტერნეტ ბანკი" });
-            await _uniteOfWork.ChanellRepository.AddAsync(new Channels { ChannelType = "ინტერნეტ ბანკი" });
-            await _uniteOfWork.ChanellRepository.AddAsync(new Channels { ChannelType = "ტერმინალი" });
-            await _uniteOfWork.ChanellRepository.AddAsync(new Channels { ChannelType = "ნაღდი ანგარიშსწორება" });
-            await _uniteOfWork.ChanellRepository.AddAsync(new Channels { ChannelType = "განვადება" });
+            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType="ფილიალი" });
+            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "მობილური ინტერნეტ ბანკი" });
+            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "ინტერნეტ ბანკი" });
+            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "ტერმინალი" });
+            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "ნაღდი ანგარიშსწორება" });
+            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "განვადება" });
             return true;
         }
         #endregion
@@ -98,7 +98,6 @@ namespace RGBA.Optio.Stream.SeedServices
                     {
                         IsActive = true,
                         TransactionCategory="ტრანსპორტი",
-                        TransactionTypeID=1,
                     },
                     new Category()
                     {
@@ -122,7 +121,7 @@ namespace RGBA.Optio.Stream.SeedServices
                     {
                         IsActive = true,
                         TransactionCategory="შიდა გადარიცხვა",
-                        TransactionTypeID=1,
+                        TransactionTypeId=1,
                     },
                 }
             });
@@ -136,7 +135,7 @@ namespace RGBA.Optio.Stream.SeedServices
                     {
                         IsActive = true,
                         TransactionCategory="სხვა ბანკში გადარიცხვა",
-                        TransactionTypeID=1
+                        TransactionTypeId=1
                     }
                 }
             });
@@ -150,7 +149,7 @@ namespace RGBA.Optio.Stream.SeedServices
                     {
                         IsActive = true,
                         TransactionCategory="თანხის განაღდება",
-                        TransactionTypeID=1
+                        TransactionTypeId=1
                     },
                 }
             });
@@ -167,24 +166,24 @@ namespace RGBA.Optio.Stream.SeedServices
             {
                 foreach (var Dgiuri in currency.Currencies)
                 {
-                    var curenc=await optioDB.Currencies.FirstOrDefaultAsync(io=>io.NameOfValute==Dgiuri.name);
+                    var curenc=await optioDB.Currencies.FirstOrDefaultAsync(io=>io.NameOfCurrency==Dgiuri.name);
                     if (curenc is  null)
                     {
                         curenc = new Currency()
                         {
                             CurrencyCode = Dgiuri.code,
-                            NameOfValute = Dgiuri.name,
+                            NameOfCurrency = Dgiuri.name,
                             IsActive = true,
                         };
                     }
 
-                    var valute = new ValuteCourse()
+                    var valute = new ExchangeRate()
                     {
-                        ExchangeRate = (decimal)Dgiuri.rate/Dgiuri.quantity,
-                        DateOfValuteCourse = currency.Date,
+                        Rate = (decimal)Dgiuri.rate/Dgiuri.quantity,
+                        Date = currency.Date,
                         Currency = curenc,
                     };
-                    optioDB.ValuteCourses.Add(valute);
+                    optioDB.ExchangeRates.Add(valute);
                     await optioDB.SaveChangesAsync();
                 }
             }
@@ -240,7 +239,7 @@ namespace RGBA.Optio.Stream.SeedServices
                     IsActive = true,
                 };
               
-                trans.AmountEquivalent = trans.Amount * currencyIn.Courses.OrderByDescending(i => i.DateOfValuteCourse).FirstOrDefault().ExchangeRate;
+                trans.AmountEquivalent = trans.Amount * currencyIn.Courses.OrderByDescending(i => i.Date).FirstOrDefault().Rate;
                transactions.Add(trans);
             }
             await optioDB.Transactions.AddRangeAsync(transactions);
@@ -296,7 +295,7 @@ namespace RGBA.Optio.Stream.SeedServices
                     ChannelId = channelIndex,
                     IsActive = true,
                 };
-                trans.AmountEquivalent = trans.Amount * currencyIn.Courses.OrderByDescending(i => i.DateOfValuteCourse).FirstOrDefault().ExchangeRate;
+                trans.AmountEquivalent = trans.Amount * currencyIn.Courses.OrderByDescending(i => i.Date).FirstOrDefault().Rate;
                 try
                 {
                     using (IDbConnection db = new SqlConnection(conf.GetConnectionString("OptiosString")))
@@ -320,7 +319,7 @@ namespace RGBA.Optio.Stream.SeedServices
 
         public async Task<IEnumerable<Transaction>> GetAllTransactions()
         {
-            return await _uniteOfWork.MerchantRepository.getalltransactions();
+            return await _uniteOfWork.MerchantRepository.GetAllTransactions();
         }
 
         public async Task<IEnumerable<Transaction>> GetAllTransactionsWithoutDapper()

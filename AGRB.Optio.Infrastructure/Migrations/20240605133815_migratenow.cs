@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AGRB.Optio.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class migratedatad : Migration
+    public partial class migratenow : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,18 +69,18 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Curencies",
+                name: "Currencies",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name_Of_Valute = table.Column<string>(type: "varchar(30)", unicode: false, maxLength: 30, nullable: false),
+                    Name_Of_Currency = table.Column<string>(type: "varchar(30)", unicode: false, maxLength: 30, nullable: false),
                     Currency_Code = table.Column<string>(type: "varchar(30)", unicode: false, maxLength: 30, nullable: false),
                     Status_Of_Currency = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Curencies", x => x.Id);
+                    table.PrimaryKey("PK_Currencies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -232,23 +232,23 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ValutesCourses",
+                name: "ExchangeRates",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Exchange_Rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Last_Updated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CurrencyID = table.Column<int>(type: "int", nullable: false),
-                    Status_Of_Valute = table.Column<bool>(type: "bit", nullable: false)
+                    CurrencyId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ValutesCourses", x => x.Id);
+                    table.PrimaryKey("PK_ExchangeRates", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ValutesCourses_Curencies_CurrencyID",
-                        column: x => x.CurrencyID,
-                        principalTable: "Curencies",
+                        name: "FK_ExchangeRates_Currencies_CurrencyId",
+                        column: x => x.CurrencyId,
+                        principalTable: "Currencies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -259,21 +259,21 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LocatrionId = table.Column<long>(type: "bigint", nullable: false),
-                    merchantId = table.Column<long>(type: "bigint", nullable: false)
+                    LocationId = table.Column<long>(type: "bigint", nullable: false),
+                    MerchantId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LocationToMerchants", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LocationToMerchants_Locations_LocatrionId",
-                        column: x => x.LocatrionId,
+                        name: "FK_LocationToMerchants_Locations_LocationId",
+                        column: x => x.LocationId,
                         principalTable: "Locations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_LocationToMerchants_Merchants_merchantId",
-                        column: x => x.merchantId,
+                        name: "FK_LocationToMerchants_Merchants_MerchantId",
+                        column: x => x.MerchantId,
                         principalTable: "Merchants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -287,14 +287,15 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Transaction_Category = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    TransactionTypeID = table.Column<long>(type: "bigint", nullable: false)
+                    TransactionTypeId = table.Column<long>(type: "bigint", nullable: false),
+                    TypeOfTransactionId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CategoryOfTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CategoryOfTransactions_TypeOfTransactions_TransactionTypeID",
-                        column: x => x.TransactionTypeID,
+                        name: "FK_CategoryOfTransactions_TypeOfTransactions_TypeOfTransactionId",
+                        column: x => x.TypeOfTransactionId,
                         principalTable: "TypeOfTransactions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -331,9 +332,9 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Transactions_Curencies_CurrencyId",
+                        name: "FK_Transactions_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
-                        principalTable: "Curencies",
+                        principalTable: "Currencies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -380,7 +381,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 name: "IX_AspNetUsers_Personal_Number",
                 table: "AspNetUsers",
                 column: "Personal_Number",
-                unique: true,
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
@@ -397,9 +397,9 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryOfTransactions_TransactionTypeID",
+                name: "IX_CategoryOfTransactions_TypeOfTransactionId",
                 table: "CategoryOfTransactions",
-                column: "TransactionTypeID");
+                column: "TypeOfTransactionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Channels_Channel_Type",
@@ -408,15 +408,32 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Curencies_Currency_Code",
-                table: "Curencies",
+                name: "IX_Currencies_Currency_Code",
+                table: "Currencies",
                 column: "Currency_Code",
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Curencies_Name_Of_Valute",
-                table: "Curencies",
-                column: "Name_Of_Valute",
+                name: "IX_Currencies_Name_Of_Currency",
+                table: "Currencies",
+                column: "Name_Of_Currency",
+                descending: new bool[0]);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExchangeRates_CurrencyId",
+                table: "ExchangeRates",
+                column: "CurrencyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExchangeRates_Last_Updated",
+                table: "ExchangeRates",
+                column: "Last_Updated",
+                descending: new bool[0]);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExchangeRates_Rate",
+                table: "ExchangeRates",
+                column: "Rate",
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
@@ -426,14 +443,14 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationToMerchants_LocatrionId",
+                name: "IX_LocationToMerchants_LocationId",
                 table: "LocationToMerchants",
-                column: "LocatrionId");
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationToMerchants_merchantId",
+                name: "IX_LocationToMerchants_MerchantId",
                 table: "LocationToMerchants",
-                column: "merchantId");
+                column: "MerchantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Merchants_Name",
@@ -484,23 +501,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 table: "TypeOfTransactions",
                 column: "Transaction_Name",
                 descending: new bool[0]);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ValutesCourses_CurrencyID",
-                table: "ValutesCourses",
-                column: "CurrencyID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ValutesCourses_Exchange_Rate",
-                table: "ValutesCourses",
-                column: "Exchange_Rate",
-                descending: new bool[0]);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ValutesCourses_Last_Updated",
-                table: "ValutesCourses",
-                column: "Last_Updated",
-                descending: new bool[0]);
         }
 
         /// <inheritdoc />
@@ -522,13 +522,13 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "ExchangeRates");
+
+            migrationBuilder.DropTable(
                 name: "LocationToMerchants");
 
             migrationBuilder.DropTable(
                 name: "Transactions");
-
-            migrationBuilder.DropTable(
-                name: "ValutesCourses");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -546,10 +546,10 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 name: "Channels");
 
             migrationBuilder.DropTable(
-                name: "Merchants");
+                name: "Currencies");
 
             migrationBuilder.DropTable(
-                name: "Curencies");
+                name: "Merchants");
 
             migrationBuilder.DropTable(
                 name: "TypeOfTransactions");

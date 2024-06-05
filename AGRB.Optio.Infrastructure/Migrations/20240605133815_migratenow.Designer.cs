@@ -12,8 +12,8 @@ using Optio.Core.Data;
 namespace AGRB.Optio.Infrastructure.Migrations
 {
     [DbContext(typeof(OptioDB))]
-    [Migration("20240529173031_mgrt")]
-    partial class mgrt
+    [Migration("20240605133815_migratenow")]
+    partial class migratenow
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
