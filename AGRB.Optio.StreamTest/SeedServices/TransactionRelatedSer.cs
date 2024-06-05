@@ -230,7 +230,7 @@ namespace RGBA.Optio.Stream.SeedServices
 
                 var trans = new Transaction
                 {
-                    Date = DateTime.Now,
+                    Date = DateTime.Now.AddDays(-rand1.Next(3,60)),
                     Amount = rand1.Next(10000),
                     AmountEquivalent = 0,
                     CurrencyId = currencyIndex,
