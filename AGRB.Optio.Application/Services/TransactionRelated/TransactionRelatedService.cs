@@ -5,18 +5,14 @@ using RGBA.Optio.Core.Interfaces;
 using RGBA.Optio.Domain.Custom_Exceptions;
 using RGBA.Optio.Domain.Interfaces;
 using RGBA.Optio.Domain.Models;
-using System.Numerics;
 
 namespace RGBA.Optio.Domain.Services.TransactionRelated
 {
-    public class TransactionRelatedService : AbstractService<TransactionRelatedService>, ITransactionRelatedService
+    public class TransactionRelatedService(IUniteOfWork work, IMapper map, ILogger<TransactionRelatedService> log)
+        : AbstractService<TransactionRelatedService>(work, map, log), ITransactionRelatedService
     {
-        public TransactionRelatedService(IUniteOfWork work, IMapper map, ILogger<TransactionRelatedService> log) : base(work, map, log)
-        {
-        }
-
         #region AddAsync
-        public async Task<long> AddAsync(ChanellModel entity)
+        public async Task<long> AddAsync(ChannelModel entity)
         {
             try
             {
@@ -24,14 +20,12 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp = mapper.Map<Channels>(entity);
-                if (mapp is not null)
-                {
-                    var res = await work.ChanellRepository.AddAsync(mapp);
-                    logger.LogInformation($"{entity.ChannelType} is successfully added", DateTime.Now.ToShortDateString());
-                    return res;
-                }
-                return -1;
+
+                var mapChannels = mapper.Map<Channels>(entity);
+                if (mapChannels is null) return -1;
+                var res = await work.ChannelRepository.AddAsync(mapChannels);
+                logger.LogInformation($"{entity.ChannelType} is successfully added", DateTime.Now.ToShortDateString());
+                return res;
             }
             catch (Exception ex)
             {
@@ -48,15 +42,13 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapped = mapper.Map<Category>(entity);
-                if (mapped is not null)
-                {
-                    var res = await work.CategoryOfTransactionRepository.AddAsync(mapped);
-                    logger.LogInformation($"{entity.TransactionCategory} is successfully added", DateTime.Now.ToShortDateString());
-                    return res;
-                }
-                return -1;
 
+                var mapCategory = mapper.Map<Category>(entity);
+                if (mapCategory is null) return -1;
+                var res = await work.CategoryOfTransactionRepository.AddAsync(mapCategory);
+                logger.LogInformation($"{entity.TransactionCategory} is successfully added",
+                    DateTime.Now.ToShortDateString());
+                return res;
             }
             catch (Exception ex)
             {
@@ -73,14 +65,13 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp = mapper.Map<TypeOfTransaction>(entity);
-                if (mapp is not null)
-                {
-                    var res = await work.TypeOfTransactionRepository.AddAsync(mapp);
-                    logger.LogInformation($"{entity.TransactionName} is successfully added", DateTime.Now.ToShortDateString());
-                    return res;
-                }
-                return -1;
+
+                var mapTypeOfTransaction = mapper.Map<TypeOfTransaction>(entity);
+                if (mapTypeOfTransaction is null) return -1;
+                var res = await work.TypeOfTransactionRepository.AddAsync(mapTypeOfTransaction);
+                logger.LogInformation($"{entity.TransactionName} is successfully added",
+                    DateTime.Now.ToShortDateString());
+                return res;
             }
             catch (Exception ex)
             {
@@ -91,17 +82,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region GetAllActiveAsync
-        public async Task<IEnumerable<ChanellModel>> GetAllActiveAsync(ChanellModel Identify)
+        public async Task<IEnumerable<ChannelModel>> GetAllActiveAsync(ChannelModel Identify)
         {
             try
             {
-                var allChanell = await work.ChanellRepository.GetAllActiveChannelAsync();
-                if(allChanell is not null)
-                {
-                    var mapped = mapper.Map<IEnumerable<ChanellModel>>(allChanell);
-                    return mapped;
-                }
-                return new List<ChanellModel>();
+                var activeChannelAsync = await work.ChannelRepository.GetAllActiveChannelAsync();
+                if (activeChannelAsync is null) return new List<ChannelModel>();
+                var mapped = mapper.Map<IEnumerable<ChannelModel>>(activeChannelAsync);
+                return mapped;
             }
             catch (Exception exp)
             {
@@ -110,17 +98,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<IEnumerable<CategoryModel>> GetAllActiveAsync(CategoryModel Identify)
+        public async Task<IEnumerable<CategoryModel>> GetAllActiveAsync(CategoryModel identify)
         {
             try
             {
-                var allChanell = await work.CategoryOfTransactionRepository.GetAllActiveAsync();
-                if (allChanell is not null)
-                {
-                    var mapped = mapper.Map<IEnumerable<CategoryModel>>(allChanell);
-                    return mapped;
-                }
-                return new List<CategoryModel>();
+                var activeAsync = await work.CategoryOfTransactionRepository.GetAllActiveAsync();
+                if (activeAsync is null) return new List<CategoryModel>();
+                var mapped = mapper.Map<IEnumerable<CategoryModel>>(activeAsync);
+                return mapped;
             }
             catch (Exception exp)
             {
@@ -129,17 +114,15 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async  Task<IEnumerable<TransactionTypeModel>> GetAllActiveAsync(TransactionTypeModel Identify)
+        public async  Task<IEnumerable<TransactionTypeModel>> GetAllActiveAsync(TransactionTypeModel identify)
         {
             try
             {
-                var allChanell = await work.TypeOfTransactionRepository.GetAllActiveTypeOfTransactionAsync();
-                if (allChanell is not null)
-                {
-                    var mapped = mapper.Map<IEnumerable<TransactionTypeModel>>(allChanell);
-                    return mapped;
-                }
-                return new List<TransactionTypeModel>();
+                var activeTypeOfTransactionAsync =
+                    await work.TypeOfTransactionRepository.GetAllActiveTypeOfTransactionAsync();
+                if (activeTypeOfTransactionAsync is null) return new List<TransactionTypeModel>();
+                var mapped = mapper.Map<IEnumerable<TransactionTypeModel>>(activeTypeOfTransactionAsync);
+                return mapped;
             }
             catch (Exception exp)
             {
@@ -150,18 +133,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region GetAllAsync
-
-        public async Task<IEnumerable<ChanellModel>> GetAllAsync(ChanellModel Identify)
+        public async Task<IEnumerable<ChannelModel>> GetAllAsync(ChannelModel identify)
         {
             try
             {
-                var res = await work.ChanellRepository.GetAllAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<ChanellModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<ChanellModel>();
+                var res = await work.ChannelRepository.GetAllAsync();
+                if (res is null) return Enumerable.Empty<ChannelModel>();
+                var mapChannelModel = mapper.Map<IEnumerable<ChannelModel>>(res);
+                return mapChannelModel;
             }
             catch (Exception ex)
             {
@@ -170,18 +149,15 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<IEnumerable<CategoryModel>> GetAllAsync(CategoryModel Identify)
+        public async Task<IEnumerable<CategoryModel>> GetAllAsync(CategoryModel identify)
         {
 
             try
             {
                 var res = await work.CategoryOfTransactionRepository.GetAllAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<CategoryModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<CategoryModel>();
+                if (res is null) return Enumerable.Empty<CategoryModel>();
+                var mapCategoryModel = mapper.Map<IEnumerable<CategoryModel>>(res);
+                return mapCategoryModel;
             }
             catch (Exception ex)
             {
@@ -190,17 +166,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<IEnumerable<TransactionTypeModel>> GetAllAsync(TransactionTypeModel Identify)
+        public async Task<IEnumerable<TransactionTypeModel>> GetAllAsync(TransactionTypeModel identify)
         {
             try
             {
                 var res = await work.TypeOfTransactionRepository.GetAllAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<TransactionTypeModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<TransactionTypeModel>();
+                if (res is null) return Enumerable.Empty<TransactionTypeModel>();
+                var mapTransactionTypeModel = mapper.Map<IEnumerable<TransactionTypeModel>>(res);
+                return mapTransactionTypeModel;
             }
             catch (Exception ex)
             {
@@ -212,20 +185,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
 
         #region GetByIdAsync
 
-        public async Task<ChanellModel> GetByIdAsync(long id, ChanellModel Identify)
+        public async Task<ChannelModel> GetByIdAsync(long id, ChannelModel identify)
         {
             try
             {
-                var res = await work.ChanellRepository.GetByIdAsync(id);
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<ChanellModel>(res);
-                    return mapp;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Channel by id: {id} not found");
-                }
+                var res = await work.ChannelRepository.GetByIdAsync(id)
+                          ?? throw new ItemNotFoundException($"Channel by id: {id} not found");
+                var mapChannelModel = mapper.Map<ChannelModel>(res);
+                return mapChannelModel;
             }
             catch (Exception ex)
             {
@@ -234,20 +201,16 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<CategoryModel> GetByIdAsync(long id, CategoryModel Identify)
+        public async Task<CategoryModel> GetByIdAsync(long id, CategoryModel identify)
         {
             try
             {
-                var res = await work.CategoryOfTransactionRepository.GetByIdAsync(id);
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<CategoryModel>(res);
-                    return mapp;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Category by id: {id} not found");
-                }
+                var res = await work.CategoryOfTransactionRepository.GetByIdAsync(id) 
+                    ?? throw new ItemNotFoundException($"Category by id: {id} not found");
+                   
+                var mapCategoryModel = mapper.Map<CategoryModel>(res);
+                return mapCategoryModel;
+            
             }
             catch (Exception ex)
             {
@@ -256,20 +219,15 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public  async Task<TransactionTypeModel> GetByIdAsync(long id, TransactionTypeModel Identify)
+        public  async Task<TransactionTypeModel> GetByIdAsync(long id, TransactionTypeModel identify)
         {
             try
             {
-                var res = await work.TypeOfTransactionRepository.GetByIdAsync(id);
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<TransactionTypeModel>(res);
-                    return mapp;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Transaction Type by id: {id} not found");
-                }
+                var res = await work.TypeOfTransactionRepository.GetByIdAsync(id)
+                          ?? throw new ItemNotFoundException($"Transaction Type by id: {id} not found");
+            
+                var mapTransactionTypeModel = mapper.Map<TransactionTypeModel>(res);
+                return mapTransactionTypeModel;
             }
             catch (Exception ex)
             {
@@ -280,21 +238,16 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region RemoveAsync
-        public async Task<bool> RemoveAsync(long Id, ChanellModel identity)
+        public async Task<bool> RemoveAsync(long id, ChannelModel identity)
         {
             try
             {
-                var chanell = await work.ChanellRepository.GetByIdAsync(Id);
-                if (chanell is not null)
-                {
-                    var mapped = mapper.Map<Channels>(chanell);
-                    if (mapped is not null)
-                    {
-                        var res = await work.ChanellRepository.RemoveAsync(mapped);
-                        return res;
-                    }
-                }
-                return false;
+                var channels = await work.ChannelRepository.GetByIdAsync(id);
+                if (channels is null) return false;
+                var mapped = mapper.Map<Channels>(channels);
+                if (mapped is null) return false;
+                var res = await work.ChannelRepository.RemoveAsync(mapped);
+                return res;
             }
             catch (Exception ex)
             {
@@ -303,21 +256,17 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<bool> RemoveAsync(long Id, CategoryModel identity)
+        public async Task<bool> RemoveAsync(long id, CategoryModel identity)
         {
             try
             {
-                 var category = await work.CategoryOfTransactionRepository.GetByIdAsync(Id);
-                if (category is not null)
-                {
-                    var mapped = mapper.Map<Category>(category);
-                    if (mapped is not null)
-                    {
-                        var res = await work.CategoryOfTransactionRepository.RemoveAsync(mapped);
-                        return res;
-                    }
-                }
-                return false;
+                var category = await work.CategoryOfTransactionRepository.GetByIdAsync(id);
+                if (category is null) return false;
+
+                var mapped = mapper.Map<Category>(category);
+                if (mapped is null) return false;
+                var res = await work.CategoryOfTransactionRepository.RemoveAsync(mapped);
+                return res;
             }
             catch (Exception ex)
             {
@@ -326,21 +275,16 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public  async Task<bool> RemoveAsync(long Id, TransactionTypeModel Identity)
+        public  async Task<bool> RemoveAsync(long id, TransactionTypeModel identity)
         {
             try
             {
-                var transactyp = await work.TypeOfTransactionRepository.GetByIdAsync(Id);
-                if (transactyp is not null)
-                {
-                    var mapped = mapper.Map<TypeOfTransaction>(transactyp);
-                    if (mapped is not null)
-                    {
-                        var res = await work.TypeOfTransactionRepository.RemoveAsync(mapped);
-                        return res;
-                    }
-                }
-                return false;
+                var typeOfTransaction = await work.TypeOfTransactionRepository.GetByIdAsync(id);
+                if (typeOfTransaction is null) return false;
+                var mapped = mapper.Map<TypeOfTransaction>(typeOfTransaction);
+                if (mapped is null) return false;
+                var res = await work.TypeOfTransactionRepository.RemoveAsync(mapped);
+                return res;
             }
             catch (Exception ex)
             {
@@ -351,11 +295,11 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region SoftDeleteAsync
-        public async Task<bool> SoftDeleteAsync(long id, ChanellModel Identify)
+        public async Task<bool> SoftDeleteAsync(long id, ChannelModel identify)
         {
             try
             {
-                var res = await  work.ChanellRepository.SoftDeleteAsync(id);
+                var res = await  work.ChannelRepository.SoftDeleteAsync(id);
                 return res;
             }
             catch (Exception exp)
@@ -365,7 +309,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async  Task<bool> SoftDeleteAsync(long id, CategoryModel Identify)
+        public async  Task<bool> SoftDeleteAsync(long id, CategoryModel identify)
         {
             try
             {
@@ -379,7 +323,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async  Task<bool> SoftDeleteAsync(long id, TransactionTypeModel Identify)
+        public async  Task<bool> SoftDeleteAsync(long id, TransactionTypeModel identify)
         {
             try
             {
@@ -395,7 +339,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region UpdateAsync
-        public async Task<bool> UpdateAsync(long id, ChanellModel entity)
+        public async Task<bool> UpdateAsync(long id, ChannelModel entity)
         {
             try
             {
@@ -403,10 +347,10 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var map = mapper.Map<Channels>(entity);
-                if (map is not null)
+                var mapped = mapper.Map<Channels>(entity);
+                if (mapped is not null)
                 {
-                    return await work.ChanellRepository.UpdateAsync(id,map);
+                    return await work.ChannelRepository.UpdateAsync(id,mapped);
                 }
                 return false;
             }
@@ -425,12 +369,10 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var map = mapper.Map<Category>(entity);
-                if (map is not null)
-                {
-                    return await work.CategoryOfTransactionRepository.UpdateAsync(id,map);
-                }
-                return false;
+
+                var mapped = mapper.Map<Category>(entity);
+                if (mapped is null) return false;
+                return await work.CategoryOfTransactionRepository.UpdateAsync(id, mapped);
             }
             catch (Exception exp)
             {
@@ -448,12 +390,10 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var map = mapper.Map<TypeOfTransaction>(entity);
-                if (map is not null)
-                {
-                    return await work.TypeOfTransactionRepository.UpdateAsync(id,map);
-                }
-                return false;
+                var mapped = mapper.Map<TypeOfTransaction>(entity);
+                if (mapped is null) return false;
+                return await work.TypeOfTransactionRepository.UpdateAsync(id,mapped);
+             
             }
             catch (Exception exp)
             {

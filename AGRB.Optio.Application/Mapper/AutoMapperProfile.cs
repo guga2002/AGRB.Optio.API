@@ -10,14 +10,14 @@ namespace RGBA.Optio.Domain.Mapper
         public AutoMapperProfile()
         {
             CreateMap<Category,CategoryModel>().ReverseMap();
-            CreateMap<Channels,ChanellModel>().ReverseMap();
+            CreateMap<Channels,ChannelModel>().ReverseMap();
             CreateMap<Currency,CurrencyModel>().ReverseMap();
-            CreateMap<Location,locationModel>().ReverseMap();
+            CreateMap<Location,LocationModel>().ReverseMap();
             CreateMap<Merchant,MerchantModel>().ReverseMap();
             CreateMap<Transaction,TransactionModel>().ReverseMap();
             CreateMap<TypeOfTransaction,TransactionTypeModel>().ReverseMap();
             CreateMap<User,UserModel>().ReverseMap();   
-            CreateMap<ValuteCourse,ValuteModel>().ReverseMap();
+            CreateMap<ExchangeRate,ExchangeRateModel>().ReverseMap();
         }
     }
 }

@@ -2,13 +2,9 @@
 
 namespace Optio.Core.Repositories
 {
-    public abstract class AbstractClass
+    public abstract class AbstractClass(OptioDB optioDB)
     {
-        protected readonly OptioDB context;
-        protected AbstractClass(OptioDB optioDB)
-        {
-            context = optioDB;
-        }
+        protected readonly OptioDB Context = optioDB;
     }
 
 }

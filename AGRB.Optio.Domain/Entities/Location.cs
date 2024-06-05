@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Optio.Core.Entities
 {
     [Table("Locations")]
-    [Index(nameof(LocationName),IsDescending =new bool[] {true})]
+    [Index(nameof(LocationName),IsDescending = [true])]
     public class Location:AbstractClass
     {
         [Column("Location_Name")]

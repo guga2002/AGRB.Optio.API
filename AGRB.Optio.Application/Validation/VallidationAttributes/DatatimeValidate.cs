@@ -2,7 +2,7 @@
 
 namespace RGBA.Optio.Domain.Validation.VallidationAttributes
 {
-    public class DatatimeValidate: ValidationAttribute
+    public class DataTimeValidate : ValidationAttribute
     {
         public override bool IsValid(object? value)
         {

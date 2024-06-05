@@ -8,12 +8,9 @@ using RGBA.Optio.Domain.Models;
 
 namespace RGBA.Optio.Domain.Services.TransactionRelated
 {
-    public class MerchantRelatedService : AbstractService<MerchantRelatedService>, IMerchantRelatedService
+    public class MerchantRelatedService(IUniteOfWork work, IMapper map, ILogger<MerchantRelatedService> log)
+        : AbstractService<MerchantRelatedService>(work, map, log), IMerchantRelatedService
     {
-        public MerchantRelatedService(IUniteOfWork work, IMapper map, ILogger<MerchantRelatedService> log) : base(work, map, log)
-        {
-        }
-
         #region AddAsync
         public async Task<long> AddAsync(MerchantModel entity)
         {
@@ -23,14 +20,11 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp = mapper.Map<Merchant>(entity);
-                if (mapp is not null)
-                {
-                    var res = await work.MerchantRepository.AddAsync(mapp);
-                    logger.LogInformation($"{entity.Name} is successfully added", DateTime.Now.ToShortDateString());
-                    return res;
-                }
-                return -1;
+                var mapMerchant = mapper.Map<Merchant>(entity);
+                if (mapMerchant is null) return -1;
+                var res = await work.MerchantRepository.AddAsync(mapMerchant);
+                logger.LogInformation($"{entity.Name} is successfully added", DateTime.Now.ToShortDateString());
+                return res;
             }
             catch (Exception ex)
             {
@@ -39,7 +33,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<long> AddAsync(locationModel entity)
+        public async Task<long> AddAsync(LocationModel entity)
         {
             try
             {
@@ -47,10 +41,10 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp = mapper.Map<Location>(entity);
-                if (mapp is not null)
+                var mapLocation = mapper.Map<Location>(entity);
+                if (mapLocation is not null)
                 {
-                    var res = await work.LocationRepository.AddAsync(mapp);
+                    var res = await work.LocationRepository.AddAsync(mapLocation);
                     logger.LogInformation($"{entity.LocationName} is successfully added", DateTime.Now.ToShortDateString());
                     return res;
                 }
@@ -65,12 +59,12 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         }
         #endregion
 
-        #region AssignLocationtoMerchant
-        public async Task<bool> AssignLocationtoMerchant(long Merchantid, long Locationid)
+        #region AssignLocationToMerchant
+        public async Task<bool> AssignLocationToMerchant(long merchantId, long locationId)
         {
             try
             {
-              var res= await  work.MerchantRepository.AssignLocationtoMerchant(Merchantid, Locationid);
+              var res= await  work.MerchantRepository.AssignLocationToMerchant(merchantId, locationId);
               return res;
             }
             catch (Exception ex)
@@ -84,17 +78,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
 
         #region GetAllActiveAsync
 
-        public async Task<IEnumerable<locationModel>> GetAllActiveAsync(locationModel Identify)
+        public async Task<IEnumerable<LocationModel>> GetAllActiveAsync(LocationModel identify)
         {
             try
             {
                 var res =await work.LocationRepository.GetAllActiveLocationAsync();
-                if(res is not null)
-                {
-                    var mapp=mapper.Map<IEnumerable<locationModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<locationModel>();
+                if (res is null) return Enumerable.Empty<LocationModel>();
+                var mapLocationModel = mapper.Map<IEnumerable<LocationModel>>(res);
+                return mapLocationModel;
             }
             catch (Exception ex)
             {
@@ -103,17 +94,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<IEnumerable<MerchantModel>> GetAllActiveAsync(MerchantModel Identify)
+        public async Task<IEnumerable<MerchantModel>> GetAllActiveAsync(MerchantModel identify)
         {
             try
             {
                 var res = await work.MerchantRepository.GetAllActiveMerchantAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<MerchantModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<MerchantModel>();
+                if (res is null) return Enumerable.Empty<MerchantModel>();
+                var mapMerchantModel = mapper.Map<IEnumerable<MerchantModel>>(res);
+                return mapMerchantModel;
             }
             catch (Exception ex)
             {
@@ -124,18 +112,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region GetAllAsync
-
-        public async Task<IEnumerable<locationModel>> GetAllAsync(locationModel Identify)
+        public async Task<IEnumerable<LocationModel>> GetAllAsync(LocationModel identify)
         {
             try
             {
                 var res = await work.LocationRepository.GetAllAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<locationModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<locationModel>();
+                if (res is null) return Enumerable.Empty<LocationModel>();
+                var mapLocationModel = mapper.Map<IEnumerable<LocationModel>>(res);
+                return mapLocationModel;
             }
             catch (Exception ex)
             {
@@ -145,17 +129,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         }
 
 
-        public async Task<IEnumerable<MerchantModel>> GetAllAsync(MerchantModel Identify)
+        public async Task<IEnumerable<MerchantModel>> GetAllAsync(MerchantModel identify)
         {
             try
             {
                 var res = await work.MerchantRepository.GetAllAsync();
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<IEnumerable<MerchantModel>>(res);
-                    return mapp;
-                }
-                return Enumerable.Empty<MerchantModel>();
+                if (res is null) return Enumerable.Empty<MerchantModel>();
+                var mapMerchantModel = mapper.Map<IEnumerable<MerchantModel>>(res);
+                return mapMerchantModel;
             }
             catch (Exception ex)
             {
@@ -166,21 +147,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region GetByIdAsync
-
-        public async Task<locationModel> GetByIdAsync(long id, locationModel Identify)
+        public async Task<LocationModel> GetByIdAsync(long id, LocationModel identify)
         {
             try
             {
-                var res =await work.LocationRepository.GetByIdAsync(id);
-                if(res is not null)
-                {
-                    var mapp=mapper.Map<locationModel>(res);
-                    return mapp;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Location with id: {id} not found");
-                }
+                var res = await work.LocationRepository.GetByIdAsync(id);
+                if (res is null) throw new ItemNotFoundException($"Location with id: {id} not found");
+                var mapLocationModel = mapper.Map<LocationModel>(res);
+                return mapLocationModel;
             }
             catch (Exception ex)
             {
@@ -189,20 +163,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<MerchantModel> GetByIdAsync(long id, MerchantModel Identify)
+        public async Task<MerchantModel> GetByIdAsync(long id, MerchantModel identify)
         {
             try
             {
                 var res = await work.MerchantRepository.GetByIdAsync(id);
-                if (res is not null)
-                {
-                    var mapp = mapper.Map<MerchantModel>(res);
-                    return mapp;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"Merchant with id: {id} not found");
-                }
+                if (res is null) throw new ItemNotFoundException($"Merchant with id: {id} not found");
+                var mapMerchantModel = mapper.Map<MerchantModel>(res);
+                return mapMerchantModel;
             }
             catch (Exception ex)
             {
@@ -214,21 +182,16 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
 
         #region RemoveAsync
 
-        public async Task<bool> RemoveAsync(long Id, locationModel Identity)
+        public async Task<bool> RemoveAsync(long id, LocationModel identity)
         {
             try
             {
-                var location = await work.LocationRepository.GetByIdAsync(Id);
-                if (location is not null)
-                {
-                    var mapp = mapper.Map<Location>(location);
-                    if (mapp is not null)
-                    {
-                        var res = await work.LocationRepository.RemoveAsync(mapp);
-                        return res;
-                    }
-                }
-                return false;
+                var location = await work.LocationRepository.GetByIdAsync(id);
+                if (location is null) return false;
+                var mapLocation = mapper.Map<Location>(location);
+                if (mapLocation is null) return false;
+                var res = await work.LocationRepository.RemoveAsync(mapLocation);
+                return res;
             }
             catch (Exception ex)
             {
@@ -237,21 +200,16 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<bool> RemoveAsync(long Id, MerchantModel identity)
+        public async Task<bool> RemoveAsync(long id, MerchantModel identity)
         {
             try
             {
-                var merchant = await work.MerchantRepository.GetByIdAsync(Id);
-                if (merchant is not null)
-                {
-                    var mapp = mapper.Map<Merchant>(merchant);
-                    if (mapp is not null)
-                    {
-                        var res = await work.MerchantRepository.RemoveAsync(mapp);
-                        return res;
-                    }
-                }
-                return false;
+                var merchant = await work.MerchantRepository.GetByIdAsync(id);
+                if (merchant is null) return false;
+                var mapMerchant = mapper.Map<Merchant>(merchant);
+                if (mapMerchant is null) return false;
+                var res = await work.MerchantRepository.RemoveAsync(mapMerchant);
+                return res;
             }
             catch (Exception ex)
             {
@@ -262,8 +220,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         #endregion
 
         #region SoftDeleteAsync
-
-        public async Task<bool> SoftDeleteAsync(long id, locationModel Identify)
+        public async Task<bool> SoftDeleteAsync(long id, LocationModel identify)
         {
             try
             {
@@ -277,7 +234,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<bool> SoftDeleteAsync(long id, MerchantModel Identify)
+        public async Task<bool> SoftDeleteAsync(long id, MerchantModel identify)
         {
             try
             {
@@ -294,24 +251,20 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
 
         #region UpdateAsync
 
-        public async Task<bool> UpdateAsync(long id, locationModel entity)
+        public async Task<bool> UpdateAsync(long id, LocationModel entity)
         {
             try
             {
-                if(entity is null || string.IsNullOrWhiteSpace(entity.LocationName))
+                if (entity is null || string.IsNullOrWhiteSpace(entity.LocationName))
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp=mapper.Map<Location>(entity);
-                if(mapp is not null)
-                {
-                    var res=await work.LocationRepository.UpdateAsync(id,mapp);
-                    return res;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"{entity.LocationName} not found");
-                }
+
+                var mapLocation = mapper.Map<Location>(entity);
+                if (mapLocation is null) throw new ItemNotFoundException($"{entity.LocationName} not found");
+                var res = await work.LocationRepository.UpdateAsync(id, mapLocation);
+                return res;
+
             }
             catch (Exception ex)
             {
@@ -328,16 +281,11 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapp = mapper.Map<Merchant>(entity);
-                if (mapp is not null)
-                {
-                    var res = await work.MerchantRepository.UpdateAsync(id,mapp);
-                    return res;
-                }
-                else
-                {
-                    throw new ItemNotFoundException($"{entity.Name} not found");
-                }
+
+                var mapMerchant = mapper.Map<Merchant>(entity);
+                if (mapMerchant is null) throw new ItemNotFoundException($"{entity.Name} not found");
+                var res = await work.MerchantRepository.UpdateAsync(id, mapMerchant);
+                return res;
             }
             catch (Exception ex)
             {

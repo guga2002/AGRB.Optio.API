@@ -2,23 +2,16 @@
 
 namespace RGBA.Optio.Core.PerformanceImprovmentServices
 {
-    public class CacheService
+    public class CacheService(IMemoryCache cache)
     {
-        private readonly IMemoryCache _cache;
-
-        public CacheService(IMemoryCache cache)
-        {
-            _cache = cache;
-        }
-
         #region GetOrCreate
         public T GetOrCreate<T>(string key, Func<T> createItem, TimeSpan absoluteExpiration)
         {
-            if (!_cache.TryGetValue(key, out T item))
+            if (!cache.TryGetValue(key, out T item))
             {
                 item = createItem();
 
-                _cache.Set(key, item, new MemoryCacheEntryOptions
+                cache.Set(key, item, new MemoryCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = absoluteExpiration
                 });
@@ -30,7 +23,7 @@ namespace RGBA.Optio.Core.PerformanceImprovmentServices
 
         public void Remove(string key)
         {
-            _cache.Remove(key);
+            cache.Remove(key);
         }
     }
 }

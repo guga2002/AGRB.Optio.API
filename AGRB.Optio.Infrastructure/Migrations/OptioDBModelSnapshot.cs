@@ -172,7 +172,10 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("Transaction_Category");
 
-                    b.Property<long>("TransactionTypeID")
+                    b.Property<long>("TransactionTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TypeOfTransactionId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -180,7 +183,7 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     b.HasIndex("TransactionCategory")
                         .IsDescending();
 
-                    b.HasIndex("TransactionTypeID");
+                    b.HasIndex("TypeOfTransactionId");
 
                     b.ToTable("CategoryOfTransactions");
                 });
@@ -363,22 +366,63 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("Status_Of_Currency");
 
-                    b.Property<string>("NameOfValute")
+
+                    b.Property<string>("NameOfCurrency")
+
                         .IsRequired()
                         .HasMaxLength(30)
                         .IsUnicode(false)
                         .HasColumnType("varchar(30)")
-                        .HasColumnName("Name_Of_Valute");
+                   
+                        .HasColumnName("Name_Of_Currency");
+
 
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyCode")
                         .IsDescending();
 
-                    b.HasIndex("NameOfValute")
+                    b.HasIndex("NameOfCurrency")
                         .IsDescending();
 
-                    b.ToTable("Curencies");
+                    b.ToTable("Currencies");
+                });
+
+            modelBuilder.Entity("RGBA.Optio.Core.Entities.ExchangeRate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("Last_Updated");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("Status");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("Rate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("Date")
+                        .IsDescending();
+
+                    b.HasIndex("Rate")
+                        .IsDescending();
+
+                    b.ToTable("ExchangeRates");
+
                 });
 
             modelBuilder.Entity("RGBA.Optio.Core.Entities.LocationToMerchant", b =>
@@ -389,17 +433,20 @@ namespace AGRB.Optio.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("LocatrionId")
+
+                    b.Property<long>("LocationId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("merchantId")
+                    b.Property<long>("MerchantId")
+
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LocatrionId");
+                    b.HasIndex("LocationId");
 
-                    b.HasIndex("merchantId");
+                    b.HasIndex("MerchantId");
+
 
                     b.ToTable("LocationToMerchants");
                 });
@@ -489,46 +536,10 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.HasIndex("PersonalNumber")
-                        .IsUnique()
+
                         .IsDescending();
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("RGBA.Optio.Core.Entities.ValuteCourse", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("CurrencyID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateOfValuteCourse")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("Last_Updated");
-
-                    b.Property<decimal>("ExchangeRate")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("Exchange_Rate");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("Status_Of_Valute");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrencyID");
-
-                    b.HasIndex("DateOfValuteCourse")
-                        .IsDescending();
-
-                    b.HasIndex("ExchangeRate")
-                        .IsDescending();
-
-                    b.ToTable("ValutesCourses");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -584,13 +595,14 @@ namespace AGRB.Optio.Infrastructure.Migrations
 
             modelBuilder.Entity("Optio.Core.Entities.Category", b =>
                 {
-                    b.HasOne("Optio.Core.Entities.TypeOfTransaction", "typeOfTransaction")
+                    b.HasOne("Optio.Core.Entities.TypeOfTransaction", "TypeOfTransaction")
                         .WithMany("Category")
-                        .HasForeignKey("TransactionTypeID")
+                        .HasForeignKey("TypeOfTransactionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("typeOfTransaction");
+                    b.Navigation("TypeOfTransaction");
+
                 });
 
             modelBuilder.Entity("Optio.Core.Entities.Transaction", b =>
@@ -628,34 +640,36 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     b.Navigation("Merchant");
                 });
 
-            modelBuilder.Entity("RGBA.Optio.Core.Entities.LocationToMerchant", b =>
-                {
-                    b.HasOne("Optio.Core.Entities.Location", "location")
-                        .WithMany("Merchants")
-                        .HasForeignKey("LocatrionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
-                    b.HasOne("Optio.Core.Entities.Merchant", "merchant")
-                        .WithMany("Locations")
-                        .HasForeignKey("merchantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("location");
-
-                    b.Navigation("merchant");
-                });
-
-            modelBuilder.Entity("RGBA.Optio.Core.Entities.ValuteCourse", b =>
+            modelBuilder.Entity("RGBA.Optio.Core.Entities.ExchangeRate", b =>
                 {
                     b.HasOne("RGBA.Optio.Core.Entities.Currency", "Currency")
                         .WithMany("Courses")
-                        .HasForeignKey("CurrencyID")
+                        .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Currency");
+                });
+
+            modelBuilder.Entity("RGBA.Optio.Core.Entities.LocationToMerchant", b =>
+                {
+                    b.HasOne("Optio.Core.Entities.Location", "Location")
+                        .WithMany("Merchants")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Optio.Core.Entities.Merchant", "Merchant")
+                        .WithMany("Locations")
+                        .HasForeignKey("MerchantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("Merchant");
+
                 });
 
             modelBuilder.Entity("Optio.Core.Entities.Category", b =>

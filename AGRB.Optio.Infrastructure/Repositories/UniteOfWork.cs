@@ -9,41 +9,32 @@ using RGBA.Optio.Core.PerformanceImprovmentServices;
 
 namespace RGBA.Optio.Core.Repositories
 {
-    public class UniteOfWork : IUniteOfWork
+    public class UniteOfWork(
+        OptioDB db,
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
+        IConfiguration configuration,
+        RoleManager<IdentityRole> role,
+        CacheService cash)
+        : IUniteOfWork
     {
-        private readonly OptioDB db;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly CacheService chash;
-        private readonly IConfiguration configuration;
-        public UniteOfWork(OptioDB db, UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, RoleManager<IdentityRole> role,CacheService cash)
-        {
-            this.db = db;
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _roleManager = role;
-            this.configuration = configuration;
-            this.chash = cash;
-        }
-        public ICategoryRepo CategoryOfTransactionRepository =>new CategoryOfTransactionRepos(db,chash);
+        public ICategoryRepo CategoryOfTransactionRepository =>new CategoryOfTransactionRepos(db,cash);
 
-        public IChannelRepo ChanellRepository => new ChannelRepos(db,chash);
+        public IChannelRepo ChannelRepository => new ChannelRepos(db,cash);
 
-        public ILocationRepo LocationRepository => new LocationRepos(db, chash);
+        public ILocationRepo LocationRepository => new LocationRepos(db, cash);
 
         public IMerchantRepo MerchantRepository => new MerchantRepos(db,configuration);
 
-        public ITransactionRepo TransactionRepository => new TransactionRepos(db,chash);
+        public ITransactionRepo TransactionRepository => new TransactionRepos(db);
 
         public ITypeOfTransactionRepo TypeOfTransactionRepository => new TypeOfTransactionRepos(db);
 
-
-        public IValuteCourse ValuteCourse => new ValuteRepository(db);
-
-        public ICurrencyRepository CurrencyRepository => new CurrencyReposiotry(db);
+        public ICurrencyRepository CurrencyRepository => new CurrencyRepos(db);
     
         public ILocationToMerchantRepository LocationToMerchantRepository => new LocationToMerchantRepos(db);
+
+        public IExchangeRate ExchangeRateRepository => new ExchangeRateRepos(db);
 
         public async Task CheckAndCommitAsync()
         {
@@ -61,8 +52,8 @@ namespace RGBA.Optio.Core.Repositories
         public void Dispose()
         {
             db.Dispose();
-            _userManager.Dispose();
-            _roleManager.Dispose();
+            userManager.Dispose();
+            role.Dispose();
         }
 
        

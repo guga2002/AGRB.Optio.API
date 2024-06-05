@@ -2,10 +2,10 @@
 {
     public interface IGetInfo<T,K> where T : class
     {
-        Task<T> GetByIdAsync(K id,T Identify);
+        Task<T> GetByIdAsync(K id,T identify);
 
-        Task<IEnumerable<T>> GetAllAsync(T Identify);
+        Task<IEnumerable<T>> GetAllAsync(T identify);
 
-        Task<IEnumerable<T>> GetAllActiveAsync(T Identify);
+        Task<IEnumerable<T>> GetAllActiveAsync(T identify);
     }
 }

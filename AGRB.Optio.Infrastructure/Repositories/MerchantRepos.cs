@@ -8,7 +8,6 @@ using System.Data;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 
-
 namespace Optio.Core.Repositories
 {
     public class MerchantRepos : AbstractClass, IMerchantRepo
@@ -18,25 +17,21 @@ namespace Optio.Core.Repositories
 
         public MerchantRepos(OptioDB optioDB, IConfiguration conf):base(optioDB)
         {
-            merchant = context.Set<Merchant>(); 
+            merchant = Context.Set<Merchant>(); 
             this.conf= conf;
         }
 
-        #region AssignLocationtoMerchant
-        public async Task<bool> AssignLocationtoMerchant(long Merchantid,long Locationid)
+        #region AssignLocationToMerchant
+        public async Task<bool> AssignLocationToMerchant(long merchantId,long locationId)
         {
             try
             {
-                if(await merchant.AnyAsync(io=>io.Id==Merchantid)&&await context.Locations.AnyAsync(io=>io.Id==Locationid))
-                {
-                    using (IDbConnection db = new SqlConnection(conf.GetConnectionString("OptiosString")))
-                    {
-                        string sqlQuery = "INSERT INTO LocationToMerchants (LocatrionId, merchantId) VALUES (@LocatrionId, @merchantId)";
-                        await db.ExecuteAsync(sqlQuery, new { LocatrionId = Locationid, merchantId = Merchantid });
-                    }
-                    return true;
-                }
-                return false;
+                if (!await merchant.AnyAsync(io => io.Id == merchantId) ||
+                    !await Context.Locations.AnyAsync(io => io.Id == locationId)) return false;
+                using IDbConnection db = new SqlConnection(conf.GetConnectionString("OptiosString"));
+                var sqlQuery = "INSERT INTO LocationToMerchants (locationId, merchantId) VALUES (@locationId, @merchantId)";
+                await db.ExecuteAsync(sqlQuery, new { LocationId = locationId, MerchantId = merchantId });
+                return true;
             }
             catch (Exception)
             {
@@ -46,17 +41,16 @@ namespace Optio.Core.Repositories
         }
         #endregion
 
-        #region getalltransactions
-        public async Task<List<Transaction>> getalltransactions()
+        #region GetAllTransactions
+        public async Task<List<Transaction>> GetAllTransactions()
         {
             try
             {
                 using (IDbConnection db = new SqlConnection(conf.GetConnectionString("OptiosString")))
                 {
-
-                    string sqlQuery ="SELECT Date_Of_Transaction AS Date, Amount, Amount_Equivalent as AmountEquivalent, Transaction_Status AS IsActive, CurrencyId, CategoryId, MerchantId, ChannelId FROM Transactions";
+                    var sqlQuery =
+                        "SELECT Date_Of_Transaction AS Date, Amount, Amount_Equivalent as AmountEquivalent, Transaction_Status AS IsActive, CurrencyId, CategoryId, MerchantId, ChannelId FROM Transactions";
                     var transactions = await db.QueryAsync<Transaction>(sqlQuery);
-
                     return transactions.ToList<Transaction>();
                 }
             }
@@ -76,11 +70,11 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var obj = await merchant.SingleOrDefaultAsync(i => i.Name == entity.Name);
-                if (obj == null)
+               
+                if (!await merchant.AnyAsync(i => i.Name == entity.Name))
                 {
                     await merchant.AddAsync(entity);
-                    await context.SaveChangesAsync();
+                    await Context.SaveChangesAsync();
                     var max = await merchant.MaxAsync(io => io.Id);
                     return max;
                 }
@@ -128,15 +122,8 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var store = await merchant.AsNoTracking().Where(i => i.IsActive == true).ToListAsync();
-                if (store == null)
-                {
-                    throw new InvalidOperationException("No active merchants found");
-                }
-                else
-                {
-                    return store;
-                }
+                var store = await merchant.AsNoTracking().Where(i => i.IsActive).ToListAsync();
+                return store;
 
             }
             catch (Exception)
@@ -152,15 +139,8 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var store = await merchant.FindAsync(id);
-                if (store is null)
-                {
-                    throw new InvalidOperationException("No merchant found");
-                }
-                else
-                {
-                    return store;
-                }
+                var store = await merchant.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
+                return store;
 
             }
             catch (Exception)
@@ -178,7 +158,7 @@ namespace Optio.Core.Repositories
             {
                 ArgumentNullException.ThrowIfNull(entity, nameof(entity));
                 merchant.Remove(entity);
-                await context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -193,17 +173,11 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var store=await merchant.FindAsync(id);
-                if (store is null)
-                {
-                    throw new InvalidOperationException("No merchant found");
-                }
-                else
-                {
-                    store.IsActive = false;
-                    await context.SaveChangesAsync();
-                    return true;
-                }
+                var store=await merchant.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
+
+                store.IsActive = false;
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (Exception)
             {
@@ -218,17 +192,11 @@ namespace Optio.Core.Repositories
             try
             {
                 ArgumentNullException.ThrowIfNull(entity,nameof(entity));
-                var store = await merchant.FindAsync(id);
-                if (store is null)
-                {
-                    throw new InvalidOperationException("No merchant found");
-                }
-                else
-                {
-                    store.Name = entity.Name;
-                    await context.SaveChangesAsync();
-                    return true;
-                }
+                var store = await merchant.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
+            
+                store.Name = entity.Name;
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (DbUpdateConcurrencyException)
             {
