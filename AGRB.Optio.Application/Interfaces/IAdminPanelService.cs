@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AGRB.Optio.Application.Models.ResponseModels;
+using Microsoft.AspNetCore.Identity;
 using RGBA.Optio.Domain.Models;
 using RGBA.Optio.Domain.Models.RequestModels;
 
@@ -11,7 +12,7 @@ namespace RGBA.Optio.Domain.Interfaces
         Task<bool> ForgetPassword(string email, string newPassword); 
         Task<bool> RefreshToken(string username,string token);
         Task<IdentityResult> RegisterUserAsync(UserModel user, string password);
-        Task<(SignInResult, string)> SignInAsync(SignInModel mod);
+        Task<SignInResponse> SignInAsync(SignInModel mod);
         Task<IdentityResult> AddRolesAsync(string roleName);
         Task<IdentityResult> AssignRoleToUserAsync(string userId, string role);
         Task<IdentityResult> ResetPasswordAsync(PasswordResetModel arg,string username);

@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Models.ResponseModels;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +14,7 @@ using RGBA.Optio.Domain.Models.RequestModels;
 using RGBA.Optio.Domain.Services.Outer_Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace RGBA.Optio.Domain.Services
@@ -340,85 +343,90 @@ namespace RGBA.Optio.Domain.Services
         #endregion
 
         #region SignInAsync
-
-        public async Task<(Microsoft.AspNetCore.Identity.SignInResult, string)> SignInAsync(SignInModel mod)
-        {
-            if (string.IsNullOrEmpty(mod.Username) || string.IsNullOrEmpty(mod.Password))
+            public async Task<SignInResponse> SignInAsync(SignInModel mod)
             {
-                throw new OptioGeneralException("Username or password is empty.");
-            }
+                if (string.IsNullOrEmpty(mod.Username) || string.IsNullOrEmpty(mod.Password))
+                {
+                    throw new OptioGeneralException("Username or password is empty.");
+                }
 
-            var result = await signin.PasswordSignInAsync(mod.Username, mod.Password, mod.SetCookie,
-                lockoutOnFailure: false);
+                var result = await signin.PasswordSignInAsync(mod.Username, mod.Password, mod.SetCookie, lockoutOnFailure: false);
 
-            switch (result.Succeeded)
-            {
-                case true:
+                if (result.Succeeded)
                 {
                     await SetPersistentCookieAsync(_httpContextAccessor.HttpContext.User);
-                    var token = GenerateJwtToken(mod.Username);
-                    await Console.Out.WriteLineAsync(token);
+                    var accessToken = GenerateJwtToken(mod.Username);
+                    var refreshToken = GenerateRefreshToken();
+
+
                     var usr = await userManager.FindByNameAsync(mod.Username);
-                    if (usr == null) return (result, token);
-                    var recipientName = usr.Name + ' ' + usr.Surname;
-                    var emailContent = $@"
-                      <html>
-                     <body style='font-family: Arial, sans-serif;'>
-                     <p>Dear <span style='color: #3366cc;'>{recipientName}</span>,</p>
-                     <p>We noticed a new sign-in to your RGBASOLUTION account. If this was you, there's no need for further action. 
-                      However, if you didn't initiate this sign-in, please contact us immediately, and we will assist you in securing your account.</p>
-                     <p>Thank you for your attention to this matter.</p>
-                     <p style='color: #ff6600;'>Sincerely,<br/>Your RGBASOLUTION Team</p>
-                     </body>
-                     </html>";
+                    if (usr == null) return new SignInResponse() { AuthToken = accessToken,RefreshToken=refreshToken.Token,ValidateTill=refreshToken.ExpiryDate };
 
-                    smtp.SendMessage(usr.Email,
-                        $"Security Alert: New Sign-in to Your RGBASOLUTION Account {DateTime.Now.ToShortTimeString()}",
-                        emailContent);
-                    await userManager.AddClaimAsync(usr, new Claim("Name", usr.Name));
-                    await userManager.AddClaimAsync(usr, new Claim("Surname", usr.Surname));
-                    await userManager.AddClaimAsync(usr, new Claim("PersonalNumber", usr.PersonalNumber));
-                    await userManager.AddClaimAsync(usr, new Claim("BirthDay", usr.BirthDate.ToShortDateString()));
-                    await userManager.AddLoginAsync(usr,
-                        new UserLoginInfo("JWT", GenerateJwtToken(usr.UserName), "Authorization"));
+                    SaveRefreshToken(usr.Id, refreshToken);
 
-                    return (result, token);
+                var recipientName = usr.Name + ' ' + usr.Surname;
+                var emailContent = $@"
+            <html>
+           <body style='font-family: Arial, sans-serif;'>
+           <p>Dear <span style='color: #3366cc;'>{recipientName}</span>,</p>
+           <p>We noticed a new sign-in to your RGBASOLUTION account. If this was you, there's no need for further action. 
+            However, if you didn't initiate this sign-in, please contact us immediately, and we will assist you in securing your account.</p>
+           <p>Thank you for your attention to this matter.</p>
+           <p style='color: #ff6600;'>Sincerely,<br/>Your RGBASOLUTION Team</p>
+           </body>
+           </html>";
+
+                smtp.SendMessage(usr.Email,
+                    $"Security Alert: New Sign-in to Your RGBASOLUTION Account {DateTime.Now.ToShortTimeString()}",
+                    emailContent);
+
+                return new SignInResponse() { AuthToken = accessToken, RefreshToken = refreshToken.Token, ValidateTill=refreshToken.ExpiryDate };
                 }
-                case false when !mod.SetCookie:
-                    //await ClearPersistentCookieAsync();
-                    break;
+
+            throw new ArgumentException("sign in was not succesfully");
             }
 
-            return (null, null);
-        }
-
-        #endregion
-
-        #region GenerateJwtToken
-
-        private string GenerateJwtToken(string username)
-        {
+            private string GenerateJwtToken(string username)
+            {
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, username),
-            };
+            new Claim(ClaimTypes.Name, username),
+                };
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E="));
+                var key = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E"));
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: "https://localhost:44359/",
-                audience: "https://localhost:44359/",
-                claims: claims,
-                expires: DateTime.Now.AddHours(6),
-                signingCredentials: credentials);
+                var token = new JwtSecurityToken(
+                   // issuer: "https://localhost:7116",
+                  //  audience: "https://localhost:7116",
+                    claims: claims,
+                    expires: DateTime.Now.AddHours(6),
+                    signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
 
-        #endregion
+            private RefreshTokenModel GenerateRefreshToken()
+            {
+                var refreshToken = new RefreshTokenModel
+                {
+                    Token = Guid.NewGuid().ToString(),
+                    ExpiryDate = DateTime.UtcNow.AddDays(30) 
+                };
+
+                return refreshToken;
+            }
+
+            private Dictionary<string, RefreshTokenModel> _refreshTokens = new Dictionary<string, RefreshTokenModel>();
+
+            private void SaveRefreshToken(string userId, RefreshTokenModel refreshToken)
+            {
+                _refreshTokens[userId] = refreshToken;
+            }
+
+            #endregion
 
         #region SetPersistentCookieAsync&&SetPersistentCookieAsync
 

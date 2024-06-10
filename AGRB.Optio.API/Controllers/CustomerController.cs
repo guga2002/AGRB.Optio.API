@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using AGRB.Optio.API.StaticFiles;
 using RGBA.Optio.Domain.Responses;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using AGRB.Optio.Application.Models.ResponseModels;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -56,7 +57,7 @@ namespace RGBA.Optio.UI.Controllers
         [HttpPost]
         [Route(nameof(SignIn))]
         [AllowAnonymous]
-        public async Task<Response<(SignInResult,string)>> SignIn([FromBody]SignInModel mod)
+        public async Task<Response<SignInResponse>> SignIn([FromBody]SignInModel mod)
         {
             try
             {
@@ -65,12 +66,16 @@ namespace RGBA.Optio.UI.Controllers
                     throw new OptioGeneralException(mod.Username);
                 }
                 var res = await se.SignInAsync(mod);
-                return Response<(SignInResult,string)>.Ok(res);
+                if (res is not null)
+                {
+                    return Response<SignInResponse>.Ok(res);
+                }
+                return Response<SignInResponse>.Error("Sign in  wailed");
             }
             catch (Exception exp)
             {
                 log.LogCritical(exp.Message);
-                return Response<(SignInResult, string)>.Error(ErrorKeys.InternalServerError);
+                return Response<SignInResponse>.Error(exp.Message);
             }
         }
 
