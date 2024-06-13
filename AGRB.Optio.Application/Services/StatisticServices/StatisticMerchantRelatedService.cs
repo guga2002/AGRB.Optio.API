@@ -35,26 +35,22 @@ namespace RGBA.Optio.Domain.Services.StatisticServices
                                       volume = g.Sum(i => i.AmountEquivalent)
                                   };
 
+                    List<ChannelResponseModel> lst=new List<ChannelResponseModel>();
                     var channelList = channel.ToList();
-                    var tasks = channelList.Select(async g =>
+                    foreach (var item in channelList)
                     {
-                        var channelDetails = await work.ChannelRepository.GetByIdAsync(g.channelId);
-                        return channelDetails switch
+                        var channelDetails = await work.ChannelRepository.GetByIdAsync(item.channelId);
+                        var res = new ChannelResponseModel
                         {
-                            null => throw new OptioGeneralException($"Channel with ID {g.channelId} not found."),
-                            _ => new ChannelResponseModel
-                            {
-                                ChannelType = channelDetails.ChannelType,
-                                Quantity = g.channelCount,
-                                Volume = g.volume,
-                                Average = g.volume / g.channelCount
-                            },
+                            ChannelType = channelDetails.ChannelType,
+                            Quantity = item.channelCount,
+                            Volume = item.volume,
+                            Average = item.volume/item.channelCount,
+
                         };
-                    });
-
-                    var channels = await Task.WhenAll(tasks);
-
-                    return channels.OrderByDescending(c => c.Volume);
+                        lst.Add(res);
+                    }
+                    return lst;
                 }
 
             }
@@ -162,27 +158,22 @@ namespace RGBA.Optio.Domain.Services.StatisticServices
                                    };
 
                     var merchantList = merchant.ToList();
-                    var tasks = merchantList.Select(async g =>
+                    List<MerchantResponseModel> merch = new List<MerchantResponseModel>();
+                    foreach (var item in merchantList)
                     {
-                        var merchantDetails = await work.MerchantRepository.GetByIdAsync(g.merchantId);
-                        return merchantDetails switch
+                        var merchantDetails = await work.MerchantRepository.GetByIdAsync(item.merchantId);
+
+                        var res = new MerchantResponseModel
                         {
-                            null => throw new OptioGeneralException($"merchant with ID {g.merchantId} not found."),
-                            _ => new MerchantResponseModel
-                            {
-                                Name = merchantDetails.Name,
-                                Quantity = g.merchantCount,
-                                Volume = g.volume,
-                                Average = g.volume / g.merchantCount
-                            }
+                            Name = merchantDetails.Name,
+                            Quantity = item.merchantCount,
+                            Volume = item.volume,
+                            Average = item.volume / item.merchantCount
                         };
-                    });
-
-                    var merch = await Task.WhenAll(tasks);
-
+                        merch.Add(res);
+                    }
                     return merch.OrderByDescending(c => c.Volume);
                 }
-
             }
             catch (Exception ex)
             {

@@ -49,11 +49,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                const string cacheKey = "all channels";
-                await Task.Delay(1);
-                var ch = cacheService.GetOrCreate(cacheKey, () => CompiledQueryGetAll.Invoke(Context) ??
-                                                                  throw new ArgumentException("No channel found"), TimeSpan.FromMinutes(30)); 
-                return ch ?? throw new ArgumentException("No channel found");
+               return await channels.ToListAsync();
             }
             catch (Exception)
             {
@@ -90,13 +86,10 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var cacheKey = $"channel with {id}";
-                await Task.Delay(1);
-                var channel = cacheService.GetOrCreate(cacheKey, () => CompiledQueryGetBtId.Invoke(Context, id) ??
-                                                                       throw new ArgumentException("No channel found"), TimeSpan.FromMinutes(15));
+                var res=await channels.FirstOrDefaultAsync(i=>i.Id==id);
+                if (res == null) throw new InvalidOperationException(" no entity found");
 
-                return channel ?? throw new ArgumentException("No channel found");
-
+                return res;
             }
             catch (Exception)
             {
