@@ -1,4 +1,5 @@
-﻿using Optio.Core.Interfaces;
+﻿using AGRB.Optio.Domain.Interfaces;
+using Optio.Core.Interfaces;
 
 namespace RGBA.Optio.Core.Interfaces
 {
@@ -21,6 +22,8 @@ namespace RGBA.Optio.Core.Interfaces
         IExchangeRate ExchangeRateRepository { get; }
 
         ICurrencyRepository CurrencyRepository { get; }
+
+        IFeadbackRepository FeadbackRepository { get; }
 
         Task CheckAndCommitAsync();
     }

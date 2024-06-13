@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AGRB.Optio.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,5 +26,7 @@ namespace RGBA.Optio.Core.Entities
         [Column("User_BirthDay")]
         [DataType(DataType.Date)]
         public DateTime BirthDate { get; set; }
+
+        public virtual IEnumerable<Feadback> Deadbacks { get; set; }
     }
 }

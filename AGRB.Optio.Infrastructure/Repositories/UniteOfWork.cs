@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AGRB.Optio.Domain.Interfaces;
+using AGRB.Optio.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Optio.Core.Data;
 using Optio.Core.Interfaces;
@@ -35,6 +37,8 @@ namespace RGBA.Optio.Core.Repositories
         public ILocationToMerchantRepository LocationToMerchantRepository => new LocationToMerchantRepos(db);
 
         public IExchangeRate ExchangeRateRepository => new ExchangeRateRepos(db);
+
+        public IFeadbackRepository FeadbackRepository => new FeadbackRepository(db);
 
         public async Task CheckAndCommitAsync()
         {

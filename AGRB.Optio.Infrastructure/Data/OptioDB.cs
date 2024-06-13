@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using AGRB.Optio.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Optio.Core.Entities;
 using RGBA.Optio.Core.Entities;
@@ -16,5 +17,6 @@ namespace Optio.Core.Data
         public virtual DbSet<TypeOfTransaction> Types { get; set; }
         public virtual DbSet<ExchangeRate> ExchangeRates { get; set; }
         public virtual DbSet<Currency> Currencies { get; set; }
+        public virtual DbSet<Feadback> Feadbacks { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Models.RequestModels;
+using AGRB.Optio.Domain.Entities;
+using AutoMapper;
 using Optio.Core.Entities;
 using RGBA.Optio.Core.Entities;
 using RGBA.Optio.Domain.Models;
@@ -18,6 +20,7 @@ namespace RGBA.Optio.Domain.Mapper
             CreateMap<TypeOfTransaction,TransactionTypeModel>().ReverseMap();
             CreateMap<User,UserModel>().ReverseMap();   
             CreateMap<ExchangeRate,ExchangeRateModel>().ReverseMap();
+            CreateMap<Feadback,FeadbackModel>().ReverseMap();
         }
     }
 }

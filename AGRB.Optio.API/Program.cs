@@ -21,6 +21,10 @@ using RGBA.Optio.Domain.Interfaces.StatisticInterfaces;
 using RGBA.Optio.Domain.Services;
 using RGBA.Optio.Domain.Services.StatisticServices;
 using RGBA.Optio.Domain.Services.TransactionRelated;
+using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Domain.Interfaces;
+using AGRB.Optio.Infrastructure.Repositories;
+using AGRB.Optio.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +60,8 @@ builder.Services.AddScoped<RoleManager<IdentityRole>>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 builder.Services.AddScoped<IUniteOfWork, UniteOfWork>();
+builder.Services.AddScoped<IFeadbackService, FeadbackService>();
+builder.Services.AddScoped<IFeadbackRepository,FeadbackRepository>();
 #region addScoppedManually
 builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
 builder.Services.AddScoped<IChannelRepo, ChannelRepos>();
