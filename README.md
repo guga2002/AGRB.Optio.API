@@ -22,9 +22,13 @@ Mongo Server (Version 7.0 or later) <br>
 
 **Installation**<br>
 Clone the repository to your local machine:<br>
+```sh
 git clone https://github.com/guga2002/AGRB.Optio.API.git
+```
 Navigate to the project directory:<br>
+```sh
 cd AGRB.Optio.API
+```
 
 <br>**Install the required packages:**<br>
 dotnet restore
