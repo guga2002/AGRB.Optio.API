@@ -42,7 +42,7 @@ The project will be available at **http://localhost:5000** or the port specified
 **Usage**
 You can use any API client (e.g., Postman) to interact with the API. Below are some example endpoints you can use:
 
-GET /api/Merchants - Retrieve a list of all Merchants.
+GET /api/Merchants - Retrieve a list of all Merchants.\n
 POST /api/Merchants - Create a new Merchant.
 GET /api/Transactions - Retrieve a list of all Transactions.
 GET /api/Statistics - Retrive statistic details.
