@@ -1,46 +1,46 @@
-**AGRB.Optio.API**
-AGRB.Optio.API is a powerful RESTful API project developed for the optimization and management of agribusiness. 
+**AGRB.Optio.API**<br>
+AGRB.Optio.API is a powerful RESTful API project developed for the optimization and management of agribusiness. <br>
 This API provides multi-functional operations and facilitates the automation of data management and analysis processes.
 
-**Project Description**
+**Project Description**<br>
 AGRB.Optio.API is designed to support various aspects of agribusiness management, including crop planning,
-resource allocation, and financial tracking. The API offers endpoints for managing data related to farms, fields,
+resource allocation, and financial tracking.<br> The API offers endpoints for managing data related to farms, fields,
 crops, and resources, allowing users to streamline their operations and make informed decisions based on real-time
-data analysis. By integrating AGRB.Optio.API into your agribusiness workflow, you can enhance efficiency, reduce costs, and improve overall productivity.
+data analysis.<br> By integrating AGRB.Optio.API into your agribusiness workflow, you can enhance efficiency, reduce costs, and improve overall productivity.<br>
 
-**Getting Started**
+**Getting Started**<br>
 Here you can find instructions to set up and configure the project on your
-local machine for development and testing purposes.
+local machine for development and testing purposes.<br>
 
-**Prerequisites**
-To set up the project, you need to have the following tools installed:
+**Prerequisites**<br>
+To set up the project, you need to have the following tools installed:<br>
 
-**.NET Core SDK (version 8.0 or later)**
+**.NET Core SDK (version 8.0 or later)**<br>
 Visual Studio or Visual Studio Code
-SQL Server or another compatible database
+SQL Server or another compatible database<br>
 
-**Installation**
-Clone the repository to your local machine:
+**Installation**<br>
+Clone the repository to your local machine:<br>
 git clone https://github.com/guga2002/AGRB.Optio.API.git
-Navigate to the project directory:
+Navigate to the project directory:<br>
 cd AGRB.Optio.API
 
-**Install the required packages:**
+<br>**Install the required packages:**<br>
 dotnet restore
 
-**Configuration:**
+<br>**Configuration:**<br>
 Configure the appsettings.json file with your database connection settings.
-Run the database migrations:
-dotnet ef database update
+Run the database migrations:<br>
+dotnet ef database update<br>
 
-**Running the Application**
+**Running the Application**<br>
 You can run the application using the following command:
-dotnet run
+dotnet run<br>
 
-The project will be available at **http://localhost:5000** or the port specified in the appsettings.json file.
+The project will be available at **http://localhost:5000** or the port specified in the appsettings.json file.<br>
 
-**Usage**
-You can use any API client (e.g., Postman) to interact with the API. Below are some example endpoints you can use:
+<br>**Usage**<br>
+You can use any API client (e.g., Postman) to interact with the API. Below are some example endpoints you can use:<br>
 
 GET /api/Merchants - Retrieve a list of all Merchants.<br>
 POST /api/Merchants - Create a new Merchant.<br>
@@ -49,8 +49,8 @@ GET /api/Statistics - Retrive statistic details.<br>
 GET /api/ExchangeRate - Retrieve a list of all ExchangeRate.<br>
 POST /api/Transaction - Create a new Transaction.<br>
 For detailed API documentation and further usage examples, refer to the API documentation available at
-http://localhost:5000/swagger.
+http://localhost:5000/swagger.<br>
 
-**Contributing**
-If you would like to contribute to the project, please fork the repository and submit a pull request. For major changes, 
-please open an issue first to discuss what you would like to change.
+**Contributing**<br>
+If you would like to contribute to the project, please fork the repository and submit a pull request. <br>For major changes, 
+please open an issue first to discuss what you would like to change.<br>
