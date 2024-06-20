@@ -84,7 +84,6 @@ namespace RGBA.Optio.Domain.Services.StatisticServices
                           };
 
             return grouped.OrderByDescending(i => i.Quantity);
-            //return null;
         }
 
         #endregion

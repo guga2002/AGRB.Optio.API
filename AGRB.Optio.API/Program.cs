@@ -32,7 +32,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "OtoManagementSolution", Version = "v1" });
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "OptioManagementSolution", Version = "v1" });
     opt.AddSecurityDefinition("auth", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.ApiKey,

@@ -12,8 +12,8 @@ using Optio.Core.Data;
 namespace AGRB.Optio.Infrastructure.Migrations
 {
     [DbContext(typeof(OptioDB))]
-    [Migration("20240620063811_migratey")]
-    partial class migratey
+    [Migration("20240620101905_asksa")]
+    partial class asksa
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -669,7 +669,7 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Optio.Core.Entities.Merchant", "Merchant")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("MerchantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -731,6 +731,8 @@ namespace AGRB.Optio.Infrastructure.Migrations
             modelBuilder.Entity("Optio.Core.Entities.Merchant", b =>
                 {
                     b.Navigation("Locations");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Optio.Core.Entities.TypeOfTransaction", b =>
