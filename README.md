@@ -16,9 +16,15 @@ local machine for development and testing purposes.<br>
 To set up the project, you need to have the following tools installed:<br>
 
 **.NET Core SDK (version 8.0 or later)**<br>
+```sh
 Visual Studio or Visual Studio Code
+```
+```sh
 SQL Server or another compatible database<br>
+```
+```sh
 Mongo Server (Version 7.0 or later) <br>
+```
 
 **Installation**<br>
 Clone the repository to your local machine:<br>
