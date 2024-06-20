@@ -80,12 +80,6 @@ Postman
   For detailed API documentation and further usage examples, refer to the API documentation available at
   http://localhost:5000/swagger.
 
-## Contributing
-If you would like to contribute to the project, please:
-- **fork the repository**
-- **submit a pull request**
- <br> for major changes,please open an issue first to discuss what you would like to change.<br>
-
 ## Relational models: <br>
 ![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/f3a2aacf-49ce-4567-acbd-ae820ffef948)
 
@@ -100,7 +94,13 @@ If you would like to contribute to the project, please:
 - **Restfull principes**
 ## License
 This project is licensed under the MIT License 
-- contanct me  for licence : **aapkhazava22@gmail.com** 
+- contanct me  for licence : **aapkhazava22@gmail.com**
+
+ ## Contributing
+If you would like to contribute to the project, please:
+- **fork the repository**
+- **submit a pull request**
+ <br> for major changes,please open an issue first to discuss what you would like to change.<br>
 ## Contact
 For any questions or suggestions, please contact:
 - **Author**: Guga Apkhazava , Raisa Badalova
