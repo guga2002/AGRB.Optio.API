@@ -43,8 +43,10 @@ dotnet restore
 <br>**Configuration:**<br>
 Configure the appsettings.json file with your database connection settings.
 ```sh
-Run the database migrations:<br>
-dotnet ef database update<br>
+Run the database migrations:
+```
+```sh
+dotnet ef database update
 ```
 
 **Running the Application**<br>
