@@ -62,6 +62,6 @@ please open an issue first to discuss what you would like to change.<br>
 onion Architecture:<br>
 ![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/acc022c0-ae1e-4d78-99ee-185dd8bad84a)
 <br>
-also used UniteOfWork Pattern,<br> Solid PRicncipes,<br> DI for IOC ( Inversion of controll),<br> Restfull principes.<br>
+also used **UniteOfWork Pattern**,<br> **Solid PRicncipes,<br> DI for IOC ( Inversion of controll),<br> Restfull principes.** <br>
 
 
