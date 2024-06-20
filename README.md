@@ -20,10 +20,10 @@ To set up the project, you need to have the following tools installed:<br>
 Visual Studio or Visual Studio Code
 ```
 ```sh
-SQL Server or another compatible database<br>
+SQL Server or another compatible database
 ```
 ```sh
-Mongo Server (Version 7.0 or later) <br>
+Mongo Server (Version 7.0 or later)
 ```
 
 **Installation**<br>
@@ -57,7 +57,12 @@ dotnet run
 The project will be available at **http://localhost:5000** or the port specified in the appsettings.json file.<br>
 
 <br>**Usage**<br>
-You can use any API client (e.g., Postman) to interact with the API.<br> Below are some example endpoints you can use:<br>
+You can use any API client to interact with the API
+```sh
+Postman, Swagger
+```
+
+<br> Below are some example endpoints you can use:<br>
 
 GET /api/Merchants - Retrieve a list of all Merchants.<br>
 POST /api/Merchants - Create a new Merchant.<br>
