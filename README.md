@@ -3,10 +3,10 @@ AGRB.Optio.API is a powerful RESTful API project developed for the optimization 
 This API provides multi-functional operations and facilitates the automation of data management and analysis processes.
 
 **Project Description**<br>
-AGRB.Optio.API is designed to support various aspects of agribusiness management, including crop planning,
-resource allocation, and financial tracking.<br> The API offers endpoints for managing data related to farms, fields,
-crops, and resources, allowing users to streamline their operations and make informed decisions based on real-time
-data analysis.<br> By integrating AGRB.Optio.API into your agribusiness workflow, you can enhance efficiency, reduce costs, and improve overall productivity.<br>
+AGRB.Optio.API is designed to support various aspects of Transacions management,<r> including Analys, planning,
+resource allocation, and financial tracking.<br> The API offers endpoints for managing data related cases<br>, fields,
+Transactions, and resources,<br> allowing users to streamline their operations and make informed decisions based on real-time
+data analysis.<br> By integrating AGRB.Optio.API into your Buisnes workflow, you can enhance efficiency, reduce costs, and improve overall productivity.<br>
 
 **Getting Started**<br>
 Here you can find instructions to set up and configure the project on your
@@ -18,6 +18,7 @@ To set up the project, you need to have the following tools installed:<br>
 **.NET Core SDK (version 8.0 or later)**<br>
 Visual Studio or Visual Studio Code
 SQL Server or another compatible database<br>
+Mongo Server (Version 7.0 or later) <br>
 
 **Installation**<br>
 Clone the repository to your local machine:<br>
@@ -40,7 +41,7 @@ dotnet run<br>
 The project will be available at **http://localhost:5000** or the port specified in the appsettings.json file.<br>
 
 <br>**Usage**<br>
-You can use any API client (e.g., Postman) to interact with the API. Below are some example endpoints you can use:<br>
+You can use any API client (e.g., Postman) to interact with the API.<br> Below are some example endpoints you can use:<br>
 
 GET /api/Merchants - Retrieve a list of all Merchants.<br>
 POST /api/Merchants - Create a new Merchant.<br>
