@@ -3,9 +3,9 @@ AGRB.Optio.API is a powerful RESTful API project developed for the optimization 
 This API provides multi-functional operations and facilitates the automation of data management and analysis processes.
 
 **Project Description**<br>
-AGRB.Optio.API is designed to support various aspects of Transacions management,<r> including Analys, planning,
-resource allocation, and financial tracking.<br> The API offers endpoints for managing data related cases<br>, fields,
-Transactions, and resources,<br> allowing users to streamline their operations and make informed decisions based on real-time
+AGRB.Optio.API is designed to support various aspects of Transacions management, including Analys, planning,
+resource allocation, and financial tracking.<br> The API offers endpoints for managing data related cases, fields,
+Transactions, and resources, allowing users to streamline their operations and make informed decisions based on real-time
 data analysis.<br> By integrating AGRB.Optio.API into your Buisnes workflow, you can enhance efficiency, reduce costs, and improve overall productivity.<br>
 
 **Getting Started**<br>
@@ -41,10 +41,8 @@ cd AGRB.Optio.API
 dotnet restore
 ```
 <br>**Configuration:**<br>
-Configure the appsettings.json file with your database connection settings.
-```sh
+Configure the appsettings.json file with your database connection settings.<br>
 Run the database migrations:
-```
 ```sh
 dotnet ef database update
 ```
@@ -56,12 +54,18 @@ dotnet run
 ```
 <br>
 
-The project will be available at **http://localhost:5000** or the port specified in the appsettings.json file.<br>
+The project will be available at Localhost 
+```sh
+http://localhost:5000 or port check in appseting.json
+```
 
 <br>**Usage**<br>
 You can use any API client to interact with the API
 ```sh
-Postman, Swagger
+Postman
+```
+```sh
+ Swagger
 ```
 
 <br> Below are some example endpoints you can use:<br>
