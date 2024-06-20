@@ -81,8 +81,10 @@ Postman
   http://localhost:5000/swagger.
 
 ## Contributing
-If you would like to contribute to the project, please fork the repository and submit a pull request. <br>For major changes, 
-please open an issue first to discuss what you would like to change.<br>
+If you would like to contribute to the project, please:
+- **fork the repository**
+- **submit a pull request**
+  for major changes,please open an issue first to discuss what you would like to change.<br>
 
 ## Relational models: <br>
 ![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/f3a2aacf-49ce-4567-acbd-ae820ffef948)
@@ -92,7 +94,7 @@ please open an issue first to discuss what you would like to change.<br>
 ![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/acc022c0-ae1e-4d78-99ee-185dd8bad84a)
 <br>
 - **UniteOfWork Pattern**
--  **solid PRicncipes**
+-  **solid Pricncipes**
 -   **DI for IOC ( Inversion of controll)**
 -   **Restfull principes.**
 ## License
