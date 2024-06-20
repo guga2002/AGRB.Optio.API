@@ -64,5 +64,12 @@ onion Architecture:<br>
 ![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/acc022c0-ae1e-4d78-99ee-185dd8bad84a)
 <br>
 also used **UniteOfWork Pattern**,<br> **Solid PRicncipes,<br> DI for IOC ( Inversion of controll),<br> Restfull principes.** <br>
+## License
+This project is licensed under the MIT License - contanct me  for licence : **aapkhazava22@gmail.com** <br>
+## Contact
+For any questions or suggestions, please contact:
+- **Author**: Guga Apkhazava , Raisa Badalova
+- **Email**: guram.apkhazava908@ens.tsu.ge
+- **SecondEmail**: raisa.badalova132@ens.tsu.ge
 
 
