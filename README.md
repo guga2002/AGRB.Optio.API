@@ -3,17 +3,17 @@
 AGRB.Optio.API is a powerful RESTful API project developed for the optimization and management of Bank Transactions. <br>
 This API provides multi-functional operations and facilitates the automation of data management and analysis processes.
 
--**Project Description**<br>
+**Project Description**<br>
 AGRB.Optio.API is designed to support various aspects of Transacions management, including Analys, planning,
 resource allocation, and financial tracking.<br> The API offers endpoints for managing data related cases, fields,
 Transactions, and resources, allowing users to streamline their operations and make informed decisions based on real-time
 data analysis.<br> By integrating AGRB.Optio.API into your Buisnes workflow, you can enhance efficiency, reduce costs, and improve overall productivity.<br>
 
--**Getting Started**<br>
+**Getting Started**<br>
 Here you can find instructions to set up and configure the project on your
 local machine for development and testing purposes.<br>
 
--**Prerequisites**<br>
+**Prerequisites**<br>
 To set up the project, you need to have the following tools installed:<br>
 
 **.NET Core SDK (version 8.0 or later)**<br>
@@ -27,7 +27,7 @@ SQL Server or another compatible database
 Mongo Server (Version 7.0 or later)
 ```
 
--**Installation**<br>
+**Installation**<br>
 Clone the repository to your local machine:<br>
 ```sh
 git clone https://github.com/guga2002/AGRB.Optio.API.git
@@ -60,7 +60,7 @@ The project will be available at Localhost
 http://localhost:5000 or port check in appseting.json
 ```
 
--**Usage**<br>
+**Usage**<br>
 You can use any API client to interact with the API
 ```sh
 Postman
