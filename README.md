@@ -42,12 +42,12 @@ The project will be available at **http://localhost:5000** or the port specified
 **Usage**
 You can use any API client (e.g., Postman) to interact with the API. Below are some example endpoints you can use:
 
-GET /api/Merchants - Retrieve a list of all Merchants.\n
-POST /api/Merchants - Create a new Merchant.
-GET /api/Transactions - Retrieve a list of all Transactions.
-GET /api/Statistics - Retrive statistic details.
-GET /api/ExchangeRate - Retrieve a list of all ExchangeRate.
-POST /api/Transaction - Create a new Transaction.
+GET /api/Merchants - Retrieve a list of all Merchants.<br>
+POST /api/Merchants - Create a new Merchant.<br>
+GET /api/Transactions - Retrieve a list of all Transactions.<br>
+GET /api/Statistics - Retrive statistic details.<br>
+GET /api/ExchangeRate - Retrieve a list of all ExchangeRate.<br>
+POST /api/Transaction - Create a new Transaction.<br>
 For detailed API documentation and further usage examples, refer to the API documentation available at
 http://localhost:5000/swagger.
 
