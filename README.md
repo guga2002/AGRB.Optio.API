@@ -31,16 +31,22 @@ cd AGRB.Optio.API
 ```
 
 <br>**Install the required packages:**<br>
+```sh
 dotnet restore
-
+```
 <br>**Configuration:**<br>
 Configure the appsettings.json file with your database connection settings.
+```sh
 Run the database migrations:<br>
 dotnet ef database update<br>
+```
 
 **Running the Application**<br>
 You can run the application using the following command:
-dotnet run<br>
+```sh
+dotnet run
+```
+<br>
 
 The project will be available at **http://localhost:5000** or the port specified in the appsettings.json file.<br>
 
