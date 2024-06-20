@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AGRB.Optio.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class migrateNow : Migration
+    public partial class gfr : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

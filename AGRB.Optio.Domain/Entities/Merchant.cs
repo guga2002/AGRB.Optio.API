@@ -16,5 +16,7 @@ namespace Optio.Core.Entities
         public bool IsActive { get; set; } = true;
 
         public virtual IEnumerable<LocationToMerchant>? Locations { get; set; }
+
+        public  IEnumerable<Transaction> Transactions { get; set; }
     }
 }

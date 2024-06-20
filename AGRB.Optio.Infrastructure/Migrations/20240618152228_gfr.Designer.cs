@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Optio.Core.Data;
 
@@ -11,9 +12,11 @@ using Optio.Core.Data;
 namespace AGRB.Optio.Infrastructure.Migrations
 {
     [DbContext(typeof(OptioDB))]
-    partial class OptioDBModelSnapshot : ModelSnapshot
+    [Migration("20240618152228_gfr")]
+    partial class gfr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -666,7 +669,7 @@ namespace AGRB.Optio.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Optio.Core.Entities.Merchant", "Merchant")
-                        .WithMany("Transactions")
+                        .WithMany()
                         .HasForeignKey("MerchantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -728,8 +731,6 @@ namespace AGRB.Optio.Infrastructure.Migrations
             modelBuilder.Entity("Optio.Core.Entities.Merchant", b =>
                 {
                     b.Navigation("Locations");
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Optio.Core.Entities.TypeOfTransaction", b =>

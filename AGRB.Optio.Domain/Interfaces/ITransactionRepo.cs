@@ -9,5 +9,6 @@ namespace Optio.Core.Interfaces
         Task<Transaction> GetByIdWithDetailsAsync(long id);
 
         Task<IEnumerable<Transaction>> GetAllActiveAsync();
+       
     }
 }

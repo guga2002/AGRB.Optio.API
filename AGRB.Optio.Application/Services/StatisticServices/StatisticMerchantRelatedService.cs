@@ -1,9 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
+using Optio.Core.Entities;
 using RGBA.Optio.Core.Interfaces;
+using RGBA.Optio.Core.Repositories;
 using RGBA.Optio.Domain.Custom_Exceptions;
 using RGBA.Optio.Domain.Interfaces.StatisticInterfaces;
 using RGBA.Optio.Domain.Models.ResponseModels;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace RGBA.Optio.Domain.Services.StatisticServices
 {
@@ -35,7 +40,7 @@ namespace RGBA.Optio.Domain.Services.StatisticServices
                                       volume = g.Sum(i => i.AmountEquivalent)
                                   };
 
-                    List<ChannelResponseModel> lst=new List<ChannelResponseModel>();
+                    List<ChannelResponseModel> lst = new List<ChannelResponseModel>();
                     var channelList = channel.ToList();
                     foreach (var item in channelList)
                     {
@@ -45,7 +50,7 @@ namespace RGBA.Optio.Domain.Services.StatisticServices
                             ChannelType = channelDetails.ChannelType,
                             Quantity = item.channelCount,
                             Volume = item.volume,
-                            Average = item.volume/item.channelCount,
+                            Average = item.volume / item.channelCount,
 
                         };
                         lst.Add(res);
@@ -64,73 +69,22 @@ namespace RGBA.Optio.Domain.Services.StatisticServices
         #endregion
 
         #region GetMostPopularLocationAsync
-
         public async Task<IEnumerable<LocationResponseModel>> GetMostPopularLocationAsync(DateTime start, DateTime end)
         {
-            var trans = await work.TransactionRepository.GetAllAsync();
-            var transInDate = trans.Where(i => i.Date >= start && i.Date <= end).ToList();
-            if (!trans.Any())
-            {
-                throw new OptioGeneralException("No transactions exist in the database.");
-            }
-            else
-            {
-                var filteredObject = from tran in transInDate
-                    group tran by tran.MerchantId
-                    into merch
-                    select new
-                    {
-                        merchantId = merch.Key,
-                        quantity = merch.Count(),
-                        volume = merch.Sum(i => i.Amount)
-                    };
-                var merchantLocationTask = filteredObject.Select(async mg =>
-                {
-                    var locationId =
-                        await work.LocationToMerchantRepository.GetLocationIdByMerchantIdAsync(mg.merchantId);
-                    var merchantDetails = await work.MerchantRepository.GetByIdAsync(mg.merchantId);
-                    return new
-                    {
-                        LocationId = locationId,
-                        MerchantId = mg.merchantId,
-                        merchantName = merchantDetails.Name,
-                        TransactionCount = mg.quantity,
-                        TransactionAmount = mg.volume
 
-                    };
-                });
-                var merchantLocations = await Task.WhenAll(merchantLocationTask);
+            var locationToMerchant = await work.LocationToMerchantRepository.GetAllLocationToMerchant();
 
-                var locationGroups = from i in merchantLocations
-                    group i by i.LocationId
-                    into loc
-                    select new
-                    {
-                        LocatId = loc.Key.Id,
-                        TransactCount = loc.Count(),
-                        TotalVolume = loc.Sum(i => i.TransactionAmount),
-                        merchants = loc.Select(ml => ml.merchantName).First(),
-                    };
-                var locationList = locationGroups.ToList();
-                var locationTask = locationList.Select(async lc =>
-                {
-                    var locationDetails = await work.LocationRepository.GetByIdAsync(lc.LocatId);
+            await Console.Out.WriteLineAsync(  locationToMerchant.Count().ToString());
+            var grouped = from location in locationToMerchant
+                          group location by location.Location into g
+                          select new LocationResponseModel
+                          {
+                              Location = g.Key.LocationName,
+                              Quantity = g.Sum(i => i.Merchant.Transactions.Count(i => i.Date >= start && i.Date <= end))
+                          };
 
-                    return new LocationResponseModel
-                    {
-                        Location = locationDetails.LocationName,
-                        Quantity = lc.TransactCount,
-                        Volume = lc.TotalVolume,
-                        Average = lc.TotalVolume / lc.TransactCount,
-                        MerchantName = lc.merchants
-                    };
-                });
-
-                var locations = await Task.WhenAll(locationTask);
-
-                return locations.OrderByDescending(l => l.Volume);
-
-            }
+            return grouped.OrderByDescending(i => i.Quantity);
+            //return null;
         }
 
         #endregion

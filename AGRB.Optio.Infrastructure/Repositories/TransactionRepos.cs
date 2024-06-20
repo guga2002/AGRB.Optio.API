@@ -146,5 +146,7 @@ namespace Optio.Core.Repositories
             return await transactions.AsNoTracking().Where(io => io.IsActive).ToListAsync();
         }
         #endregion
+
+   
     }
 }
