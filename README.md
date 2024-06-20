@@ -54,3 +54,14 @@ http://localhost:5000/swagger.<br>
 **Contributing**<br>
 If you would like to contribute to the project, please fork the repository and submit a pull request. <br>For major changes, 
 please open an issue first to discuss what you would like to change.<br>
+
+**Relational models:** <br>
+![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/f3a2aacf-49ce-4567-acbd-ae820ffef948)
+
+**Used Architecture:** <br>
+onion Architecture:<br>
+![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/acc022c0-ae1e-4d78-99ee-185dd8bad84a)
+<br>
+also used UniteOfWork Pattern,<br> Solid PRicncipes,<br> DI for IOC ( Inversion of controll),<br> Restfull principes.<br>
+
+
