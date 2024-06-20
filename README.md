@@ -90,17 +90,14 @@ If you would like to contribute to the project, please:
 ![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/f3a2aacf-49ce-4567-acbd-ae820ffef948)
 
 ## Used Architecture:
-- **onion Architecture**
+
 ![image](https://github.com/guga2002/AGRB.Optio.API/assets/74540934/acc022c0-ae1e-4d78-99ee-185dd8bad84a)
-
 <br>
-<br>
-
+- onion Architecture:
 - UniteOfWork Pattern
--  solid Pricncipes
--   DI for IOC ( Inversion of controll)
--   Restfull principes
--   
+- solid Pricncipes
+- DI for IOC ( Inversion of controll)
+- Restfull principes
 ## License
 This project is licensed under the MIT License 
 - contanct me  for licence : **aapkhazava22@gmail.com** 
