@@ -1,126 +1,141 @@
-﻿using AGRB.Optio.API.StaticFiles;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using AGRB.Optio.Application.Responses;
 using AGRB.Optio.Application.Models;
 using AGRB.Optio.Application.Models.ResponseModels;
 using AGRB.Optio.Application.Models.RequestModels;
 using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
+using AGRB.Optio.Application.StaticFiles;
 
 namespace RGBA.Optio.UI.Controllers
 {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// Controller for Statistic Related Actions
+    /// </summary>
     [ApiController]
-    public class StatisticController(
-        IStatisticTransactionRelatedService transactionRelatedStatistic,
-        IStatisticMerchantRelatedService merchantRelatedStatistic)
-        : ControllerBase
+    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("2.0")]
+    [Route("api/v{v:apiVersion}/[controller]")]
+    public class StatisticController: ControllerBase
     {
-
-        [HttpPost]
-        [Route(nameof(GetMostPopularCategoryAsync))]
-        public async Task<Response<IEnumerable<CategoryResponseModel>>> GetMostPopularCategoryAsync(DateRangeRequestModel date)
+        private readonly IStatisticTransactionRelatedService transactionRelatedStatistic;
+        private readonly IStatisticMerchantRelatedService merchantRelatedStatistic;
+        /// Initializes a new instance of the <see cref="StatisticController"/> class.
+        /// <param name="transactionRelatedStatistic">The TransactionrelateStatistic service.</param>
+        /// <param name="merchantRelatedStatistic">The merchant Relate service.</param>
+        public StatisticController(IStatisticTransactionRelatedService transactionRelatedStatistic, IStatisticMerchantRelatedService merchantRelatedStatistic)
         {
-            try
-            {
-               var result = await transactionRelatedStatistic.GetMostPopularCategoryAsync(date.Start,date.End);
-               return !result.Any()
-                   ? Response<IEnumerable<CategoryResponseModel>>.Error(ErrorKeys.NotFound)
-                   : Response<IEnumerable<CategoryResponseModel>>.Ok(result);
-            }
-            catch (Exception exp)
-            {
-                return Response<IEnumerable<CategoryResponseModel>>.Error(exp.Message,exp.StackTrace);
-            }
+            this.transactionRelatedStatistic = transactionRelatedStatistic;
+            this.merchantRelatedStatistic = merchantRelatedStatistic;
+        }
+
+        /// <summary>
+        ///Get Most Popular category from transactions V2.0
+        /// </summary>
+        /// <returns>A response containing a lsit of CategoryResponseModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin,authorize User**
+        /// </remarks>
+        [HttpPost]
+        [Route("[action]")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<IEnumerable<CategoryResponseModel>>> MostPopularCategory(DateRangeRequestModel date)
+        {
+            var result = await transactionRelatedStatistic.GetMostPopularCategoryAsync(date.Start, date.End);
+            return !result.Any()
+                ? Response<IEnumerable<CategoryResponseModel>>.Error(ErrorKeys.NotFound)
+                : Response<IEnumerable<CategoryResponseModel>>.Ok(result);
         }
 
 
+        /// <summary>
+        ///Get Transaction Quantity With Date from transactions V2.0
+        /// </summary>
+        /// <returns>A response containing a lsit of TransactionQuantitiesWithDateModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin,authorize User**
+        /// </remarks>
         [HttpPost]
-        [Route(nameof(GetTransactionQuantityWithDateAsync))]
-        public async Task<Response<IEnumerable<TransactionQuantitiesWithDateModel>>> GetTransactionQuantityWithDateAsync([FromBody] DateRangeRequestModel date)
+        [Route("[action]")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<IEnumerable<TransactionQuantitiesWithDateModel>>> TransactionQuantityWithDate([FromBody] DateRangeRequestModel date)
         {
-            try
-            {
-                var result = await transactionRelatedStatistic.GetTransactionQuantityWithDateAsync(date.Start, date.End);
-                return !result.Any()
-                    ? Response<IEnumerable<TransactionQuantitiesWithDateModel>>.Error(ErrorKeys.BadRequest)
-                    : Response<IEnumerable<TransactionQuantitiesWithDateModel>>.Ok(result);
-            }
-            catch (Exception exp)
-            {
-                return Response<IEnumerable<TransactionQuantitiesWithDateModel>>.Error(exp.Message,exp.StackTrace);
-            }
+            var result = await transactionRelatedStatistic.GetTransactionQuantityWithDateAsync(date.Start, date.End);
+            return !result.Any()
+                ? Response<IEnumerable<TransactionQuantitiesWithDateModel>>.Error(ErrorKeys.BadRequest)
+                : Response<IEnumerable<TransactionQuantitiesWithDateModel>>.Ok(result);
+        }
+
+        /// <summary>
+        ///Get All Transaction Between Date from transactions V2.0
+        /// </summary>
+        /// <returns>A response containing a lsit of TransactionModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin,authorize User**
+        /// </remarks>
+        [HttpPost]
+        [Route("[action]")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<IEnumerable<TransactionModel>>> AllTransactionBetweenDate([FromBody] DateRangeRequestModel date)
+        {
+            var result = await transactionRelatedStatistic.GetAllTransactionBetweenDate(date.Start, date.End);
+            return !result.Any()
+                ? Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest)
+                : Response<IEnumerable<TransactionModel>>.Ok(result);
         }
 
 
+        /// <summary>
+        ///Get Most Popular Channel  from transactions V2.0
+        /// </summary>
+        /// <returns>A response containing a lsit of ChannelResponseModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin,authorize User**
+        /// </remarks>
         [HttpPost]
-        [Route(nameof(GetAllTransactionBetweenDate))]
-        public async Task<Response<IEnumerable<TransactionModel>>> GetAllTransactionBetweenDate([FromBody]DateRangeRequestModel date)
+        [Route("[action]")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<IEnumerable<ChannelResponseModel>>> MostPopularChannel([FromBody] DateRangeRequestModel date)
         {
-            try
-            {
-                var result = await transactionRelatedStatistic.GetAllTransactionBetweenDate(date.Start, date.End);
-                return !result.Any()
-                    ? Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest)
-                    : Response<IEnumerable<TransactionModel>>.Ok(result);
-            }
-            catch (Exception exp)
-            {
-                return Response<IEnumerable<TransactionModel>>.Error(exp.Message, exp.StackTrace);
-            }
+            var result = await merchantRelatedStatistic.GetMostPopularChannelAsync(date.Start, date.End);
+            return !result.Any()
+                ? Response<IEnumerable<ChannelResponseModel>>.Error(ErrorKeys.BadRequest)
+                : Response<IEnumerable<ChannelResponseModel>>.Ok(result);
         }
 
-
+        /// <summary>
+        ///Get Most Popular Location from transactions V2.0
+        /// </summary>
+        /// <returns>A response containing a lsit of LocationResponseModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin,authorize User**
+        /// </remarks>
         [HttpPost]
-        [Route(nameof(GetMostPopularChannelAsync))]
-        public async Task<Response<IEnumerable<ChannelResponseModel>>> GetMostPopularChannelAsync([FromBody] DateRangeRequestModel date)
+        [Route("[action]")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<IEnumerable<LocationResponseModel>>> MostPopularLocation([FromBody] DateRangeRequestModel date)
         {
-            try
-            {
-                var result = await merchantRelatedStatistic.GetMostPopularChannelAsync(date.Start, date.End);
-                return !result.Any()
-                    ? Response<IEnumerable<ChannelResponseModel>>.Error(ErrorKeys.BadRequest)
-                    : Response<IEnumerable<ChannelResponseModel>>.Ok(result);
-            }
-            catch (Exception exp)
-            {
-                return Response<IEnumerable<ChannelResponseModel>>.Error(exp.Message,exp.StackTrace);
-            }
+            var result = await merchantRelatedStatistic.GetMostPopularLocationAsync(date.Start, date.End);
+            return !result.Any()
+                ? Response<IEnumerable<LocationResponseModel>>.Error(ErrorKeys.BadRequest)
+                : Response<IEnumerable<LocationResponseModel>>.Ok(result);
         }
 
-
+        /// <summary>
+        ///Get Transactions with data range V2.0
+        /// </summary>
+        /// <returns>A response containing a lsit of MerchantResponseModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin,authorize User**
+        /// </remarks>
         [HttpPost]
-        [Route(nameof(GetMostPopularLocationAsync))]
-        public async Task<Response<IEnumerable<LocationResponseModel>>> GetMostPopularLocationAsync([FromBody] DateRangeRequestModel date)
+        [Route("[action]")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<IEnumerable<MerchantResponseModel>>> MostPopularMerchants([FromBody] DateRangeRequestModel date)
         {
-            try
-            {
-                var result = await merchantRelatedStatistic.GetMostPopularLocationAsync(date.Start, date.End);
-                return !result.Any()
-                    ? Response<IEnumerable<LocationResponseModel>>.Error(ErrorKeys.BadRequest)
-                    : Response<IEnumerable<LocationResponseModel>>.Ok(result);
-            }
-            catch (Exception exp)
-            {
-                return Response<IEnumerable<LocationResponseModel>>.Error(exp.Message,exp.StackTrace);
-            }
-        }
-
-
-        [HttpPost]
-        [Route(nameof(GetMostPopularMerchantsAsync))]
-        public async Task<Response<IEnumerable<MerchantResponseModel>>> GetMostPopularMerchantsAsync([FromBody] DateRangeRequestModel date)
-        {
-            try
-            {
-                var result = await merchantRelatedStatistic.GetMostPopularMerchantsAsync(date.Start, date.End);
-                return !result.Any()
-                    ? Response<IEnumerable<MerchantResponseModel>>.Error(ErrorKeys.BadRequest)
-                    : Response<IEnumerable<MerchantResponseModel>>.Ok(result);
-            }
-            catch (Exception exp)
-            {
-                return Response<IEnumerable<MerchantResponseModel>>.Error(exp.Message,exp.StackTrace);
-            }
+            var result = await merchantRelatedStatistic.GetMostPopularMerchantsAsync(date.Start, date.End);
+            return !result.Any()
+                ? Response<IEnumerable<MerchantResponseModel>>.Error(ErrorKeys.BadRequest)
+                : Response<IEnumerable<MerchantResponseModel>>.Ok(result);
         }
     }
 }

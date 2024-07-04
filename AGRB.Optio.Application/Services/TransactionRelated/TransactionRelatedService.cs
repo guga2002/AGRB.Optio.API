@@ -6,6 +6,7 @@ using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using AGRB.Optio.Domain.Custom_Exceptions;
+using AGRB.Optio.Application.StaticFiles;
 
 namespace AGRB.Optio.Application.Services.TransactionRelated
 {
@@ -19,7 +20,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.ChannelType))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var mapChannels = mapper.Map<Channels>(entity);
@@ -41,7 +42,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrEmpty(entity.TransactionCategory))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var mapCategory = mapper.Map<Category>(entity);
@@ -64,7 +65,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.TransactionName))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var mapTypeOfTransaction = mapper.Map<TypeOfTransaction>(entity);
@@ -191,7 +192,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             try
             {
                 var res = await work.ChannelRepository.GetByIdAsync(id)
-                          ?? throw new ItemNotFoundException($"Channel by id: {id} not found");
+                          ?? throw new ItemNotFoundException(ErrorKeys.NotFound);
                 var mapChannelModel = mapper.Map<ChannelModel>(res);
                 return mapChannelModel;
             }
@@ -207,7 +208,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             try
             {
                 var res = await work.CategoryOfTransactionRepository.GetByIdAsync(id)
-                    ?? throw new ItemNotFoundException($"Category by id: {id} not found");
+                    ?? throw new ItemNotFoundException(ErrorKeys.NotFound);
 
                 var mapCategoryModel = mapper.Map<CategoryModel>(res);
                 return mapCategoryModel;
@@ -225,7 +226,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             try
             {
                 var res = await work.TypeOfTransactionRepository.GetByIdAsync(id)
-                          ?? throw new ItemNotFoundException($"Transaction Type by id: {id} not found");
+                          ?? throw new ItemNotFoundException(ErrorKeys.NotFound);
 
                 var mapTransactionTypeModel = mapper.Map<TransactionTypeModel>(res);
                 return mapTransactionTypeModel;
@@ -346,7 +347,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.ChannelType))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 var mapped = mapper.Map<Channels>(entity);
                 if (mapped is not null)
@@ -368,7 +369,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.TransactionCategory))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var mapped = mapper.Map<Category>(entity);
@@ -389,7 +390,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.TransactionName))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 var mapped = mapper.Map<TypeOfTransaction>(entity);
                 if (mapped is null) return false;

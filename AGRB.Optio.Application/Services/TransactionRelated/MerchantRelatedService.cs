@@ -6,6 +6,7 @@ using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using AGRB.Optio.Domain.Custom_Exceptions;
+using AGRB.Optio.Application.StaticFiles;
 
 namespace AGRB.Optio.Application.Services.TransactionRelated
 {
@@ -19,7 +20,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.Name))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 var mapMerchant = mapper.Map<Merchant>(entity);
                 if (mapMerchant is null) return -1;
@@ -40,7 +41,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrEmpty(entity.LocationName))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 var mapLocation = mapper.Map<Location>(entity);
                 if (mapLocation is not null)
@@ -153,7 +154,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             try
             {
                 var res = await work.LocationRepository.GetByIdAsync(id);
-                if (res is null) throw new ItemNotFoundException($"Location with id: {id} not found");
+                if (res is null) throw new ItemNotFoundException(ErrorKeys.NotFound);
                 var mapLocationModel = mapper.Map<LocationModel>(res);
                 return mapLocationModel;
             }
@@ -169,7 +170,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             try
             {
                 var res = await work.MerchantRepository.GetByIdAsync(id);
-                if (res is null) throw new ItemNotFoundException($"Merchant with id: {id} not found");
+                if (res is null) throw new ItemNotFoundException(ErrorKeys.NotFound);
                 var mapMerchantModel = mapper.Map<MerchantModel>(res);
                 return mapMerchantModel;
             }
@@ -182,7 +183,6 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
         #endregion
 
         #region RemoveAsync
-
         public async Task<bool> RemoveAsync(long id, LocationModel identity)
         {
             try
@@ -258,11 +258,11 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.LocationName))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var mapLocation = mapper.Map<Location>(entity);
-                if (mapLocation is null) throw new ItemNotFoundException($"{entity.LocationName} not found");
+                if (mapLocation is null) throw new ItemNotFoundException($"{entity.LocationName} {ErrorKeys.NotFound}");
                 var res = await work.LocationRepository.UpdateAsync(id, mapLocation);
                 return res;
 
@@ -280,11 +280,11 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
             {
                 if (entity is null || string.IsNullOrWhiteSpace(entity.Name))
                 {
-                    throw new OptioGeneralException("Entity can not be null");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var mapMerchant = mapper.Map<Merchant>(entity);
-                if (mapMerchant is null) throw new ItemNotFoundException($"{entity.Name} not found");
+                if (mapMerchant is null) throw new ItemNotFoundException($"{entity.Name}{ErrorKeys.NotFound}");
                 var res = await work.MerchantRepository.UpdateAsync(id, mapMerchant);
                 return res;
             }

@@ -5,6 +5,7 @@ using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using AGRB.Optio.Domain.Custom_Exceptions;
+using AGRB.Optio.Application.StaticFiles;
 
 namespace AGRB.Optio.Application.Services
 {
@@ -18,26 +19,26 @@ namespace AGRB.Optio.Application.Services
             {
                 if (entity is null || entity.Date >= DateTime.Now)
                 {
-                    throw new OptioGeneralException("Exception while adding  Transaction");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 if (await work.CategoryOfTransactionRepository.GetByIdAsync(entity.CategoryId) is null)
                 {
-                    throw new OptioGeneralException("Such Category no exist");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 if (await work.ChannelRepository.GetByIdAsync(entity.ChannelId) is null)
                 {
-                    throw new OptioGeneralException("Channel  no exist while adding Transaction");
+                    throw new OptioGeneralException(ErrorKeys.InternalServerError);
                 }
                 if (await work.MerchantRepository.GetByIdAsync(entity.MerchantId) is null)
                 {
-                    throw new OptioGeneralException("Merchant  no exist while adding Transaction");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 if (await work.CurrencyRepository.GetByIdAsync(entity.CurrencyNameId) is null)
                 {
-                    throw new OptioGeneralException("Such Currency no exist while adding Transaction");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 var mapped = mapper.Map<Transaction>(entity);
-                if (mapped is null) return -1;
+                if (mapped is null) throw new OptioGeneralException(ErrorKeys.Mapped);
                 var res = await work.TransactionRepository.AddAsync(mapped);
                 await work.CheckAndCommitAsync();
                 return res;
@@ -60,7 +61,7 @@ namespace AGRB.Optio.Application.Services
 
                 if (res is null) return new List<TransactionModel>();
                 var mapped = mapper.Map<IEnumerable<TransactionModel>>(res);
-                return mapped ?? new List<TransactionModel>();
+                return mapped ?? throw new OptioGeneralException(ErrorKeys.NotFound);
             }
             catch (Exception exp)
             {
@@ -79,7 +80,7 @@ namespace AGRB.Optio.Application.Services
 
                 if (res is null) return new List<TransactionModel>();
                 var mapped = mapper.Map<IEnumerable<TransactionModel>>(res);
-                return mapped ?? new List<TransactionModel>();
+                return mapped ?? throw new OptioGeneralException($"{nameof(GetAllAsync)}");
             }
             catch (Exception exp)
             {
@@ -95,9 +96,9 @@ namespace AGRB.Optio.Application.Services
             try
             {
                 var res = await work.TransactionRepository.GetByIdAsync(id)
-                          ?? throw new ItemNotFoundException(" No transaction Exist");
+                          ?? throw new ItemNotFoundException(ErrorKeys.NotFound);
                 var mapped = mapper.Map<TransactionModel>(res)
-                             ?? throw new ItemNotFoundException(" No transaction Exist");
+                             ?? throw new ItemNotFoundException(ErrorKeys.NotFound);
                 return mapped;
             }
             catch (Exception exp)
@@ -153,9 +154,9 @@ namespace AGRB.Optio.Application.Services
         {
             try
             {
-                if (entity is null) throw new ResourceNotFoundException("No data exist  on this transaction in DB");
+                if (entity is null) throw new ResourceNotFoundException(ErrorKeys.NotFound);
                 var mapped = mapper.Map<Transaction>(entity)
-                             ?? throw new ResourceNotFoundException("No data exist  on this transaction in DB");
+                             ?? throw new ResourceNotFoundException(ErrorKeys.NotFound);
                 var res = await work.TransactionRepository.UpdateAsync(id, mapped);
                 await work.CheckAndCommitAsync();
                 return res;

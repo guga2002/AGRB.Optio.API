@@ -1,5 +1,6 @@
 ﻿using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
 using AGRB.Optio.Application.Models.ResponseModels;
+using AGRB.Optio.Application.StaticFiles;
 using AGRB.Optio.Domain.Custom_Exceptions;
 using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
@@ -22,7 +23,7 @@ namespace AGRB.Optio.Application.Services.StatisticServices
                 var transInDate = trans.Where(i => i.Date >= start && i.Date <= end).ToList();
                 if (transInDate.Count == 0)
                 {
-                    throw new OptioGeneralException("No transactions exist in the database.");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 else
                 {
@@ -92,7 +93,7 @@ namespace AGRB.Optio.Application.Services.StatisticServices
                 var transInDate = trans.Where(i => i.Date >= start && i.Date <= end).ToList();
                 if (transInDate.Count == 0)
                 {
-                    throw new OptioGeneralException("No transactions exist in the database.");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
                 else
                 {

@@ -5,6 +5,7 @@ using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using AGRB.Optio.Domain.Custom_Exceptions;
+using AGRB.Optio.Application.StaticFiles;
 
 namespace AGRB.Optio.Application.Services.StatisticServices
 {
@@ -22,7 +23,7 @@ namespace AGRB.Optio.Application.Services.StatisticServices
                 var transactions = await work.TransactionRepository.GetAllWithDetailsAsync();
                 if (transactions is null || !transactions.Any())
                 {
-                    throw new OptioGeneralException("No transactions exist in the database.");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var filteredTransactions = transactions.Where(t => t.IsActive && t.Date >= start && t.Date <= end).ToList();
@@ -46,7 +47,7 @@ namespace AGRB.Optio.Application.Services.StatisticServices
                 var transactions = await work.TransactionRepository.GetAllWithDetailsAsync();
                 if (!transactions.Any())
                 {
-                    throw new OptioGeneralException("No transactions exist.");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var filteredTransactions = transactions.Where(t => t.IsActive && t.Date >= start && t.Date <= end).ToList();
@@ -84,7 +85,7 @@ namespace AGRB.Optio.Application.Services.StatisticServices
 
                 if (!transactions.Any())
                 {
-                    throw new OptioGeneralException("No transactions exist.");
+                    throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var filteredTransactions = transactions.Where(t => t.IsActive && t.Date >= start && t.Date <= end).ToList();

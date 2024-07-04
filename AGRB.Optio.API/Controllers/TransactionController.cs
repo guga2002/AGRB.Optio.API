@@ -1,116 +1,94 @@
-﻿using AGRB.Optio.API.StaticFiles;
-using AGRB.Optio.Application.Interfaces;
+﻿using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Application.Models;
 using AGRB.Optio.Application.Responses;
+using AGRB.Optio.Application.StaticFiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace RGBA.Optio.UI.Controllers
 {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// Controller for Transaction Related Actions
+    /// </summary>
     [ApiController]
-    public class TransactionController(
-        ITransactionService transactionService,
-        ILogger<TransactionController> logger,
-        IMemoryCache memoryCache)
-        : ControllerBase
+    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("2.0")]
+    [Route("api/v{v:apiVersion}/[controller]")]
+    public class TransactionController: ControllerBase
     {
-        [HttpGet]
-        [Route(nameof(GetTransaction))]
-        public async Task<Response<IEnumerable<TransactionModel>>> GetTransaction()
+
+        private readonly ITransactionService transactionService;
+        private readonly IMemoryCache memoryCache;
+
+        /// Initializes a new instance of the <see cref="TransactionController"/> class.
+        /// <param name="transactionService">The Transaction service.</param>
+        /// <param name="memoryCache">The memory cash service.</param>
+        public TransactionController(ITransactionService transactionService, IMemoryCache memoryCache)
         {
-            try
-            {
-                const string cacheKey = "GetAllTransaction";
-                if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
-                {
-                    if (value != null) return Response<IEnumerable<TransactionModel>>.Ok(value);
-                }
-                else
-                {
-                    var res = await transactionService.GetAllAsync(new TransactionModel
-                    {
-                        Amount = 0,
-                        CategoryId = 0,
-                        ChannelId = 0,
-                        MerchantId = 0,
-                        CurrencyNameId = 0,
-                        Date = DateTime.Now,
-                        EquivalentInGel = 0
-                    });
-
-                    if (!res.Any())
-                    {
-                        return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
-                    }
-                    memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
-                    return Response<IEnumerable<TransactionModel>>.Ok(res);
-                }
-
-                return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.InternalServerError);
-            }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Response<IEnumerable<TransactionModel>>.Error(ex.Message, ex.StackTrace);
-            }
+            this.transactionService = transactionService;
+            this.memoryCache = memoryCache;
         }
 
-
+        /// <summary>
+        ///Get all  transactions V2.0
+        /// </summary>
+        /// <returns>A response containing a lsit of TransactionModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin**
+        /// </remarks>
         [HttpGet]
         [Route("[action]")]
-        public async Task<Response<IEnumerable<TransactionModel>>> AllActiveTransaction()
+        [MapToApiVersion("2.0")]
+        public async Task<Response<IEnumerable<TransactionModel>>> Transactions()
         {
-            try
+            const string cacheKey = "GetAllTransaction";
+            if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
             {
-                const string cacheKey = "AllActiveTransaction";
-                if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
+                if (value != null) return Response<IEnumerable<TransactionModel>>.Ok(value);
+            }
+            else
+            {
+                var res = await transactionService.GetAllAsync(new TransactionModel
                 {
-                    if (value != null) return Response<IEnumerable<TransactionModel>>.Ok(value);
-                }
-                else
-                {
-                    var res = await transactionService.GetAllActiveAsync(new TransactionModel
-                    {
-                        Amount = 0,
-                        CategoryId = 0,
-                        ChannelId = 0,
-                        MerchantId = 0,
-                        CurrencyNameId = 0,
-                        Date = DateTime.Now,
-                        EquivalentInGel = 0
-                    });
-                    if (res is null)
-                    {
-                        return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
-                    }
-                    memoryCache.Set(res, cacheKey, TimeSpan.FromMinutes(20));
-                    return Response<IEnumerable<TransactionModel>>.Ok(res);
-                }
+                    Amount = 0,
+                    CategoryId = 0,
+                    ChannelId = 0,
+                    MerchantId = 0,
+                    CurrencyNameId = 0,
+                    Date = DateTime.Now,
+                    EquivalentInGel = 0
+                });
 
-                return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
+                if (!res.Any())
+                {
+                    return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
+                }
+                memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
+                return Response<IEnumerable<TransactionModel>>.Ok(res);
             }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Response<IEnumerable<TransactionModel>>.Error(ex.Message, ex.StackTrace);
-            }
+            return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.InternalServerError);
         }
 
-
+        /// <summary>
+        ///Get all active transactions V1.0
+        /// </summary>
+        /// <returns>A response containing a lsit of TransactionModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin**
+        /// </remarks>
         [HttpGet]
-        [Route("{id:long}")]
-        public async Task<Response<TransactionModel>>Get([FromRoute]long id)
+        [Route("[action]")]
+        [MapToApiVersion("1.0")]
+        public async Task<Response<IEnumerable<TransactionModel>>> ActiveTransactions()
         {
-            try
+            const string cacheKey = "AllActiveTransaction";
+            if (memoryCache.TryGetValue(cacheKey, out IEnumerable<TransactionModel>? value))
             {
-                var cacheKey = $"TransactionById: {id}";
-                if (memoryCache.TryGetValue(cacheKey, out TransactionModel? value))
-                {
-                    if (value != null) return Response<TransactionModel>.Ok(value);
-                }
-
-                var res = await transactionService.GetByIdAsync(id, new TransactionModel
+                if (value != null) return Response<IEnumerable<TransactionModel>>.Ok(value);
+            }
+            else
+            {
+                var res = await transactionService.GetAllActiveAsync(new TransactionModel
                 {
                     Amount = 0,
                     CategoryId = 0,
@@ -122,105 +100,137 @@ namespace RGBA.Optio.UI.Controllers
                 });
                 if (res is null)
                 {
-                    return Response<TransactionModel>.Error(ErrorKeys.BadRequest);
+                    return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
                 }
-                memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
-                return Response<TransactionModel>.Ok(res);
+                memoryCache.Set(res, cacheKey, TimeSpan.FromMinutes(20));
+                return Response<IEnumerable<TransactionModel>>.Ok(res);
             }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Response<TransactionModel>.Error(ex.Message,ex.StackTrace);
-            }
+
+            return Response<IEnumerable<TransactionModel>>.Error(ErrorKeys.BadRequest);
         }
 
-
-        [HttpPost]
-        [Route(nameof(InsertTransaction))]
-        public async Task<Response<long>> InsertTransaction([FromBody]TransactionModel model)
+        /// <summary>
+        ///Get transactions by id V2.0
+        /// </summary>
+        /// <returns>A response containing TransactionModel </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin**
+        /// </remarks>
+        [HttpGet]
+        [Route("{id:long}")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<TransactionModel>> Transaction([FromRoute] long id)
         {
-            try
+
+            var cacheKey = $"TransactionById: {id}";
+            if (memoryCache.TryGetValue(cacheKey, out TransactionModel? value))
             {
-                if (!ModelState.IsValid || model is null) return Response<long>.Error(ErrorKeys.BadRequest);
-                var res=await transactionService.AddAsync(model);
-                return res != -1 ? Response<long>.Ok(res) : Response<long>.Error(ErrorKeys.NotFound);
+                if (value != null) return Response<TransactionModel>.Ok(value);
             }
-            catch (Exception ex)
+
+            var res = await transactionService.GetByIdAsync(id, new TransactionModel
             {
-                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Response<long>.Error(ex.Message, ex.StackTrace);
+                Amount = 0,
+                CategoryId = 0,
+                ChannelId = 0,
+                MerchantId = 0,
+                CurrencyNameId = 0,
+                Date = DateTime.Now,
+                EquivalentInGel = 0
+            });
+            if (res is null)
+            {
+                return Response<TransactionModel>.Error(ErrorKeys.BadRequest);
             }
+            memoryCache.Set(cacheKey, res, TimeSpan.FromMinutes(20));
+            return Response<TransactionModel>.Ok(res);
         }
 
 
+        /// <summary>
+        /// Add new Transaction to db V2.0
+        /// </summary>
+        /// <returns>A response containing a long </returns>
+        /// <remarks>
+        ///  avalible for **operator, manager,admin**
+        /// </remarks>
+        [HttpPost]
+        [Route("[action]")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<long>> Insert([FromBody] TransactionModel model)
+        {
+            if (!ModelState.IsValid || model is null) return Response<long>.Error(ErrorKeys.BadRequest);
+            var res = await transactionService.AddAsync(model);
+            return res != -1 ? Response<long>.Ok(res) : Response<long>.Error(ErrorKeys.NotFound);
+        }
+
+        /// <summary>
+        /// Delete transaction from Db V2.0
+        /// </summary>
+        /// <returns>A response containing boolean </returns>
+        /// <remarks>
+        ///  avalible for **manager,admin**
+        /// </remarks>
         [HttpDelete]
         [Route("[action]/{id:long}")]
-        public async Task<Response<bool>> DeleteTransaction([FromRoute]long id)
+        [MapToApiVersion("2.0")]
+        public async Task<Response<bool>> DeleteTransaction([FromRoute] long id)
         {
-            try
+
+            var rek = await transactionService.RemoveAsync(id, new TransactionModel()
             {
-                var rek = await transactionService.RemoveAsync(id, new TransactionModel()
-                {
-                    Amount = 0,
-                    Date = DateTime.Now,
-                    CategoryId = 0,
-                    ChannelId = 0,
-                    CurrencyNameId = 0,
-                    EquivalentInGel = 4,
-                    MerchantId = 0
-                });
-                return rek ? Response<bool>.Ok(rek) : Response<bool>.Error(ErrorKeys.NotFound);
-            }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Response<bool>.Error(ex.Message, ex.StackTrace);
-            }
+                Amount = 0,
+                Date = DateTime.Now,
+                CategoryId = 0,
+                ChannelId = 0,
+                CurrencyNameId = 0,
+                EquivalentInGel = 4,
+                MerchantId = 0
+            });
+            return rek ? Response<bool>.Ok(rek) : Response<bool>.Error(ErrorKeys.NotFound);
         }
 
-
+        /// <summary>
+        /// soft Delete transaction from Db V1.0
+        /// </summary>
+        /// <returns>A response containing boolean </returns>
+        /// <remarks>
+        ///  avalible for **manager,admin**
+        /// </remarks>
         [HttpPost]
         [Route("[action]/{id:long}")]
-        public async Task<Response<bool>> DeleteSoft([FromRoute]long id)
+        [MapToApiVersion("1.0")]
+        public async Task<Response<bool>> SoftDelete([FromRoute] long id)
         {
-            try
+            if (!ModelState.IsValid) return Response<bool>.Error(ErrorKeys.BadRequest);
+            var res = await transactionService.SoftDeleteAsync(id, new TransactionModel
             {
-                if (!ModelState.IsValid) return Response<bool>.Error(ErrorKeys.BadRequest);
-                var res =await transactionService.SoftDeleteAsync(id, new TransactionModel
-                {
-                    Amount = 0,
-                    CategoryId = 0,
-                    ChannelId = 0,
-                    MerchantId = 0,
-                    CurrencyNameId = 0,
-                    Date = DateTime.Now,
-                    EquivalentInGel = 0
-                });
-                return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.NotFound);
-            }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Response<bool>.Error(ex.Message, ex.StackTrace);
-            }
+                Amount = 0,
+                CategoryId = 0,
+                ChannelId = 0,
+                MerchantId = 0,
+                CurrencyNameId = 0,
+                Date = DateTime.Now,
+                EquivalentInGel = 0
+            });
+            return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.NotFound);
         }
 
-
+        /// <summary>
+        /// Update transaction from Db V2.0
+        /// </summary>
+        /// <returns>A response containing boolean </returns>
+        /// <remarks>
+        ///  avalible for **manager,admin**
+        /// </remarks>
         [HttpPut]
-        [Route("[action]/{id:long}/[action]")]
-        public async Task<Response<bool>> UpdateTransaction([FromRoute]long id, [FromBody]TransactionModel transactionModel)
+        [Route("[action]/{id:long}")]
+        [MapToApiVersion("2.0")]
+        public async Task<Response<bool>> Transaction([FromRoute] long id, [FromBody] TransactionModel transactionModel)
         {
-            try
-            {
-                if (!ModelState.IsValid) return Response<bool>.Error(ErrorKeys.BadRequest);
-                var res = await transactionService.UpdateAsync(id, transactionModel);
-                return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.NotFound);
-            }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
-                return Response<bool>.Error(ex.Message, ex.StackTrace);
-            }
+            if (!ModelState.IsValid) return Response<bool>.Error(ErrorKeys.BadRequest);
+            var res = await transactionService.UpdateAsync(id, transactionModel);
+            return res ? Response<bool>.Ok(res) : Response<bool>.Error(ErrorKeys.NotFound);
         }
     }
 }

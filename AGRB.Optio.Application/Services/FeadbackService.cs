@@ -1,5 +1,6 @@
 ﻿using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Application.Models.RequestModels;
+using AGRB.Optio.Application.StaticFiles;
 using AGRB.Optio.Domain.Entities;
 using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
@@ -21,7 +22,7 @@ namespace AGRB.Optio.Application.Services
             {
                return await  work.FeadbackRepository.AddAsync(mapped);
             }
-            throw new ArgumentNullException(" somethings wrong");
+            throw new ArgumentNullException(ErrorKeys.InternalServerError);
         }
 
         public async Task<IEnumerable<FeadbackModel>> GetAllActiveAsync(FeadbackModel identify)
@@ -33,7 +34,7 @@ namespace AGRB.Optio.Application.Services
                 var mapped=mapper.Map<IEnumerable<FeadbackModel>>(filtered);
                 return mapped;
             }
-            throw new ArgumentNullException(" no entitites found!");
+            throw new ArgumentNullException(ErrorKeys.NotFound);
         }
 
         public async Task<IEnumerable<FeadbackModel>> GetAllAsync(FeadbackModel identify)
@@ -44,7 +45,7 @@ namespace AGRB.Optio.Application.Services
                 var mapped = mapper.Map<IEnumerable<FeadbackModel>>(ser);
                 return mapped;
             }
-            throw new ArgumentNullException(" no entitites found!");
+            throw new ArgumentNullException(ErrorKeys.NotFound);
         }
 
         public  async Task<FeadbackModel> GetByIdAsync(long id, FeadbackModel identify)
@@ -55,7 +56,7 @@ namespace AGRB.Optio.Application.Services
                 var mapped = mapper.Map<FeadbackModel>(ser);
                 return mapped;
             }
-            throw new ArgumentNullException(" no entitites found!");
+            throw new ArgumentNullException(ErrorKeys.NotFound);
         }
 
         public async Task<bool> RemoveAsync(long id, FeadbackModel identity)
@@ -65,7 +66,7 @@ namespace AGRB.Optio.Application.Services
             {
               return  await  work.FeadbackRepository.RemoveAsync(feadbback);
             }
-            throw new ArgumentNullException("No entity found on this ID");
+            throw new ArgumentNullException(ErrorKeys.NotFound);
         }
 
         public  async Task<bool> SoftDeleteAsync(long id, FeadbackModel identify)
