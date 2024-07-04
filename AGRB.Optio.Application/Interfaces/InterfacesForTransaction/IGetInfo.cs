@@ -1,8 +1,8 @@
-﻿namespace RGBA.Optio.Domain.Interfaces.InterfacesForTransaction
+﻿namespace AGRB.Optio.Application.Interfaces.InterfacesForTransaction
 {
-    public interface IGetInfo<T,K> where T : class
+    public interface IGetInfo<T, K> where T : class
     {
-        Task<T> GetByIdAsync(K id,T identify);
+        Task<T> GetByIdAsync(K id, T identify);
 
         Task<IEnumerable<T>> GetAllAsync(T identify);
 

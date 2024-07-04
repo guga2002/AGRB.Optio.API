@@ -1,19 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RGBA.Optio.Core.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Optio.Core.Entities
+namespace AGRB.Optio.Domain.Entities
 {
     [Table("Transactions")]
-    [Index(nameof(Amount),IsDescending = [true])]
+    [Index(nameof(Amount), IsDescending = [true])]
     [Index(nameof(AmountEquivalent), IsDescending = [true])]
     [Index(nameof(Date), IsDescending = [true])]
-    public class Transaction:AbstractClass
+    public class Transaction : AbstractEntity
     {
         [Column("Date_Of_Transaction")]
         public DateTime Date { get; set; }
 
-        [Column("Amount")]
+        [Column("Total_Amount")]
         public decimal Amount { get; set; }
 
         [Column("Amount_Equivalent")]
@@ -24,7 +23,7 @@ namespace Optio.Core.Entities
 
         [ForeignKey("Currency")]
         public int CurrencyId { get; set; }
-        public virtual Currency? Currency { get; set; }
+        public virtual Currency Currency { get; set; }
 
 
         [ForeignKey("Category")]
@@ -34,12 +33,12 @@ namespace Optio.Core.Entities
 
         [ForeignKey("Merchant")]
         public long MerchantId { get; set; }
-        public virtual Merchant? Merchant {  get; set; }
+        public virtual Merchant Merchant { get; set; }
 
 
         [ForeignKey("Channel")]
         public long ChannelId { get; set; }
-        public virtual Channels? Channel { get; set; }
+        public virtual Channels Channel { get; set; }
 
     }
 }

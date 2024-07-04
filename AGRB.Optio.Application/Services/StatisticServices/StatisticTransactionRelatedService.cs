@@ -1,12 +1,12 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Models.ResponseModels;
+using AGRB.Optio.Domain.Interfaces;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces.StatisticInterfaces;
-using RGBA.Optio.Domain.Models;
-using RGBA.Optio.Domain.Models.ResponseModels;
+using AGRB.Optio.Domain.Custom_Exceptions;
 
-namespace RGBA.Optio.Domain.Services.StatisticServices
+namespace AGRB.Optio.Application.Services.StatisticServices
 {
     public class StatisticTransactionRelatedService(
         IUniteOfWork work,

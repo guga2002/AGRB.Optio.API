@@ -1,12 +1,13 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Services;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using RGBA.Optio.Core.Entities;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Models;
+using AGRB.Optio.Domain.Custom_Exceptions;
 
-namespace RGBA.Optio.Domain.Services.TransactionRelated
+namespace AGRB.Optio.Application.Services.TransactionRelated
 {
     public class CurrencyRelatedService(IUniteOfWork work, IMapper map, ILogger<CurrencyRelatedService> log)
         : AbstractService<CurrencyRelatedService>(work, map, log), ICurrencyRelatedService
@@ -83,7 +84,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
             catch (Exception ex)
             {
-                logger.LogCritical(ex.Message,ex.StackTrace,DateTime.Now.ToShortTimeString());
+                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
                 throw;
             }
         }
@@ -111,8 +112,8 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             try
             {
                 var res = await work.ExchangeRateRepository.GetAllAsync();
-                if(res is null) return Enumerable.Empty<ExchangeRateModel>();
-                var mapExchangeRateModel = mapper.Map<IEnumerable<ExchangeRateModel>>(res); 
+                if (res is null) return Enumerable.Empty<ExchangeRateModel>();
+                var mapExchangeRateModel = mapper.Map<IEnumerable<ExchangeRateModel>>(res);
                 return mapExchangeRateModel;
             }
             catch (Exception ex)
@@ -144,7 +145,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                var res =await work.ExchangeRateRepository.GetByIdAsync(id);
+                var res = await work.ExchangeRateRepository.GetByIdAsync(id);
                 if (res is not null)
                 {
                     var mapExchangeRateModel = mapper.Map<ExchangeRateModel>(res);
@@ -158,7 +159,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
             catch (Exception ex)
             {
-                logger.LogCritical(ex.Message,ex.StackTrace, DateTime.Now.ToShortTimeString());
+                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
                 throw;
             }
         }
@@ -166,7 +167,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
 
         #region RemoveAsync
 
-        public async Task<bool> RemoveAsync(int id,CurrencyModel identity)
+        public async Task<bool> RemoveAsync(int id, CurrencyModel identity)
         {
             try
             {
@@ -180,12 +181,12 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
             catch (Exception ex)
             {
-                logger.LogCritical(ex.Message,ex.StackTrace,DateTime.Now.ToShortTimeString());  
+                logger.LogCritical(ex.Message, ex.StackTrace, DateTime.Now.ToShortTimeString());
                 throw;
             }
         }
 
-        public async Task<bool> RemoveAsync(long Id,ExchangeRateModel identity)
+        public async Task<bool> RemoveAsync(long Id, ExchangeRateModel identity)
         {
             try
             {
@@ -241,12 +242,12 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                if(entity == null || string.IsNullOrWhiteSpace(entity.NameOfCurrency) || string.IsNullOrWhiteSpace(entity.CurrencyCode))
+                if (entity == null || string.IsNullOrWhiteSpace(entity.NameOfCurrency) || string.IsNullOrWhiteSpace(entity.CurrencyCode))
                 {
                     throw new OptioGeneralException("Entity can not be null");
                 }
-                var mapCurrency = mapper.Map<Currency> (entity) ?? throw new ItemNotFoundException($"Currency {entity.NameOfCurrency} not found");
-                var res =work.CurrencyRepository.UpdateAsync(id, mapCurrency); return res;
+                var mapCurrency = mapper.Map<Currency>(entity) ?? throw new ItemNotFoundException($"Currency {entity.NameOfCurrency} not found");
+                var res = work.CurrencyRepository.UpdateAsync(id, mapCurrency); return res;
             }
             catch (Exception ex)
             {
@@ -259,14 +260,14 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                if (entity == null || string.IsNullOrWhiteSpace(entity.DateOfExchangeRate.ToString()) || entity.CurrencyId<0||entity.ExchangeRate<0)
+                if (entity == null || string.IsNullOrWhiteSpace(entity.DateOfExchangeRate.ToString()) || entity.CurrencyId < 0 || entity.ExchangeRate < 0)
                 {
                     throw new OptioGeneralException("Entity can not be null and currency id must be > 0 and  exchange rate must be > 0");
                 }
                 var mapExchangeRate = mapper.Map<ExchangeRate>(entity);
                 if (mapExchangeRate is null) throw new ItemNotFoundException($"Exchange rate with currency id {entity.CurrencyId} not found");
-                
-                var res = work.ExchangeRateRepository.UpdateAsync(id,mapExchangeRate);
+
+                var res = work.ExchangeRateRepository.UpdateAsync(id, mapExchangeRate);
                 return res;
             }
             catch (Exception ex)

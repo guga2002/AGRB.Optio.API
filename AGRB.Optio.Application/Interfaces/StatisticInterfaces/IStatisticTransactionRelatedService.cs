@@ -1,7 +1,7 @@
-﻿using RGBA.Optio.Domain.Models;
-using RGBA.Optio.Domain.Models.ResponseModels;
+﻿using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Models.ResponseModels;
 
-namespace RGBA.Optio.Domain.Interfaces.StatisticInterfaces
+namespace AGRB.Optio.Application.Interfaces.StatisticInterfaces
 {
     public interface IStatisticTransactionRelatedService
     {

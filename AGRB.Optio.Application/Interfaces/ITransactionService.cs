@@ -1,11 +1,11 @@
-﻿using RGBA.Optio.Domain.Interfaces.InterfacesForTransaction;
-using RGBA.Optio.Domain.Models;
+﻿using AGRB.Optio.Application.Interfaces.InterfacesForTransaction;
+using AGRB.Optio.Application.Models;
 
-namespace RGBA.Optio.Domain.Interfaces
+namespace AGRB.Optio.Application.Interfaces
 {
-    public interface ITransactionService:IAddInfo<TransactionModel>, 
-     IUpdateInfo<TransactionModel,long>,IGetInfo<TransactionModel,long>,IRemoveInfo<TransactionModel,long>
+    public interface ITransactionService : IAddInfo<TransactionModel>,
+     IUpdateInfo<TransactionModel, long>, IGetInfo<TransactionModel, long>, IRemoveInfo<TransactionModel, long>
     {
-      
+
     }
 }

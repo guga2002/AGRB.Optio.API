@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace RGBA.Optio.UI.Reflections
+namespace AGRB.Optio.Persistance.Reflections
 {
     public static class ReflectionServices
     {

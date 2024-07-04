@@ -1,4 +1,4 @@
-﻿namespace RGBA.Optio.Stream.Interfaces
+﻿namespace AGRB.Optio.StreamTest.Interfaces
 {
     public interface IMerchantRelatedSer
     {

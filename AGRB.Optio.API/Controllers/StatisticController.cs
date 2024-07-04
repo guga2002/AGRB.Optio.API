@@ -1,10 +1,10 @@
 ﻿using AGRB.Optio.API.StaticFiles;
 using Microsoft.AspNetCore.Mvc;
-using RGBA.Optio.Domain.Interfaces.StatisticInterfaces;
-using RGBA.Optio.Domain.Models.RequestModels;
-using RGBA.Optio.Domain.Models.ResponseModels;
-using RGBA.Optio.Domain.Responses;
-using RGBA.Optio.Domain.Models;
+using AGRB.Optio.Application.Responses;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Models.ResponseModels;
+using AGRB.Optio.Application.Models.RequestModels;
+using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
 
 namespace RGBA.Optio.UI.Controllers
 {

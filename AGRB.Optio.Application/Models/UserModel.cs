@@ -1,8 +1,8 @@
-﻿using RGBA.Optio.Domain.Validation.VallidationAttributes;
+﻿using AGRB.Optio.Application.Validation.VallidationAttributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RGBA.Optio.Domain.Models
+namespace AGRB.Optio.Application.Models
 {
     public class UserModel
     {
@@ -43,6 +43,6 @@ namespace RGBA.Optio.Domain.Models
         [Required(ErrorMessage = "Password is required.")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 100 characters.")]
         [NotMapped]
-        public  required string Password { get; set; }
+        public required string Password { get; set; }
     }
 }

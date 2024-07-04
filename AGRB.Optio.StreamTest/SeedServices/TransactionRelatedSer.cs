@@ -1,18 +1,16 @@
-﻿using Optio.Core.Data;
-using RGBA.Optio.Core.Interfaces;
-using Optio.Core.Entities;
-using RGBA.Optio.Stream.Interfaces;
-using RGBA.Optio.Stream.DecerializerClasses;
-using RGBA.Optio.Core.Entities;
-using Currency = RGBA.Optio.Core.Entities.Currency;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using Dapper;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using AGRB.Optio.StreamTest.Interfaces;
+using AGRB.Optio.StreamTest.DecerializerCLasses;
+using AGRB.Optio.Domain.Data;
 
-namespace RGBA.Optio.Stream.SeedServices
+namespace AGRB.Optio.StreamTest.SeedServices
 {
-    public class TransactionRelatedSer:ITransactionRelatedSer
+    public class TransactionRelatedSer : ITransactionRelatedSer
     {
         private readonly IUniteOfWork _uniteOfWork;
         private readonly OptioDB optioDB;
@@ -31,7 +29,7 @@ namespace RGBA.Optio.Stream.SeedServices
         #region channel
         public async Task<bool> fillChannel()
         {
-            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType="ფილიალი" });
+            await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "ფილიალი" });
             await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "მობილური ინტერნეტ ბანკი" });
             await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "ინტერნეტ ბანკი" });
             await _uniteOfWork.ChannelRepository.AddAsync(new Channels { ChannelType = "ტერმინალი" });
@@ -47,7 +45,7 @@ namespace RGBA.Optio.Stream.SeedServices
             await optioDB.Types.AddAsync(new TypeOfTransaction()
             {
                 TransactionName = "შემოსავალი",
-              
+
                 Category = new List<Category>()
                 {
                     new Category()
@@ -159,15 +157,15 @@ namespace RGBA.Optio.Stream.SeedServices
         #endregion
 
         #region InsertCurrencies
-        public async Task  InsertCurrencies(List<CurrenciesResponse> cur)
+        public async Task InsertCurrencies(List<CurrenciesResponse> cur)
         {
 
             foreach (var currency in cur)
             {
                 foreach (var Dgiuri in currency.Currencies)
                 {
-                    var curenc=await optioDB.Currencies.FirstOrDefaultAsync(io=>io.NameOfCurrency==Dgiuri.name);
-                    if (curenc is  null)
+                    var curenc = await optioDB.Currencies.FirstOrDefaultAsync(io => io.NameOfCurrency == Dgiuri.name);
+                    if (curenc is null)
                     {
                         curenc = new Currency()
                         {
@@ -179,7 +177,7 @@ namespace RGBA.Optio.Stream.SeedServices
 
                     var valute = new ExchangeRate()
                     {
-                        Rate = (decimal)Dgiuri.rate/Dgiuri.quantity,
+                        Rate = (decimal)Dgiuri.rate / Dgiuri.quantity,
                         Date = currency.Date,
                         Currency = curenc,
                     };
@@ -219,7 +217,7 @@ namespace RGBA.Optio.Stream.SeedServices
                     continue;
                 }
 
-                var currencyIndex = rand.Next(0, (int)currency.Max(i => i.Id));
+                var currencyIndex = rand.Next(0, currency.Max(i => i.Id));
                 var currencyIn = await optioDB.Currencies.Where(i => i.Id == currencyIndex).Include(i => i.Courses).FirstOrDefaultAsync();
                 if (currencyIn is null)
                 {
@@ -229,7 +227,7 @@ namespace RGBA.Optio.Stream.SeedServices
 
                 var trans = new Transaction
                 {
-                    Date = DateTime.Now.AddDays(-rand1.Next(3,60)),
+                    Date = DateTime.Now.AddDays(-rand1.Next(3, 60)),
                     Amount = rand1.Next(10000),
                     AmountEquivalent = 0,
                     CurrencyId = currencyIndex,
@@ -238,9 +236,9 @@ namespace RGBA.Optio.Stream.SeedServices
                     ChannelId = channelIndex,
                     IsActive = true,
                 };
-              
+
                 trans.AmountEquivalent = trans.Amount * currencyIn.Courses.OrderByDescending(i => i.Date).FirstOrDefault().Rate;
-               transactions.Add(trans);
+                transactions.Add(trans);
             }
             await optioDB.Transactions.AddRangeAsync(transactions);
             await optioDB.SaveChangesAsync();
@@ -251,14 +249,14 @@ namespace RGBA.Optio.Stream.SeedServices
         #region FillTransactions
         public async Task<bool> FillTransactions(int n)
         {
-            var category= await optioDB.CategoryOfTransactions.ToListAsync();
-            var merchants=await optioDB.Merchants.ToListAsync();
+            var category = await optioDB.CategoryOfTransactions.ToListAsync();
+            var merchants = await optioDB.Merchants.ToListAsync();
             var channel = await optioDB.Channels.ToListAsync();
             var currency = await optioDB.Currencies.ToListAsync();
             for (var i = 0; i < n; i++)
             {
                 var categoryIndex = rand.Next(0, (int)category.Max(i => i.Id));
-                if(!await optioDB.CategoryOfTransactions.AnyAsync(i => i.Id == categoryIndex))
+                if (!await optioDB.CategoryOfTransactions.AnyAsync(i => i.Id == categoryIndex))
                 {
                     i--;
                     continue;
@@ -275,18 +273,18 @@ namespace RGBA.Optio.Stream.SeedServices
                     i--;
                     continue;
                 }
-                
-                var currencyIndex = rand.Next(0, (int)currency.Max(i => i.Id));
-                var currencyIn = await optioDB.Currencies.Where(i => i.Id == currencyIndex).Include(i=>i.Courses).FirstOrDefaultAsync();
+
+                var currencyIndex = rand.Next(0, currency.Max(i => i.Id));
+                var currencyIn = await optioDB.Currencies.Where(i => i.Id == currencyIndex).Include(i => i.Courses).FirstOrDefaultAsync();
                 if (currencyIn is null)
                 {
                     i--;
                     continue;
                 }
-                Random randomi=new Random();
+                Random randomi = new Random();
                 var trans = new Transaction
                 {
-                    Date = DateTime.Now.AddDays(-randomi.Next(3,200)),
+                    Date = DateTime.Now.AddDays(-randomi.Next(3, 200)),
                     Amount = rand1.Next(10000),
                     AmountEquivalent = 0,
                     CurrencyId = currencyIndex,

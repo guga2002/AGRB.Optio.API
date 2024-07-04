@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RGBA.Optio.Domain.Validation.VallidationAttributes
+namespace AGRB.Optio.Application.Validation.VallidationAttributes
 {
     public class DataTimeValidate : ValidationAttribute
     {

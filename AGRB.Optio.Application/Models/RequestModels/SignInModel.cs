@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RGBA.Optio.Domain.Models.RequestModels
+namespace AGRB.Optio.Application.Models.RequestModels
 {
     public class SignInModel
     {
-        [Required(ErrorMessage ="the field is required")]
+        [Required(ErrorMessage = "the field is required")]
         public required string Username { get; set; }
 
         [Required(ErrorMessage = "the field is required")]

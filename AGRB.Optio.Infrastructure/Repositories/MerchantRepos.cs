@@ -1,32 +1,30 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Optio.Core.Data;
-using Optio.Core.Entities;
-using Optio.Core.Interfaces;
 using System.Data;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using AGRB.Optio.Domain.Data;
 
-namespace Optio.Core.Repositories
+namespace AGRB.Optio.Infrastructure.Repositories
 {
-    public class MerchantRepos : AbstractClass, IMerchantRepo
+    public class MerchantRepos : AbstractRepositroy<Merchant>, IMerchantRepo
     {
-        private readonly DbSet<Merchant> merchant;
         private readonly IConfiguration conf;
 
-        public MerchantRepos(OptioDB optioDB, IConfiguration conf):base(optioDB)
+        public MerchantRepos(OptioDB optioDB, IConfiguration conf) : base(optioDB)
         {
-            merchant = Context.Set<Merchant>(); 
-            this.conf= conf;
+            this.conf = conf;
         }
 
         #region AssignLocationToMerchant
-        public async Task<bool> AssignLocationToMerchant(long merchantId,long locationId)
+        public async Task<bool> AssignLocationToMerchant(long merchantId, long locationId)
         {
             try
             {
-                if (!await merchant.AnyAsync(io => io.Id == merchantId) ||
+                if (!await Dbset.AnyAsync(io => io.Id == merchantId) ||
                     !await Context.Locations.AnyAsync(io => io.Id == locationId)) return false;
                 using IDbConnection db = new SqlConnection(conf.GetConnectionString("OptiosString"));
                 var sqlQuery = "INSERT INTO LocationToMerchants (locationId, merchantId) VALUES (@locationId, @merchantId)";
@@ -51,11 +49,11 @@ namespace Optio.Core.Repositories
                     var sqlQuery =
                         "SELECT Date_Of_Transaction AS Date, Amount, Amount_Equivalent as AmountEquivalent, Transaction_Status AS IsActive, CurrencyId, CategoryId, MerchantId, ChannelId FROM Transactions";
                     var transactions = await db.QueryAsync<Transaction>(sqlQuery);
-                    return transactions.ToList<Transaction>();
+                    return transactions.ToList();
                 }
             }
             catch (SqlException)
-            { 
+            {
                 throw;
             }
             catch (Exception)
@@ -70,12 +68,12 @@ namespace Optio.Core.Repositories
         {
             try
             {
-               
-                if (!await merchant.AnyAsync(i => i.Name == entity.Name))
+
+                if (!await Dbset.AnyAsync(i => i.Name == entity.Name))
                 {
-                    await merchant.AddAsync(entity);
+                    await Dbset.AddAsync(entity);
                     await Context.SaveChangesAsync();
-                    var max = await merchant.MaxAsync(io => io.Id);
+                    var max = await Dbset.MaxAsync(io => io.Id);
                     return max;
                 }
                 else
@@ -97,13 +95,13 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                if (merchant.IsNullOrEmpty())
+                if (Dbset.IsNullOrEmpty())
                 {
                     throw new InvalidOperationException("No merchants found");
                 }
                 else
                 {
-                    return await merchant
+                    return await Dbset
                         .AsNoTracking()
                         .ToListAsync();
                 }
@@ -122,7 +120,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var store = await merchant.AsNoTracking().Where(i => i.IsActive).ToListAsync();
+                var store = await Dbset.AsNoTracking().Where(i => i.IsActive).ToListAsync();
                 return store;
 
             }
@@ -139,7 +137,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var store = await merchant.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
+                var store = await Dbset.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
                 return store;
 
             }
@@ -156,8 +154,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-                merchant.Remove(entity);
+                Dbset.Remove(entity);
                 await Context.SaveChangesAsync();
                 return true;
             }
@@ -173,7 +170,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var store=await merchant.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
+                var store = await Dbset.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
 
                 store.IsActive = false;
                 await Context.SaveChangesAsync();
@@ -191,20 +188,13 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(entity,nameof(entity));
-                var store = await merchant.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
-            
+                var store = await Dbset.FindAsync(id) ?? throw new InvalidOperationException("No merchant found");
                 store.Name = entity.Name;
                 await Context.SaveChangesAsync();
                 return true;
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
             catch (Exception)
             {
-
                 throw;
             }
         }

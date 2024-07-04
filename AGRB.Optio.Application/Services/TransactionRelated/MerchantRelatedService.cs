@@ -1,12 +1,13 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Services;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Optio.Core.Entities;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Models;
+using AGRB.Optio.Domain.Custom_Exceptions;
 
-namespace RGBA.Optio.Domain.Services.TransactionRelated
+namespace AGRB.Optio.Application.Services.TransactionRelated
 {
     public class MerchantRelatedService(IUniteOfWork work, IMapper map, ILogger<MerchantRelatedService> log)
         : AbstractService<MerchantRelatedService>(work, map, log), IMerchantRelatedService
@@ -64,8 +65,8 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-              var res= await  work.MerchantRepository.AssignLocationToMerchant(merchantId, locationId);
-              return res;
+                var res = await work.MerchantRepository.AssignLocationToMerchant(merchantId, locationId);
+                return res;
             }
             catch (Exception ex)
             {
@@ -82,7 +83,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                var res =await work.LocationRepository.GetAllActiveLocationAsync();
+                var res = await work.LocationRepository.GetAllActiveLocationAsync();
                 if (res is null) return Enumerable.Empty<LocationModel>();
                 var mapLocationModel = mapper.Map<IEnumerable<LocationModel>>(res);
                 return mapLocationModel;
@@ -224,7 +225,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                var res =await work.LocationRepository.SoftDeleteAsync(id);
+                var res = await work.LocationRepository.SoftDeleteAsync(id);
                 return res;
             }
             catch (Exception ex)
@@ -273,7 +274,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<bool> UpdateAsync(long id,MerchantModel entity)
+        public async Task<bool> UpdateAsync(long id, MerchantModel entity)
         {
             try
             {

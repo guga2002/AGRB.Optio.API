@@ -1,20 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RGBA.Optio.Core.Entities;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Optio.Core.Entities
+namespace AGRB.Optio.Domain.Entities
 {
     [Table("Locations")]
-    [Index(nameof(LocationName),IsDescending = [true])]
-    public class Location:AbstractClass
+    [Index(nameof(LocationName), IsDescending = [true])]
+    public class Location : AbstractEntity
     {
         [Column("Location_Name")]
-        [StringLength(50,ErrorMessage ="Location name is not valid",MinimumLength =3)]
-        public required string LocationName {  get; set; }
+        public required string LocationName { get; set; }
 
+        [Column("Location_Status")]
         public bool IsActive { get; set; } = true;
 
         public virtual IEnumerable<LocationToMerchant> Merchants { get; set; }
+
+        public Location()
+        {
+            Merchants = new List<LocationToMerchant>();
+        }
     }
 }

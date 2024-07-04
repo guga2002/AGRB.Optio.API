@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RGBA.Optio.Domain.Models.RequestModels
+namespace AGRB.Optio.Application.Models.RequestModels
 {
     public class RoleModel
     {
@@ -8,7 +8,7 @@ namespace RGBA.Optio.Domain.Models.RequestModels
         public required string Name { get; set; }
 
 
-        [Required(ErrorMessage ="the field is required")]
+        [Required(ErrorMessage = "the field is required")]
         public required string NormalizedName { get; set; }
     }
 }

@@ -1,9 +1,9 @@
-﻿namespace RGBA.Optio.Domain.Interfaces.InterfacesForTransaction
+﻿namespace AGRB.Optio.Application.Interfaces.InterfacesForTransaction
 {
     public interface IRemoveInfo<T, K> where T : class
     {
-        Task<bool> RemoveAsync(K id,T identity);
+        Task<bool> RemoveAsync(K id, T identity);
 
-        Task<bool> SoftDeleteAsync(K id,T identify);
+        Task<bool> SoftDeleteAsync(K id, T identify);
     }
 }

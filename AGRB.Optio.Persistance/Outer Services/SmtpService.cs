@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
 
-namespace RGBA.Optio.Domain.Services.Outer_Services
+namespace AGRB.Optio.Domain.Services.Outer_Services
 {
     public  class SmtpService
     {

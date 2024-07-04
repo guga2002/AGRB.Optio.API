@@ -1,6 +1,6 @@
 ﻿using AGRB.Optio.Domain.Entities;
 using MongoDB.Driver;
-namespace RGBA.Optio.Core.Data
+namespace AGRB.Optio.Domain.Data
 {
     public sealed class OptioMongoContext
     {
@@ -9,8 +9,8 @@ namespace RGBA.Optio.Core.Data
         public OptioMongoContext()
         {
             client = new MongoClient();
-            var database = client.GetDatabase("LogRGBA");
-            UserLogs=database.GetCollection<Logs>("LogsUserActions");
+            var database = client.GetDatabase("Log_Optio_Solution");
+            UserLogs = database.GetCollection<Logs>("AuditLogs");
         }
     }
 }

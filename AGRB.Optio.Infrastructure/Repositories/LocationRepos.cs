@@ -1,20 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Optio.Core.Data;
-using Optio.Core.Entities;
-using Optio.Core.Interfaces;
-using RGBA.Optio.Core.PerformanceImprovmentServices;
+﻿using AGRB.Optio.Domain.Data;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace Optio.Core.Repositories
+namespace AGRB.Optio.Infrastructure.Repositories
 {
-    public class LocationRepos : AbstractClass, ILocationRepo
+    public class LocationRepos : AbstractRepositroy<Location>, ILocationRepo
     {
-        private readonly DbSet<Location> locations;
-        private readonly CacheService cacheService;
 
-        public LocationRepos(OptioDB optioDB, CacheService cacheService):base(optioDB)
+        public LocationRepos(OptioDB optioDB) : base(optioDB)
         {
-            locations=Context.Set<Location>();
-            this.cacheService=cacheService;
         }
 
 
@@ -23,11 +18,11 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                if (!await locations.AnyAsync(i => i.LocationName.ToLower() == entity.LocationName.ToLower()))
+                if (!await Dbset.AnyAsync(i => i.LocationName.ToLower() == entity.LocationName.ToLower()))
                 {
-                    await locations.AddAsync(entity);
+                    await Dbset.AddAsync(entity);
                     await Context.SaveChangesAsync();
-                    var max = await locations.MaxAsync(io => io.Id);
+                    var max = await Dbset.MaxAsync(io => io.Id);
                     return max;
                 }
                 else
@@ -47,7 +42,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                return await locations.AsNoTracking().ToListAsync();
+                return await Dbset.AsNoTracking().ToListAsync();
             }
             catch (Exception)
             {
@@ -57,10 +52,9 @@ namespace Optio.Core.Repositories
         #endregion
 
         #region GetAllActiveLocationAsync
-
         public async Task<IEnumerable<Location>> GetAllActiveLocationAsync()
         {
-               return await locations.AsNoTracking().Where(i => i.IsActive).ToListAsync();
+            return await Dbset.AsNoTracking().Where(i => i.IsActive).ToListAsync();
         }
         #endregion
 
@@ -70,24 +64,12 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var key = $"Location by Id:{id}";
-                await Task.Delay(1);
-                var location = cacheService.GetOrCreate(
-                    key, () =>
-                    {
-                        return locations
-                        .AsNoTracking()
-                        .Single(i => i.Id == id) ??
-                        throw new ArgumentException($"No location found by id: {id}");
-
-                    }, TimeSpan.FromMinutes(15)
-                    ) ;
-                return location ?? throw new ArgumentException($"No location found by id: {id}"); ;
-
+                return await Dbset
+                .AsNoTracking()
+                .SingleAsync(i => i.Id == id);
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -98,8 +80,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-                locations.Remove(entity);
+                Dbset.Remove(entity);
                 await Context.SaveChangesAsync();
                 return true;
             }
@@ -115,17 +96,11 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var city = await locations.FindAsync(id);
-                if (city is null)
-                {
-                    throw new InvalidOperationException("No such city was found");
-                }
-                else
-                {
-                    city.IsActive = false;
-                    await Context.SaveChangesAsync();
-                    return true;
-                }
+                var city = await Dbset.FindAsync(id) ?? throw new InvalidOperationException("No such city was found");
+
+                city.IsActive = false;
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (Exception)
             {
@@ -139,23 +114,10 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(entity,nameof(entity));
-                var city = await locations.FindAsync(id);
-                if (city is null)
-                {
-                    throw new InvalidOperationException("No such city was found");
-                }
-                else
-                {
-                    city.LocationName = entity.LocationName;
-                    await Context.SaveChangesAsync();
-                    return true;
-                }
-
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
+                var city = await Dbset.FindAsync(id) ?? throw new InvalidOperationException("No such city was found");
+                city.LocationName = entity.LocationName;
+                await Context.SaveChangesAsync();
+                return true;
             }
             catch (Exception)
             {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace RGBA.Optio.Domain.LoggerFiles
+namespace AGRB.Optio.Persistance.LoggerFiles
 {
     public class LoggerProvider : ILoggerProvider
     {

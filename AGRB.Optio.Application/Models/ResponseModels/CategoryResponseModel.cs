@@ -1,11 +1,10 @@
-﻿
-namespace RGBA.Optio.Domain.Models.ResponseModels
+﻿namespace AGRB.Optio.Application.Models.ResponseModels
 {
     public class CategoryResponseModel
     {
-        public  string? TransactionCategory { get; set; }
-        public  long TransactionTypeId { get; set; }
-        public decimal TransactionCount {  get; set; }
-        public decimal TransactionVolume {  get; set; }
+        public string? TransactionCategory { get; set; }
+        public long TransactionTypeId { get; set; }
+        public decimal TransactionCount { get; set; }
+        public decimal TransactionVolume { get; set; }
     }
 }

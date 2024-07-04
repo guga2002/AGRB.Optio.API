@@ -1,9 +1,9 @@
 ﻿using AGRB.Optio.API.StaticFiles;
+using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Models;
-using RGBA.Optio.Domain.Responses;
 
 namespace RGBA.Optio.UI.Controllers
 {

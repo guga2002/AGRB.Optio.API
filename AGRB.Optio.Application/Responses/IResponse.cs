@@ -1,4 +1,4 @@
-﻿namespace RGBA.Optio.Domain.Responses
+﻿namespace AGRB.Optio.Application.Responses
 {
     public interface IResponse
     {

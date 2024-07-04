@@ -1,6 +1,6 @@
-﻿namespace RGBA.Optio.Domain.Interfaces.InterfacesForTransaction
+﻿namespace AGRB.Optio.Application.Interfaces.InterfacesForTransaction
 {
-    public interface IUpdateInfo<T,K> where T : class
+    public interface IUpdateInfo<T, K> where T : class
     {
         Task<bool> UpdateAsync(K id, T entity);
     }

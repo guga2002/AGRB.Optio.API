@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RGBA.Optio.Stream.DecerializerClasses;
-using RGBA.Optio.Stream.Interfaces;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using AGRB.Optio.StreamTest.Interfaces;
+using AGRB.Optio.StreamTest.DecerializerCLasses;
 
-namespace RGBA.Optio.Stream.Controllers
+namespace AGRB.Optio.StreamTest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -28,9 +28,9 @@ namespace RGBA.Optio.Stream.Controllers
                 using (var client = new HttpClient())
                 {
                     var response = await client.GetAsync("https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json");
-                    response.EnsureSuccessStatusCode(); 
+                    response.EnsureSuccessStatusCode();
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    var currenciesResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CurrenciesResponse>>(responseBody);
+                    var currenciesResponse = JsonConvert.DeserializeObject<List<CurrenciesResponse>>(responseBody);
                     await ITransactionRelatedSer.InsertCurrencies(currenciesResponse);
                 }
             }
@@ -43,7 +43,7 @@ namespace RGBA.Optio.Stream.Controllers
                 Console.WriteLine($"JSON deserialization failed: {ex.Message}");
             }
             catch (Exception ex)
-            { 
+            {
                 Console.WriteLine($"An unexpected error occurred: {ex.Message}");
             }
         }
@@ -91,7 +91,7 @@ namespace RGBA.Optio.Stream.Controllers
 
         [HttpGet]
         [Route("Transaction")]
-        public async Task<IActionResult> FillTransactions([FromQuery]int n)
+        public async Task<IActionResult> FillTransactions([FromQuery] int n)
         {
             Stopwatch st = new Stopwatch();
             st.Start();

@@ -1,18 +1,17 @@
-﻿using Optio.Core.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RGBA.Optio.Core.Entities
+namespace AGRB.Optio.Domain.Entities
 {
     [Table("LocationToMerchants")]
-    public class LocationToMerchant:AbstractClass
+    public class LocationToMerchant : AbstractEntity
     {
-        [ForeignKey("location")]
+        [ForeignKey("Location")]
         public long LocationId { get; set; }
 
-        [ForeignKey("merchant")]
+        [ForeignKey("Merchant")]
         public long MerchantId { get; set; }
-        public Location Location { get; set; }
+        public virtual Location Location { get; set; }
 
-        public Merchant Merchant { get; set; }
+        public virtual Merchant Merchant { get; set; }
     }
 }

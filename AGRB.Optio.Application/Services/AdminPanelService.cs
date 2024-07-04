@@ -1,23 +1,21 @@
-﻿using AGRB.Optio.Application.Models;
+﻿using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Models.RequestModels;
 using AGRB.Optio.Application.Models.ResponseModels;
+using AGRB.Optio.Domain.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using RGBA.Optio.Core.Entities;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Models;
-using RGBA.Optio.Domain.Models.RequestModels;
-using RGBA.Optio.Domain.Services.Outer_Services;
+using AGRB.Optio.Domain.Custom_Exceptions;
+using AGRB.Optio.Domain.Services.Outer_Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
-namespace RGBA.Optio.Domain.Services
+namespace AGRB.Optio.Application.Services
 {
     public class AdminPanelService(
         IHttpContextAccessor _httpContextAccessor,
@@ -178,7 +176,7 @@ namespace RGBA.Optio.Domain.Services
         {
             var user = await userManager.FindByEmailAsync(email);
 
-            if ((user is null)) throw new ArgumentException("Such User no exist");
+            if (user is null) throw new ArgumentException("Such User no exist");
             var rej = await userManager.CheckPasswordAsync(user, newPassword);
             if (rej)
             {
@@ -224,7 +222,7 @@ namespace RGBA.Optio.Domain.Services
             }
 
             var result = await signin.UpdateExternalAuthenticationTokensAsync(
-                new ExternalLoginInfo(new System.Security.Claims.ClaimsPrincipal(), "JWT Bearer",
+                new ExternalLoginInfo(new ClaimsPrincipal(), "JWT Bearer",
                     "65E255FF-F399-42D4-9C7F-D5D08B0EC285", "Auth")
                 {
                     ProviderKey = user.Id,
@@ -343,26 +341,26 @@ namespace RGBA.Optio.Domain.Services
         #endregion
 
         #region SignInAsync
-            public async Task<SignInResponse> SignInAsync(SignInModel mod)
+        public async Task<SignInResponse> SignInAsync(SignInModel mod)
+        {
+            if (string.IsNullOrEmpty(mod.Username) || string.IsNullOrEmpty(mod.Password))
             {
-                if (string.IsNullOrEmpty(mod.Username) || string.IsNullOrEmpty(mod.Password))
-                {
-                    throw new OptioGeneralException("Username or password is empty.");
-                }
+                throw new OptioGeneralException("Username or password is empty.");
+            }
 
-                var result = await signin.PasswordSignInAsync(mod.Username, mod.Password, mod.SetCookie, lockoutOnFailure: false);
+            var result = await signin.PasswordSignInAsync(mod.Username, mod.Password, mod.SetCookie, lockoutOnFailure: false);
 
-                if (result.Succeeded)
-                {
-                    await SetPersistentCookieAsync(_httpContextAccessor.HttpContext.User);
-                    var accessToken = GenerateJwtToken(mod.Username);
-                    var refreshToken = GenerateRefreshToken();
+            if (result.Succeeded)
+            {
+                await SetPersistentCookieAsync(_httpContextAccessor.HttpContext.User);
+                var accessToken = GenerateJwtToken(mod.Username);
+                var refreshToken = GenerateRefreshToken();
 
 
-                    var usr = await userManager.FindByNameAsync(mod.Username);
-                    if (usr == null) return new SignInResponse() { AuthToken = accessToken,RefreshToken=refreshToken.Token,ValidateTill=refreshToken.ExpiryDate };
+                var usr = await userManager.FindByNameAsync(mod.Username);
+                if (usr == null) return new SignInResponse() { AuthToken = accessToken, RefreshToken = refreshToken.Token, ValidateTill = refreshToken.ExpiryDate };
 
-                    SaveRefreshToken(usr.Id, refreshToken);
+                SaveRefreshToken(usr.Id, refreshToken);
 
                 var recipientName = usr.Name + ' ' + usr.Surname;
                 var emailContent = $@"
@@ -380,53 +378,53 @@ namespace RGBA.Optio.Domain.Services
                     $"Security Alert: New Sign-in to Your RGBASOLUTION Account {DateTime.Now.ToShortTimeString()}",
                     emailContent);
 
-                return new SignInResponse() { AuthToken = accessToken, RefreshToken = refreshToken.Token, ValidateTill=refreshToken.ExpiryDate };
-                }
-
-            throw new ArgumentException("sign in was not succesfully");
+                return new SignInResponse() { AuthToken = accessToken, RefreshToken = refreshToken.Token, ValidateTill = refreshToken.ExpiryDate };
             }
 
-            private string GenerateJwtToken(string username)
-            {
+            throw new ArgumentException("sign in was not succesfully");
+        }
+
+        private string GenerateJwtToken(string username)
+        {
             var claims = new[]
             {
             new Claim(ClaimTypes.Name, username),
                 };
 
-                var key = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E"));
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E"));
 
-                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                var token = new JwtSecurityToken(
-                   // issuer: "https://localhost:7116",
-                  //  audience: "https://localhost:7116",
-                    claims: claims,
-                    expires: DateTime.Now.AddHours(6),
-                    signingCredentials: credentials);
+            var token = new JwtSecurityToken(
+                // issuer: "https://localhost:7116",
+                //  audience: "https://localhost:7116",
+                claims: claims,
+                expires: DateTime.Now.AddHours(6),
+                signingCredentials: credentials);
 
-                return new JwtSecurityTokenHandler().WriteToken(token);
-            }
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
 
-            private RefreshTokenModel GenerateRefreshToken()
+        private RefreshTokenModel GenerateRefreshToken()
+        {
+            var refreshToken = new RefreshTokenModel
             {
-                var refreshToken = new RefreshTokenModel
-                {
-                    Token = Guid.NewGuid().ToString(),
-                    ExpiryDate = DateTime.UtcNow.AddDays(30) 
-                };
+                Token = Guid.NewGuid().ToString(),
+                ExpiryDate = DateTime.UtcNow.AddDays(30)
+            };
 
-                return refreshToken;
-            }
+            return refreshToken;
+        }
 
-            private Dictionary<string, RefreshTokenModel> _refreshTokens = new Dictionary<string, RefreshTokenModel>();
+        private Dictionary<string, RefreshTokenModel> _refreshTokens = new Dictionary<string, RefreshTokenModel>();
 
-            private void SaveRefreshToken(string userId, RefreshTokenModel refreshToken)
-            {
-                _refreshTokens[userId] = refreshToken;
-            }
+        private void SaveRefreshToken(string userId, RefreshTokenModel refreshToken)
+        {
+            _refreshTokens[userId] = refreshToken;
+        }
 
-            #endregion
+        #endregion
 
         #region SetPersistentCookieAsync&&SetPersistentCookieAsync
 

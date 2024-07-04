@@ -1,7 +1,8 @@
-﻿using RGBA.Optio.Domain.Validation.VallidationAttributes;
+﻿
+using AGRB.Optio.Application.Validation.VallidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace RGBA.Optio.Domain.Models
+namespace AGRB.Optio.Application.Models
 {
     public class ExchangeRateModel
     {

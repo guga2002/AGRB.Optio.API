@@ -1,6 +1,6 @@
-﻿using AGRB.Optio.Application.Models.RequestModels;
+﻿using AGRB.Optio.Application.Interfaces.InterfacesForTransaction;
+using AGRB.Optio.Application.Models.RequestModels;
 using AGRB.Optio.Domain.Entities;
-using RGBA.Optio.Domain.Interfaces.InterfacesForTransaction;
 
 namespace AGRB.Optio.Application.Interfaces
 {

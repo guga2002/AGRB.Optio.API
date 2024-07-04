@@ -1,18 +1,18 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Optio.Core.Entities;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Models;
+using AGRB.Optio.Domain.Custom_Exceptions;
 
-namespace RGBA.Optio.Domain.Services
+namespace AGRB.Optio.Application.Services
 {
     public class TransactionService(IUniteOfWork work, IMapper map, ILogger<TransactionService> log)
         : AbstractService<TransactionService>(work, map, log), ITransactionService
     {
         #region AddAsync
-        public async  Task<long> AddAsync(TransactionModel entity)
+        public async Task<long> AddAsync(TransactionModel entity)
         {
             try
             {
@@ -38,13 +38,13 @@ namespace RGBA.Optio.Domain.Services
                 }
                 var mapped = mapper.Map<Transaction>(entity);
                 if (mapped is null) return -1;
-                var res=await work.TransactionRepository.AddAsync(mapped);
+                var res = await work.TransactionRepository.AddAsync(mapped);
                 await work.CheckAndCommitAsync();
                 return res;
             }
             catch (Exception exp)
             {
-                logger.LogCritical(exp.Message,exp.StackTrace);
+                logger.LogCritical(exp.Message, exp.StackTrace);
                 throw;
             }
         }
@@ -154,9 +154,9 @@ namespace RGBA.Optio.Domain.Services
             try
             {
                 if (entity is null) throw new ResourceNotFoundException("No data exist  on this transaction in DB");
-                var mapped = mapper.Map<Transaction>(entity) 
+                var mapped = mapper.Map<Transaction>(entity)
                              ?? throw new ResourceNotFoundException("No data exist  on this transaction in DB");
-                var res = await work.TransactionRepository.UpdateAsync(id,mapped);
+                var res = await work.TransactionRepository.UpdateAsync(id, mapped);
                 await work.CheckAndCommitAsync();
                 return res;
             }

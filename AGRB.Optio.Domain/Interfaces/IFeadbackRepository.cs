@@ -1,5 +1,4 @@
 ﻿using AGRB.Optio.Domain.Entities;
-using Optio.Core.Interfaces;
 
 namespace AGRB.Optio.Domain.Interfaces
 {

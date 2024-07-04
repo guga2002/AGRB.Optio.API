@@ -1,16 +1,14 @@
 ﻿using AGRB.Optio.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Optio.Core.Entities;
-using RGBA.Optio.Core.Entities;
 
-namespace Optio.Core.Data
+namespace AGRB.Optio.Domain.Data
 {
     public class OptioDB(DbContextOptions<OptioDB> bs) : IdentityDbContext<User>(bs)
     {
         public virtual DbSet<LocationToMerchant> LocationToMerchants { get; set; }
         public virtual DbSet<Category> CategoryOfTransactions { get; set; }
-        public virtual DbSet<Channels>Channels { get; set; }
+        public virtual DbSet<Channels> Channels { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
         public virtual DbSet<Merchant> Merchants { get; set; }
         public virtual DbSet<Transaction> Transactions { get; set; }

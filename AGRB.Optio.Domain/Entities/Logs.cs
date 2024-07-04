@@ -20,6 +20,5 @@ namespace AGRB.Optio.Domain.Entities
         public string? LogLevel { get; set; }
 
         public string? Message { get; set; }
-
     }
 }

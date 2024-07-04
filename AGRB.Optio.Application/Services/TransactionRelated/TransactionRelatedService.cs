@@ -1,12 +1,13 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Services;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Optio.Core.Entities;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Models;
+using AGRB.Optio.Domain.Custom_Exceptions;
 
-namespace RGBA.Optio.Domain.Services.TransactionRelated
+namespace AGRB.Optio.Application.Services.TransactionRelated
 {
     public class TransactionRelatedService(IUniteOfWork work, IMapper map, ILogger<TransactionRelatedService> log)
         : AbstractService<TransactionRelatedService>(work, map, log), ITransactionRelatedService
@@ -114,7 +115,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async  Task<IEnumerable<TransactionTypeModel>> GetAllActiveAsync(TransactionTypeModel identify)
+        public async Task<IEnumerable<TransactionTypeModel>> GetAllActiveAsync(TransactionTypeModel identify)
         {
             try
             {
@@ -205,12 +206,12 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                var res = await work.CategoryOfTransactionRepository.GetByIdAsync(id) 
+                var res = await work.CategoryOfTransactionRepository.GetByIdAsync(id)
                     ?? throw new ItemNotFoundException($"Category by id: {id} not found");
-                   
+
                 var mapCategoryModel = mapper.Map<CategoryModel>(res);
                 return mapCategoryModel;
-            
+
             }
             catch (Exception ex)
             {
@@ -219,13 +220,13 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public  async Task<TransactionTypeModel> GetByIdAsync(long id, TransactionTypeModel identify)
+        public async Task<TransactionTypeModel> GetByIdAsync(long id, TransactionTypeModel identify)
         {
             try
             {
                 var res = await work.TypeOfTransactionRepository.GetByIdAsync(id)
                           ?? throw new ItemNotFoundException($"Transaction Type by id: {id} not found");
-            
+
                 var mapTransactionTypeModel = mapper.Map<TransactionTypeModel>(res);
                 return mapTransactionTypeModel;
             }
@@ -275,7 +276,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public  async Task<bool> RemoveAsync(long id, TransactionTypeModel identity)
+        public async Task<bool> RemoveAsync(long id, TransactionTypeModel identity)
         {
             try
             {
@@ -299,7 +300,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
         {
             try
             {
-                var res = await  work.ChannelRepository.SoftDeleteAsync(id);
+                var res = await work.ChannelRepository.SoftDeleteAsync(id);
                 return res;
             }
             catch (Exception exp)
@@ -309,11 +310,11 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async  Task<bool> SoftDeleteAsync(long id, CategoryModel identify)
+        public async Task<bool> SoftDeleteAsync(long id, CategoryModel identify)
         {
             try
             {
-                var res = await  work.CategoryOfTransactionRepository.SoftDeleteAsync(id);
+                var res = await work.CategoryOfTransactionRepository.SoftDeleteAsync(id);
                 return res;
             }
             catch (Exception exp)
@@ -323,7 +324,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async  Task<bool> SoftDeleteAsync(long id, TransactionTypeModel identify)
+        public async Task<bool> SoftDeleteAsync(long id, TransactionTypeModel identify)
         {
             try
             {
@@ -350,7 +351,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 var mapped = mapper.Map<Channels>(entity);
                 if (mapped is not null)
                 {
-                    return await work.ChannelRepository.UpdateAsync(id,mapped);
+                    return await work.ChannelRepository.UpdateAsync(id, mapped);
                 }
                 return false;
             }
@@ -361,7 +362,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public  async Task<bool> UpdateAsync(long id, CategoryModel entity)
+        public async Task<bool> UpdateAsync(long id, CategoryModel entity)
         {
             try
             {
@@ -381,7 +382,7 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
             }
         }
 
-        public async Task<bool> UpdateAsync(long id,TransactionTypeModel entity)
+        public async Task<bool> UpdateAsync(long id, TransactionTypeModel entity)
         {
 
             try
@@ -392,8 +393,8 @@ namespace RGBA.Optio.Domain.Services.TransactionRelated
                 }
                 var mapped = mapper.Map<TypeOfTransaction>(entity);
                 if (mapped is null) return false;
-                return await work.TypeOfTransactionRepository.UpdateAsync(id,mapped);
-             
+                return await work.TypeOfTransactionRepository.UpdateAsync(id, mapped);
+
             }
             catch (Exception exp)
             {

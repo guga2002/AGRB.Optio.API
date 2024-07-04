@@ -1,17 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Optio.Core.Data;
-using Optio.Core.Entities;
-using Optio.Core.Interfaces;
+﻿using AGRB.Optio.Domain.Data;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace Optio.Core.Repositories
+namespace AGRB.Optio.Infrastructure.Repositories
 {
-    public class TypeOfTransactionRepos : AbstractClass, ITypeOfTransactionRepo
+    public class TypeOfTransactionRepos : AbstractRepositroy<TypeOfTransaction>, ITypeOfTransactionRepo
     {
-        private readonly DbSet<TypeOfTransaction> typeOfTransaction;
 
         public TypeOfTransactionRepos(OptioDB optioDB) : base(optioDB)
         {
-            typeOfTransaction=Context.Set<TypeOfTransaction>();
         }
 
         #region AddAsync
@@ -19,11 +17,11 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                if (await typeOfTransaction.AnyAsync(io => io.TransactionName == entity.TransactionName)) return -1;
-                
-                await typeOfTransaction.AddAsync(entity);
+                if (await Dbset.AnyAsync(io => io.TransactionName == entity.TransactionName)) throw new ArgumentException("Such Type already exist in DB");
+
+                await Dbset.AddAsync(entity);
                 await Context.SaveChangesAsync();
-                var max = await typeOfTransaction.MaxAsync(io => io.Id);
+                var max = await Dbset.MaxAsync(io => io.Id);
                 return max;
             }
             catch (Exception)
@@ -38,7 +36,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                return await typeOfTransaction.
+                return await Dbset.
                      AsNoTracking()
                      .ToListAsync();
             }
@@ -51,12 +49,11 @@ namespace Optio.Core.Repositories
         #endregion
 
         #region GetAllActiveTypeOfTransactionAsync
-
         public async Task<IEnumerable<TypeOfTransaction>> GetAllActiveTypeOfTransactionAsync()
         {
             try
             {
-                return await typeOfTransaction.
+                return await Dbset.
                      AsNoTracking().
                      Where(io => io.IsActive)
                      .ToListAsync();
@@ -73,7 +70,7 @@ namespace Optio.Core.Repositories
 
         public async Task<TypeOfTransaction> GetByIdAsync(long id)
         {
-            return await typeOfTransaction.FindAsync(id) ??
+            return await Dbset.FindAsync(id) ??
                    throw new InvalidOperationException("TypeOfTransaction No Exist");
         }
         #endregion
@@ -83,7 +80,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                typeOfTransaction.Remove(entity);
+                Dbset.Remove(entity);
                 await Context.SaveChangesAsync();
                 return true;
             }
@@ -99,7 +96,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var typ = await typeOfTransaction
+                var typ = await Dbset
                               .FindAsync(id) ??
                           throw new InvalidOperationException("TypeOfTransaction No Exist");
 
@@ -121,17 +118,12 @@ namespace Optio.Core.Repositories
             try
             {
                 ArgumentNullException.ThrowIfNull(entity);
-                var existingEntity = await typeOfTransaction.FindAsync(id) ??
+                var existingEntity = await Dbset.FindAsync(id) ??
                                      throw new InvalidOperationException("There is no such Type of transaction");
-                
+
                 existingEntity.TransactionName = entity.TransactionName;
                 await Context.SaveChangesAsync();
                 return true;
-                
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
             }
             catch (Exception)
             {

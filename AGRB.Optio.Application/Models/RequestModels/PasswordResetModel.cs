@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RGBA.Optio.Domain.Models.RequestModels
+namespace AGRB.Optio.Application.Models.RequestModels
 {
     public class PasswordResetModel
     {
         [Required(ErrorMessage = "Old Password is required")]
         public required string OldPassword { get; set; }
 
-        [Required(ErrorMessage ="Password is required")]
+        [Required(ErrorMessage = "Password is required")]
         public required string NewPassword { get; set; }
     }
 }

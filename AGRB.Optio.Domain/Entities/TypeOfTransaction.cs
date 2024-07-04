@@ -1,20 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Optio.Core.Entities
+namespace AGRB.Optio.Domain.Entities
 {
     [Table("TypeOfTransactions")]
-    [Index(nameof(TransactionName),IsDescending = [true])]
-    public class TypeOfTransaction:AbstractClass
+    [Index(nameof(TransactionName), IsDescending = [true])]
+    public class TypeOfTransaction : AbstractEntity
     {
         [Column("Transaction_Name")]
-        [StringLength(100,ErrorMessage ="Transaction name is not valid!",MinimumLength =3)]
         public required string TransactionName { get; set; }
 
-        [Column("Status_Of_Transaction_Type")]
+        [Column("Status_Transaction_Type")]
         public bool IsActive { get; set; } = true;
 
-        public virtual IEnumerable<Category>? Category { get; set; }
+        public virtual IEnumerable<Category> Category { get; set; }
+        public TypeOfTransaction()
+        {
+            Category = new List<Category>();
+        }
     }
 }

@@ -1,9 +1,8 @@
-﻿using Optio.Core.Interfaces;
-using RGBA.Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace RGBA.Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface ICurrencyRepository:ICrudRepo<Currency,int>
+    public interface ICurrencyRepository : ICrudRepo<Currency, int>
     {
         Task<IEnumerable<Currency>> GetAllActiveAsync();
 

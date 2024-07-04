@@ -1,39 +1,34 @@
-﻿using AGRB.Optio.Domain.Interfaces;
-using AGRB.Optio.Infrastructure.Repositories;
+﻿using AGRB.Optio.Domain.Data;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using AGRB.Optio.Infrastructure.PerformanceImprovmentServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Optio.Core.Data;
-using Optio.Core.Interfaces;
-using Optio.Core.Repositories;
-using RGBA.Optio.Core.Entities;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Core.PerformanceImprovmentServices;
 
-namespace RGBA.Optio.Core.Repositories
+namespace AGRB.Optio.Infrastructure.Repositories
 {
     public class UniteOfWork(
         OptioDB db,
         UserManager<User> userManager,
-        SignInManager<User> signInManager,
         IConfiguration configuration,
         RoleManager<IdentityRole> role,
         CacheService cash)
         : IUniteOfWork
     {
-        public ICategoryRepo CategoryOfTransactionRepository =>new CategoryOfTransactionRepos(db,cash);
+        public ICategoryRepo CategoryOfTransactionRepository => new CategoryOfTransactionRepos(db, cash);
 
-        public IChannelRepo ChannelRepository => new ChannelRepos(db,cash);
+        public IChannelRepo ChannelRepository => new ChannelRepos(db);
 
-        public ILocationRepo LocationRepository => new LocationRepos(db, cash);
+        public ILocationRepo LocationRepository => new LocationRepos(db);
 
-        public IMerchantRepo MerchantRepository => new MerchantRepos(db,configuration);
+        public IMerchantRepo MerchantRepository => new MerchantRepos(db, configuration);
 
         public ITransactionRepo TransactionRepository => new TransactionRepos(db);
 
         public ITypeOfTransactionRepo TypeOfTransactionRepository => new TypeOfTransactionRepos(db);
 
         public ICurrencyRepository CurrencyRepository => new CurrencyRepos(db);
-    
+
         public ILocationToMerchantRepository LocationToMerchantRepository => new LocationToMerchantRepos(db);
 
         public IExchangeRate ExchangeRateRepository => new ExchangeRateRepos(db);
@@ -44,8 +39,8 @@ namespace RGBA.Optio.Core.Repositories
         {
             try
             {
-              await  db.SaveChangesAsync();
-              await db.Database.CommitTransactionAsync();
+                await db.SaveChangesAsync();
+                await db.Database.CommitTransactionAsync();
             }
             catch (Exception)
             {
@@ -59,7 +54,5 @@ namespace RGBA.Optio.Core.Repositories
             userManager.Dispose();
             role.Dispose();
         }
-
-       
     }
 }

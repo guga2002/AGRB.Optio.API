@@ -1,21 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Optio.Core.Entities
+namespace AGRB.Optio.Domain.Entities
 {
     [Table("Channels")]
-    [Index(nameof(ChannelType),IsDescending = [true])]
-    public class Channels:AbstractClass
+    [Index(nameof(ChannelType), IsDescending = [true])]
+    public class Channels : AbstractEntity
     {
         [Column("Channel_Type")]
-        [StringLength(50,ErrorMessage ="Such  a  channel Name  is not Valid",MinimumLength =2)]
         public required string ChannelType { get; set; }
 
+        [Column("Chanell_Status")]
         public bool IsActive { get; set; } = true;
 
-        public virtual IEnumerable<Transaction> Transactions { get; set;}
+        public virtual IEnumerable<Transaction> Transactions { get; set; }
 
-
+        public Channels()
+        {
+            Transactions = new List<Transaction>();
+        }
     }
 }

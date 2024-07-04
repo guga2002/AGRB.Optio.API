@@ -1,11 +1,8 @@
 ﻿using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Application.Models.RequestModels;
-using AGRB.Optio.Domain.Entities;
-using AutoMapper;
+using AGRB.Optio.Application.Responses;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RGBA.Optio.Domain.Responses;
 
 namespace AGRB.Optio.API.Controllers
 {

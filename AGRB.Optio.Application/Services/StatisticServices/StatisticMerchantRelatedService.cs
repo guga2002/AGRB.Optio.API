@@ -1,16 +1,11 @@
-﻿using AutoMapper;
+﻿using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
+using AGRB.Optio.Application.Models.ResponseModels;
+using AGRB.Optio.Domain.Custom_Exceptions;
+using AGRB.Optio.Domain.Interfaces;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
-using Optio.Core.Entities;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Core.Repositories;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces.StatisticInterfaces;
-using RGBA.Optio.Domain.Models.ResponseModels;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 
-namespace RGBA.Optio.Domain.Services.StatisticServices
+namespace AGRB.Optio.Application.Services.StatisticServices
 {
     public class StatisticMerchantRelatedService(
         IUniteOfWork work,
@@ -74,7 +69,7 @@ namespace RGBA.Optio.Domain.Services.StatisticServices
 
             var locationToMerchant = await work.LocationToMerchantRepository.GetAllLocationToMerchant();
 
-            await Console.Out.WriteLineAsync(  locationToMerchant.Count().ToString());
+            await Console.Out.WriteLineAsync(locationToMerchant.Count().ToString());
             var grouped = from location in locationToMerchant
                           group location by location.Location into g
                           select new LocationResponseModel

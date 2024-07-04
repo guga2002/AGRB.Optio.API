@@ -1,9 +1,8 @@
-﻿using Optio.Core.Interfaces;
-using RGBA.Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace RGBA.Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface IExchangeRate:ICrudRepo<ExchangeRate, long>
+    public interface IExchangeRate : ICrudRepo<ExchangeRate, long>
     {
         Task<IEnumerable<ExchangeRate>> GetAllActiveRateAsync();
     }

@@ -2,29 +2,21 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Optio.Core.Data;
-using RGBA.Optio.Core.Entities;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Core.PerformanceImprovmentServices;
-using RGBA.Optio.Core.Repositories;
-using RGBA.Optio.Domain.LoggerFiles;
-using RGBA.Optio.Domain.Mapper;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using RGBA.Optio.Domain.Services.Outer_Services;
-using RGBA.Optio.UI.Reflections;
-using System.Reflection;
-using Optio.Core.Interfaces;
-using Optio.Core.Repositories;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Interfaces.StatisticInterfaces;
-using RGBA.Optio.Domain.Services;
-using RGBA.Optio.Domain.Services.StatisticServices;
-using RGBA.Optio.Domain.Services.TransactionRelated;
 using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Domain.Interfaces;
 using AGRB.Optio.Infrastructure.Repositories;
 using AGRB.Optio.Application.Services;
+using AGRB.Optio.Infrastructure.PerformanceImprovmentServices;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Application.Services.TransactionRelated;
+using AGRB.Optio.Application.Services.StatisticServices;
+using AGRB.Optio.Application.Mapper;
+using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
+using AGRB.Optio.Domain.Services.Outer_Services;
+using AGRB.Optio.Persistance.LoggerFiles;
+using AGRB.Optio.Domain.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -114,12 +106,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            //ValidateIssuer = true,
-            //ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-           // ValidIssuer = "http://localhost:42130",
-            //ValidAudience = "http://localhost:42130",
+            ValidIssuer = "http://localhost:42130",
+            ValidAudience = "http://localhost:42130",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E")),
         };
     });
@@ -142,14 +134,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI(io =>
-//    {
-//        io.SwaggerEndpoint("/swagger/v1/swagger.json", "OptionManagementSolution");
-//    });
-//}
 
 if (app.Environment.IsDevelopment() ||app.Environment.IsProduction())
 {
@@ -161,7 +145,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseCors("RequestPipeline");
+app.UseCors("RequestPipeline");
 app.MapControllers();
 
 app.Run();

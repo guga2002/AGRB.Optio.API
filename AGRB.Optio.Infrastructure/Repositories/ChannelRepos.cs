@@ -1,28 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Optio.Core.Data;
-using Optio.Core.Entities;
-using Optio.Core.Interfaces;
-using RGBA.Optio.Core.PerformanceImprovmentServices;
+﻿using AGRB.Optio.Domain.Data;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace Optio.Core.Repositories
+namespace AGRB.Optio.Infrastructure.Repositories
 {
-    public class ChannelRepos(OptioDB optioDB, CacheService cacheService) : AbstractClass(optioDB), IChannelRepo
+    public class ChannelRepos(OptioDB optioDB) : AbstractRepositroy<Channels>(optioDB), IChannelRepo
     {
-      
-        private readonly DbSet<Channels> channels = optioDB.Set<Channels>();
-
 
         #region AddAsync
         public async Task<long> AddAsync(Channels entity)
         {
             try
-            { 
-                var channel= await channels.AnyAsync(i=>i.ChannelType==entity.ChannelType);
+            {
+                var channel = await Dbset.AnyAsync(i => i.ChannelType == entity.ChannelType);
                 if (!channel)
                 {
-                    await channels.AddAsync(entity);
+                    await Dbset.AddAsync(entity);
                     await Context.SaveChangesAsync();
-                    var res= await channels.MaxAsync(io=>io.Id);
+                    var res = await Dbset.MaxAsync(io => io.Id);
                     return res;
                 }
                 else
@@ -49,7 +45,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-               return await channels.ToListAsync();
+                return await Dbset.ToListAsync();
             }
             catch (Exception)
             {
@@ -65,8 +61,8 @@ namespace Optio.Core.Repositories
         {
             try
             {
-              return await channels.Where(io => io.IsActive)
-                    .ToListAsync();
+                return await Dbset.Where(io => io.IsActive)
+                      .ToListAsync();
             }
             catch (Exception)
             {
@@ -80,15 +76,13 @@ namespace Optio.Core.Repositories
         Func<OptioDB, long, Channels?> CompiledQueryGetBtId =
             EF.CompileQuery(
                 (OptioDB db, long id) =>
-                db.Channels.SingleOrDefault(i=>i.Id==id)
+                db.Channels.SingleOrDefault(i => i.Id == id)
                 );
         public async Task<Channels> GetByIdAsync(long id)
         {
             try
             {
-                var res=await channels.FirstOrDefaultAsync(i=>i.Id==id);
-                if (res == null) throw new InvalidOperationException(" no entity found");
-
+                var res = await Dbset.FindAsync(id) ?? throw new InvalidOperationException(" no entity found");
                 return res;
             }
             catch (Exception)
@@ -103,8 +97,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-                channels.Remove(entity);
+                Dbset.Remove(entity);
                 await Context.SaveChangesAsync();
                 return true;
             }
@@ -121,7 +114,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var channel = await channels.FindAsync(id);
+                var channel = await Dbset.FindAsync(id);
                 if (channel is not null)
                 {
                     channel.IsActive = false;
@@ -147,8 +140,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(entity,nameof(entity));
-                var channel = await channels.FindAsync(id);
+                var channel = await Dbset.FindAsync(id);
                 if (channel is not null)
                 {
                     channel.ChannelType = entity.ChannelType;
@@ -159,13 +151,8 @@ namespace Optio.Core.Repositories
                 {
                     throw new InvalidOperationException("No similar channel found");
                 }
-
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
-            catch(Exception )
+            catch (Exception)
             {
                 throw;
             }

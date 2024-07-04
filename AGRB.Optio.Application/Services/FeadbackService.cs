@@ -1,10 +1,9 @@
 ﻿using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Application.Models.RequestModels;
 using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
-using RGBA.Optio.Core.Interfaces;
-using RGBA.Optio.Domain.Services;
 
 namespace AGRB.Optio.Application.Services
 {

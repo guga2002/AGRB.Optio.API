@@ -1,5 +1,4 @@
-﻿
-namespace RGBA.Optio.Domain.Responses
+﻿namespace AGRB.Optio.Application.Responses
 {
     public class ErrorResponse : Response<object>
     {

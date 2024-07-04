@@ -1,4 +1,4 @@
-﻿namespace RGBA.Optio.Stream.DecerializerClasses
+﻿namespace AGRB.Optio.StreamTest.DecerializerCLasses
 {
     public class CurrenciesResponse
     {

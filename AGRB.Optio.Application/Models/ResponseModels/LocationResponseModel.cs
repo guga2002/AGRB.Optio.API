@@ -1,5 +1,4 @@
-﻿
-namespace RGBA.Optio.Domain.Models.ResponseModels
+﻿namespace AGRB.Optio.Application.Models.ResponseModels
 {
     public class LocationResponseModel
     {

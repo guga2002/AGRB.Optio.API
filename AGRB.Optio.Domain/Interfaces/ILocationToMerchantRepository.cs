@@ -1,7 +1,6 @@
-﻿using Optio.Core.Entities;
-using RGBA.Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace RGBA.Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
     public interface ILocationToMerchantRepository
     {

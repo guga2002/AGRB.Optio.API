@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace RGBA.Optio.Core.PerformanceImprovmentServices
+namespace AGRB.Optio.Infrastructure.PerformanceImprovmentServices
 {
     public class CacheService(IMemoryCache cache)
     {

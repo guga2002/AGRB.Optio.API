@@ -1,8 +1,8 @@
-﻿using Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface ITypeOfTransactionRepo:ICrudRepo<TypeOfTransaction, long>
+    public interface ITypeOfTransactionRepo : ICrudRepo<TypeOfTransaction, long>
     {
         Task<IEnumerable<TypeOfTransaction>> GetAllActiveTypeOfTransactionAsync();
     }

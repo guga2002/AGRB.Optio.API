@@ -1,8 +1,8 @@
-﻿using Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface ILocationRepo:ICrudRepo<Location, long>
+    public interface ILocationRepo : ICrudRepo<Location, long>
     {
         Task<IEnumerable<Location>> GetAllActiveLocationAsync();
     }

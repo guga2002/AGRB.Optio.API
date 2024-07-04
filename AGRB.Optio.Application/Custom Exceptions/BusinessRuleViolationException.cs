@@ -1,4 +1,4 @@
-﻿namespace RGBA.Optio.Domain.Custom_Exceptions
+﻿namespace AGRB.Optio.Domain.Custom_Exceptions
 {
     public class BusinessRuleViolationException:Exception
     {

@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Optio.Core.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RGBA.Optio.Core.Entities
+namespace AGRB.Optio.Domain.Entities
 {
     [Table("ExchangeRates")]
-    [Index(nameof(Date),IsDescending = [true])]
-    [Index(nameof(Rate),IsDescending = [true])]
-    public class ExchangeRate:AbstractClass
+    [Index(nameof(Date), IsDescending = [true])]
+    [Index(nameof(Rate), IsDescending = [true])]
+    public class ExchangeRate : AbstractEntity
     {
         [Column("Rate")]
         public decimal Rate { get; set; }
@@ -16,9 +15,9 @@ namespace RGBA.Optio.Core.Entities
         public DateTime Date { get; set; }
 
         [ForeignKey("Currency")]
-        public int CurrencyId {  get; set; }
+        public int CurrencyId { get; set; }
 
-        [Column("Status")]
+        [Column("Exchange_Rate_Status")]
         public bool IsActive { get; set; } = true;
 
         public virtual required Currency Currency { get; set; }

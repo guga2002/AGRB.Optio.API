@@ -1,14 +1,14 @@
-﻿using RGBA.Optio.Domain.Validation.VallidationAttributes;
+﻿using AGRB.Optio.Application.Validation.VallidationAttributes;
 using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 
-namespace RGBA.Optio.Domain.Models
+namespace AGRB.Optio.Application.Models
 {
     public class TransactionModel
     {
         [Required(ErrorMessage = "Date is required.")]
         [DataTimeValidate]
-        [Display(Name ="Date of transaction")]
+        [Display(Name = "Date of transaction")]
         public required DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Currency ID is required.")]
@@ -20,7 +20,7 @@ namespace RGBA.Optio.Domain.Models
         public required float Amount { get; set; }
 
         [Required(ErrorMessage = "Equivalent in GEL is required.")]
-        [Range(0.01,double.MaxValue, ErrorMessage = "Equivalent in GEL must be greater than 0.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Equivalent in GEL must be greater than 0.")]
         [Display(Name = "Equivalent in GEL")]
         public required double EquivalentInGel { get; set; }
 

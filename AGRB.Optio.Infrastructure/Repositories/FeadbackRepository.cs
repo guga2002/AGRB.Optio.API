@@ -1,55 +1,61 @@
-﻿using AGRB.Optio.Domain.Entities;
+﻿using AGRB.Optio.Domain.Data;
+using AGRB.Optio.Domain.Entities;
 using AGRB.Optio.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Optio.Core.Data;
-using Optio.Core.Repositories;
 
 namespace AGRB.Optio.Infrastructure.Repositories
 {
-    public class FeadbackRepository : AbstractClass, IFeadbackRepository
+    public class FeadbackRepository : AbstractRepositroy<Feadback>, IFeadbackRepository
     {
-        private readonly DbSet<Feadback> feadbacks;
         public FeadbackRepository(OptioDB optioDB) : base(optioDB)
         {
-            feadbacks = Context.Set<Feadback>();
         }
 
+        #region AddAsync
         public async Task<long> AddAsync(Feadback entity)
         {
-            if (!await feadbacks.AnyAsync(io => io.UserId == entity.UserId && io.FeadBack == entity.FeadBack))
+            if (!await Dbset.AnyAsync(io => io.UserId == entity.UserId && io.FeadBack == entity.FeadBack))
             {
-                await feadbacks.AddAsync(entity);
+                await Dbset.AddAsync(entity);
                 await Context.SaveChangesAsync();
-                return feadbacks.Max(o => o.Id);
+                return Dbset.Max(o => o.Id);
             }
             throw new ArgumentNullException("such review already exist in DB!");
         }
+        #endregion
 
+        #region GetAllAsync
         public async Task<IEnumerable<Feadback>> GetAllAsync()
         {
-            return await feadbacks.ToListAsync();
+            return await Dbset.ToListAsync();
         }
+        #endregion
 
+        #region GetByIdAsync
         public async Task<Feadback> GetByIdAsync(long id)
         {
-            var res = await feadbacks.FindAsync(id);
+            var res = await Dbset.FindAsync(id);
             if (res is not null)
             {
                 return res;
             }
             throw new ArgumentNullException(" no entity found on this ID");
         }
+        #endregion
 
+        #region RemoveAsync
         public async Task<bool> RemoveAsync(Feadback entity)
         {
-            feadbacks.Remove(entity);
+            Dbset.Remove(entity);
             await Context.SaveChangesAsync();
             return true;
         }
+        #endregion
 
+        #region SoftDeleteAsync
         public async Task<bool> SoftDeleteAsync(long id)
         {
-            var res = await feadbacks.FindAsync(id);
+            var res = await Dbset.FindAsync(id);
             if (res is not null)
             {
                 res.Status = true;
@@ -58,10 +64,12 @@ namespace AGRB.Optio.Infrastructure.Repositories
             }
             throw new ArgumentNullException(" no entity found on this ID");
         }
+        #endregion
 
+        #region UpdateAsync
         public async Task<bool> UpdateAsync(long id, Feadback entity)
         {
-            var res = await feadbacks.FindAsync(id);
+            var res = await Dbset.FindAsync(id);
             if (res is not null)
             {
                 res.Email = entity.Email;
@@ -74,5 +82,6 @@ namespace AGRB.Optio.Infrastructure.Repositories
             }
             return false;
         }
+        #endregion
     }
 }

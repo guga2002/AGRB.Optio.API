@@ -1,13 +1,13 @@
-﻿using AGRB.Optio.Domain.Entities;
+﻿using AGRB.Optio.Domain.Data;
+using AGRB.Optio.Domain.Entities;
 using Microsoft.Extensions.Logging;
-using RGBA.Optio.Core.Data;
 
-namespace RGBA.Optio.Domain.LoggerFiles
+namespace AGRB.Optio.Persistance.LoggerFiles
 {
     public class Logger : ILogger
     {
         private readonly OptioMongoContext context = new();
-        
+
 
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         {

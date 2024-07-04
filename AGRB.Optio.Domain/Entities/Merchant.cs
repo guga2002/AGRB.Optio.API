@@ -1,22 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RGBA.Optio.Core.Entities;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Optio.Core.Entities
+namespace AGRB.Optio.Domain.Entities
 {
     [Table("Merchants")]
-    [Index(nameof(Name),IsDescending = [true])]
-    public class Merchant:AbstractClass
+    [Index(nameof(Name), IsDescending = [true])]
+    public class Merchant : AbstractEntity
     {
-        [Column("Name")]
-        [StringLength(50,ErrorMessage ="Merchant name is not valid!",MinimumLength =3)]
+        [Column("Merchant_Name")]
         public required string Name { get; set; }
 
+        [Column("Merchant_Status")]
         public bool IsActive { get; set; } = true;
 
-        public virtual IEnumerable<LocationToMerchant>? Locations { get; set; }
+        public virtual IEnumerable<LocationToMerchant> Locations { get; set; }
 
-        public  IEnumerable<Transaction> Transactions { get; set; }
+        public virtual IEnumerable<Transaction> Transactions { get; set; }
+        public Merchant()
+        {
+            Locations = new List<LocationToMerchant>();
+            Transactions = new List<Transaction>();
+        }
     }
 }

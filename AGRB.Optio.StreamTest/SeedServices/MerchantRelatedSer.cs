@@ -1,12 +1,12 @@
-﻿using RGBA.Optio.Core.Interfaces;
-using Optio.Core.Entities;
-using RGBA.Optio.Stream.Interfaces;
-using Optio.Core.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using AGRB.Optio.Domain.Interfaces;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.StreamTest.Interfaces;
+using AGRB.Optio.Domain.Data;
 
-namespace RGBA.Optio.Stream.SeedServices
+namespace AGRB.Optio.StreamTest.SeedServices
 {
-    public class MerchantRelatedSer:IMerchantRelatedSer
+    public class MerchantRelatedSer : IMerchantRelatedSer
     {
         private readonly IUniteOfWork _uniteOfWork;
         private readonly OptioDB optioDB;
@@ -16,18 +16,18 @@ namespace RGBA.Optio.Stream.SeedServices
         {
             this._uniteOfWork = _uniteOfWork;
             this.optioDB = optioDB;
-            rand= new Random();
-            rand1= new Random();
+            rand = new Random();
+            rand1 = new Random();
         }
 
         #region FillDataToLocation
 
         public async Task<bool> FillDataToLocation()
         {
-            await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "თბილისი",IsActive = true});
+            await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "თბილისი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "რუსთავი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ბათუმი", IsActive = true });
-            await  _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ქობულეთი", IsActive = true });
+            await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ქობულეთი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "გარდაბანი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ბაკურიანი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ლანჩუთი", IsActive = true });
@@ -36,7 +36,7 @@ namespace RGBA.Optio.Stream.SeedServices
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "გუდაური", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ზუგდიდი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "სამტრედია", IsActive = true });
-            await  _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ფოთი", IsActive = true });
+            await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "ფოთი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "მესტია", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "თელავი", IsActive = true });
             await _uniteOfWork.LocationRepository.AddAsync(new Location { LocationName = "სიღნაღი", IsActive = true });
@@ -84,7 +84,7 @@ namespace RGBA.Optio.Stream.SeedServices
         {
 
             var minLocationId = await optioDB.Locations.OrderBy(l => l.Id).FirstOrDefaultAsync();
-            var maxLocationId= await optioDB.Locations.OrderBy(l => l.Id).LastOrDefaultAsync();
+            var maxLocationId = await optioDB.Locations.OrderBy(l => l.Id).LastOrDefaultAsync();
             var minMerchantId = await optioDB.Merchants.OrderBy(l => l.Id).FirstOrDefaultAsync();
             var maxMerchantId = await optioDB.Merchants.OrderBy(l => l.Id).LastOrDefaultAsync();
             for (int i = 0; i < countNumber; i++)
@@ -96,7 +96,7 @@ namespace RGBA.Optio.Stream.SeedServices
 
                         var randMerch = rand.Next((int)minMerchantId.Id, (int)maxMerchantId.Id);
                         var randLocat = rand1.Next((int)minLocationId.Id, (int)maxLocationId.Id);
-                        if (await optioDB.Merchants.AnyAsync(i=>i.Id==randMerch) || await optioDB.Locations.AnyAsync(i=>i.Id==randLocat))
+                        if (await optioDB.Merchants.AnyAsync(i => i.Id == randMerch) || await optioDB.Locations.AnyAsync(i => i.Id == randLocat))
                         {
                             await _uniteOfWork.MerchantRepository.AssignLocationToMerchant(randMerch, randLocat);
                         }
@@ -109,7 +109,7 @@ namespace RGBA.Optio.Stream.SeedServices
                 }
                 catch (Exception ex)
                 {
-                    Console.ForegroundColor= ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     await Console.Out.WriteLineAsync($"shecdopmaaaaaaaaaaa {ex.Message}");
                     Console.ResetColor();
                 }

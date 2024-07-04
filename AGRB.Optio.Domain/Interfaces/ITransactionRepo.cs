@@ -1,14 +1,14 @@
-﻿using Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface ITransactionRepo:ICrudRepo<Transaction, long>
+    public interface ITransactionRepo : ICrudRepo<Transaction, long>
     {
         Task<IEnumerable<Transaction>> GetAllWithDetailsAsync();
 
         Task<Transaction> GetByIdWithDetailsAsync(long id);
 
         Task<IEnumerable<Transaction>> GetAllActiveAsync();
-       
+
     }
 }

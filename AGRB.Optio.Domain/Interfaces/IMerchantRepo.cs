@@ -1,8 +1,8 @@
-﻿using Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface IMerchantRepo:ICrudRepo<Merchant, long>
+    public interface IMerchantRepo : ICrudRepo<Merchant, long>
     {
         Task<IEnumerable<Merchant>> GetAllActiveMerchantAsync();
         Task<bool> AssignLocationToMerchant(long merchantId, long locationId);

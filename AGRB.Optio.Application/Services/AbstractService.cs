@@ -1,8 +1,8 @@
-﻿using RGBA.Optio.Core.Interfaces;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using AGRB.Optio.Domain.Interfaces;
 
-namespace RGBA.Optio.Domain.Services
+namespace AGRB.Optio.Application.Services
 {
     public abstract class AbstractService<T>(IUniteOfWork work, IMapper map, ILogger<T> log)
         where T : class

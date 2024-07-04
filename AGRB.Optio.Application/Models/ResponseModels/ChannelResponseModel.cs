@@ -1,11 +1,11 @@
-﻿namespace RGBA.Optio.Domain.Models.ResponseModels
+﻿namespace AGRB.Optio.Application.Models.ResponseModels
 {
     public class ChannelResponseModel
     {
         public string? ChannelType { get; set; }
-        public long Quantity {  get; set; }
-        public decimal Volume {  get; set; }
-        public decimal Average {  get; set; }
+        public long Quantity { get; set; }
+        public decimal Volume { get; set; }
+        public decimal Average { get; set; }
 
     }
 }

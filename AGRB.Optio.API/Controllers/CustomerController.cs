@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using RGBA.Optio.Core.Entities;
-using RGBA.Optio.Domain.Custom_Exceptions;
-using RGBA.Optio.Domain.Interfaces;
-using RGBA.Optio.Domain.Models;
-using RGBA.Optio.Domain.Models.RequestModels;
-using RGBA.Optio.Domain.Services.Outer_Services;
-using System.Net.Http.Headers;
 using AGRB.Optio.API.StaticFiles;
-using RGBA.Optio.Domain.Responses;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 using AGRB.Optio.Application.Models.ResponseModels;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Application.Responses;
+using AGRB.Optio.Application.Models;
+using AGRB.Optio.Application.Models.RequestModels;
+using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.Domain.Services.Outer_Services;
+using AGRB.Optio.Domain.Custom_Exceptions;
 
 namespace RGBA.Optio.UI.Controllers
 {

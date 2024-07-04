@@ -1,8 +1,8 @@
-﻿using Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface IChannelRepo : ICrudRepo<Channels,long>
+    public interface IChannelRepo : ICrudRepo<Channels, long>
     {
         Task<IEnumerable<Channels>> GetAllActiveChannelAsync();
     }

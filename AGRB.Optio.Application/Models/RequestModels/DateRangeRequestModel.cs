@@ -1,5 +1,4 @@
-﻿
-namespace RGBA.Optio.Domain.Models.RequestModels
+﻿namespace AGRB.Optio.Application.Models.RequestModels
 {
     public class DateRangeRequestModel
     {

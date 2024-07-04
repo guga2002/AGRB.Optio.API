@@ -1,6 +1,4 @@
-﻿
-
-namespace RGBA.Optio.Domain.Responses
+﻿namespace AGRB.Optio.Application.Responses
 {
     public class Response<T> : IResponse
     {
@@ -93,7 +91,7 @@ namespace RGBA.Optio.Domain.Responses
 
         public static implicit operator Response<T>(ErrorResponse errorReponse)
         {
-            return new Response<T>(false, default(T), errorReponse.Messages, errorReponse.Errors);
+            return new Response<T>(false, default, errorReponse.Messages, errorReponse.Errors);
         }
 
         public static Response<T> Ok(T result)
@@ -110,26 +108,26 @@ namespace RGBA.Optio.Domain.Responses
         {
             return Error(response.Errors);
         }
-        
+
         public static Response<T> Error(string key, string value)
         {
             var responseError = new ResponseError(key, value);
-            return new Response<T>(false, default(T), responseError);
+            return new Response<T>(false, default, responseError);
         }
 
         public static Response<T> Error(string key, string value, string details)
         {
             var responseError = new ResponseError(key, value, details);
-            return new Response<T>(false, default(T), responseError);
+            return new Response<T>(false, default, responseError);
         }
 
         public static Response<T> Error(IList<ResponseError> errors)
         {
-            return new Response<T>(false, default(T), errors);
+            return new Response<T>(false, default, errors);
         }
         public static Response<T> Error(ICollection<ResponseError> errors)
         {
-            return new Response<T>(false, default(T), errors);
+            return new Response<T>(false, default, errors);
         }
 
         public void AddErrors(ICollection<ResponseError> errors)

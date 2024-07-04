@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AGRB.Optio.Infrastructure.Migrations
+namespace AGRB.Optio.Domain.Migrations
 {
     /// <inheritdoc />
-    public partial class asksa : Migration
+    public partial class Mgrt : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,9 +30,9 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    User_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    User_Surname = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Personal_Number = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    User_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    User_Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Personal_Number = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     User_BirthDay = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -60,8 +60,8 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Channel_Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Channel_Type = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Chanell_Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,8 +74,8 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name_Of_Currency = table.Column<string>(type: "varchar(30)", unicode: false, maxLength: 30, nullable: false),
-                    Currency_Code = table.Column<string>(type: "varchar(30)", unicode: false, maxLength: 30, nullable: false),
+                    Name_Of_Currency = table.Column<string>(type: "varchar(900)", unicode: false, nullable: false),
+                    Currency_Code = table.Column<string>(type: "varchar(900)", unicode: false, nullable: false),
                     Status_Of_Currency = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -89,8 +89,8 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Location_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Location_Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Location_Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,8 +103,8 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Merchant_Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Merchant_Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,8 +117,8 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Transaction_Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Status_Of_Transaction_Type = table.Column<bool>(type: "bit", nullable: false)
+                    Transaction_Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Status_Transaction_Type = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -237,12 +237,12 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FeadBack = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    User_Feadback = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FeadbackDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Name_Of_User = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RatingGivedByUser = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    Rating_By_User = table.Column<int>(type: "int", nullable: false),
+                    Feadback_Status = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -265,7 +265,7 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     Rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Last_Updated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<bool>(type: "bit", nullable: false)
+                    Exchange_Rate_Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,17 +310,16 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Transaction_Category = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    TransactionTypeId = table.Column<long>(type: "bigint", nullable: false),
-                    TypeOfTransactionId = table.Column<long>(type: "bigint", nullable: false)
+                    Transaction_Category = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Category_Status = table.Column<bool>(type: "bit", nullable: false),
+                    TransactionTypeId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CategoryOfTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CategoryOfTransactions_TypeOfTransactions_TypeOfTransactionId",
-                        column: x => x.TypeOfTransactionId,
+                        name: "FK_CategoryOfTransactions_TypeOfTransactions_TransactionTypeId",
+                        column: x => x.TransactionTypeId,
                         principalTable: "TypeOfTransactions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -333,7 +332,7 @@ namespace AGRB.Optio.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date_Of_Transaction = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Total_Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Amount_Equivalent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Transaction_Status = table.Column<bool>(type: "bit", nullable: false),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
@@ -422,9 +421,9 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryOfTransactions_TypeOfTransactionId",
+                name: "IX_CategoryOfTransactions_TransactionTypeId",
                 table: "CategoryOfTransactions",
-                column: "TypeOfTransactionId");
+                column: "TransactionTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Channels_Channel_Type",
@@ -483,15 +482,9 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 column: "MerchantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Merchants_Name",
+                name: "IX_Merchants_Merchant_Name",
                 table: "Merchants",
-                column: "Name",
-                descending: new bool[0]);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Transactions_Amount",
-                table: "Transactions",
-                column: "Amount",
+                column: "Merchant_Name",
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
@@ -525,6 +518,12 @@ namespace AGRB.Optio.Infrastructure.Migrations
                 name: "IX_Transactions_MerchantId",
                 table: "Transactions",
                 column: "MerchantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_Total_Amount",
+                table: "Transactions",
+                column: "Total_Amount",
+                descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TypeOfTransactions_Transaction_Name",

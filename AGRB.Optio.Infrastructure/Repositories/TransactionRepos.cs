@@ -1,18 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Optio.Core.Data;
-using Optio.Core.Entities;
-using Optio.Core.Interfaces;
-using RGBA.Optio.Core.PerformanceImprovmentServices;
+﻿using AGRB.Optio.Domain.Data;
+using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace Optio.Core.Repositories
+namespace AGRB.Optio.Infrastructure.Repositories
 {
-    public class TransactionRepos : AbstractClass, ITransactionRepo
+    public class TransactionRepos : AbstractRepositroy<Transaction>, ITransactionRepo
     {
-        private readonly DbSet<Transaction> transactions;
 
         public TransactionRepos(OptioDB optioDB) : base(optioDB)
         {
-            transactions = Context.Set<Transaction>();
         }
 
         #region AddAsync
@@ -24,7 +21,7 @@ namespace Optio.Core.Repositories
                 Context.Currencies.AnyAsync(io => io.Id == entity.CurrencyId),
                 Context.Locations.AnyAsync(io => io.Id == entity.ChannelId),
                 Context.Merchants.AnyAsync(io => io.Id == entity.MerchantId),
-                transactions.AnyAsync(io => io.Id == entity.Id)
+                Dbset.AnyAsync(io => io.Id == entity.Id)
             };
 
             var results = await Task.WhenAll(tasks);
@@ -39,7 +36,7 @@ namespace Optio.Core.Repositories
                 throw new ArgumentException("Such a Transaction Already Exist In Db");
             }
 
-            await transactions.AddAsync(entity);
+            await Dbset.AddAsync(entity);
             await Context.SaveChangesAsync();
 
             return entity.Id;
@@ -49,14 +46,14 @@ namespace Optio.Core.Repositories
         #region GetAllAsync
         public async Task<IEnumerable<Transaction>> GetAllAsync()
         {
-            return await transactions.AsNoTracking().ToListAsync();
+            return await Dbset.AsNoTracking().ToListAsync();
         }
         #endregion
 
         #region GetAllWithDetailsAsync
         public async Task<IEnumerable<Transaction>> GetAllWithDetailsAsync()
         {
-            var transactionsWithDetails = await transactions
+            var transactionsWithDetails = await Dbset
                 .Include(io => io.Category)
                 .Include(io => io.Channel)
                 .Include(io => io.Currency).ThenInclude(io => io.Courses)
@@ -71,7 +68,7 @@ namespace Optio.Core.Repositories
         #region GetByIdAsync
         public async Task<Transaction> GetByIdAsync(long id)
         {
-            return await transactions.AsNoTracking()
+            return await Dbset.AsNoTracking()
                        .FirstOrDefaultAsync(io => io.IsActive && io.Id == id)
                    ?? throw new ArgumentNullException("Transaction not found");
         }
@@ -80,7 +77,7 @@ namespace Optio.Core.Repositories
         #region GetByIdWithDetailsAsync
         public async Task<Transaction> GetByIdWithDetailsAsync(long id)
         {
-            var transactionWithDetails = await transactions
+            var transactionWithDetails = await Dbset
                 .Include(io => io.Category)
                 .Include(io => io.Channel)
                 .Include(io => io.Currency).ThenInclude(io => io.Courses)
@@ -95,8 +92,7 @@ namespace Optio.Core.Repositories
         #region RemoveAsync
         public async Task<bool> RemoveAsync(Transaction entity)
         {
-            ArgumentNullException.ThrowIfNull(entity);
-            transactions.Remove(entity);
+            Dbset.Remove(entity);
             await Context.SaveChangesAsync();
             return true;
         }
@@ -105,7 +101,7 @@ namespace Optio.Core.Repositories
         #region SoftDeleteAsync
         public async Task<bool> SoftDeleteAsync(long id)
         {
-            var transaction = await transactions.FindAsync(id);
+            var transaction = await Dbset.FindAsync(id);
             if (transaction != null)
             {
                 transaction.IsActive = false;
@@ -121,7 +117,7 @@ namespace Optio.Core.Repositories
         {
             try
             {
-                var transaction = await transactions.FindAsync(id);
+                var transaction = await Dbset.FindAsync(id);
                 if (transaction != null)
                 {
                     Context.Entry(transaction).CurrentValues.SetValues(entity);
@@ -143,10 +139,8 @@ namespace Optio.Core.Repositories
         #region GetAllActiveAsync
         public async Task<IEnumerable<Transaction>> GetAllActiveAsync()
         {
-            return await transactions.AsNoTracking().Where(io => io.IsActive).ToListAsync();
+            return await Dbset.AsNoTracking().Where(io => io.IsActive).ToListAsync();
         }
         #endregion
-
-   
     }
 }

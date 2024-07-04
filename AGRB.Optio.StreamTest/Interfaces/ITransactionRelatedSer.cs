@@ -1,7 +1,7 @@
-﻿using Optio.Core.Entities;
-using RGBA.Optio.Stream.DecerializerClasses;
+﻿using AGRB.Optio.Domain.Entities;
+using AGRB.Optio.StreamTest.DecerializerCLasses;
 
-namespace RGBA.Optio.Stream.Interfaces
+namespace AGRB.Optio.StreamTest.Interfaces
 {
     public interface ITransactionRelatedSer
     {

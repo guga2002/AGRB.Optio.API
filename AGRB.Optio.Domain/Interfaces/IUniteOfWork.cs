@@ -1,9 +1,6 @@
-﻿using AGRB.Optio.Domain.Interfaces;
-using Optio.Core.Interfaces;
-
-namespace RGBA.Optio.Core.Interfaces
+﻿namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface IUniteOfWork:IDisposable
+    public interface IUniteOfWork : IDisposable
     {
         ICategoryRepo CategoryOfTransactionRepository { get; }
 
@@ -16,9 +13,9 @@ namespace RGBA.Optio.Core.Interfaces
         ITransactionRepo TransactionRepository { get; }
 
         ITypeOfTransactionRepo TypeOfTransactionRepository { get; }
-        
+
         ILocationToMerchantRepository LocationToMerchantRepository { get; }
-       
+
         IExchangeRate ExchangeRateRepository { get; }
 
         ICurrencyRepository CurrencyRepository { get; }

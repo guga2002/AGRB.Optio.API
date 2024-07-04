@@ -1,4 +1,4 @@
-﻿namespace RGBA.Optio.Stream.DecerializerClasses
+﻿namespace AGRB.Optio.StreamTest.DecerializerCLasses
 {
     public class CurrenccyJson
     {
@@ -10,6 +10,6 @@
 
         public DateTime date { get; set; }
 
-        public int  quantity { get; set; }
+        public int quantity { get; set; }
     }
 }

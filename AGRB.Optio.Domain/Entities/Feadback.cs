@@ -1,13 +1,12 @@
-﻿using Optio.Core.Entities;
-using RGBA.Optio.Core.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AGRB.Optio.Domain.Entities
 {
     [Table("Feadbacks")]
-    public class Feadback:AbstractClass
+    public class Feadback:AbstractEntity
     {
+        [Column("User_Feadback")]
         public  required string FeadBack { get; set; }
 
         [DataType(DataType.Date)]
@@ -19,14 +18,15 @@ namespace AGRB.Optio.Domain.Entities
         [EmailAddress]
         public string? Email { get; set; }
 
-        [Range(0,100)]
+        [Column("Rating_By_User")]
         public int RatingGivedByUser { get; set; }
 
+        [Column("Feadback_Status")]
         public bool Status { get; set; } = false;
 
-        [ForeignKey("user")]
-        public string UserId { get; set; }
+        [ForeignKey("User")]
+        public required string UserId { get; set; }
 
-        public virtual User user { get; set; }
+        public virtual User User { get; set; }
     }
 }

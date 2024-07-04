@@ -1,8 +1,8 @@
-﻿using Optio.Core.Entities;
+﻿using AGRB.Optio.Domain.Entities;
 
-namespace Optio.Core.Interfaces
+namespace AGRB.Optio.Domain.Interfaces
 {
-    public interface ICategoryRepo:ICrudRepo<Category,long>
+    public interface ICategoryRepo : ICrudRepo<Category, long>
     {
         Task<IEnumerable<Category>> GetAllActiveAsync();
     }
