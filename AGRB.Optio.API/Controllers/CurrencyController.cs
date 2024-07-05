@@ -66,7 +66,7 @@ namespace RGBA.Optio.UI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new OptioGeneralException(entity.DateOfExchangeRate.ToShortDateString());
+                throw new OptioGeneralException(entity.Date.ToShortDateString());
             }
             var res = await se.AddAsync(entity);
             if (res != -1)
@@ -122,7 +122,7 @@ namespace RGBA.Optio.UI.Controllers
         public async Task<Response<IEnumerable<ExchangeRateModel>>> AllActiveExchangeRate()
         {
 
-            var res = await se.GetAllActiveAsync(new ExchangeRateModel() { DateOfExchangeRate = DateTime.Now, ExchangeRate = 0, CurrencyId = 0 });
+            var res = await se.GetAllActiveAsync(new ExchangeRateModel() { Date = DateTime.Now, Rate = 0, CurrencyId = 0 });
             return Response<IEnumerable<ExchangeRateModel>>.Ok(res);
         }
 
@@ -156,7 +156,7 @@ namespace RGBA.Optio.UI.Controllers
         [MapToApiVersion("2.0")]
         public async Task<Response<IEnumerable<ExchangeRateModel>>> AllExchangeRateAsync()
         {
-            var res = await se.GetAllAsync(new ExchangeRateModel() { CurrencyId = 0, ExchangeRate = 0, DateOfExchangeRate = DateTime.Now });
+            var res = await se.GetAllAsync(new ExchangeRateModel() { CurrencyId = 0, Rate = 0, Date = DateTime.Now });
             return Response<IEnumerable<ExchangeRateModel>>.Ok(res);
         }
 
@@ -188,7 +188,7 @@ namespace RGBA.Optio.UI.Controllers
         [MapToApiVersion("2.0")]
         public async Task<Response<ExchangeRateModel>> ByIdAsync([FromRoute] long id)
         {
-            var res = await se.GetByIdAsync(id, new ExchangeRateModel() { CurrencyId = 0, ExchangeRate = 0, DateOfExchangeRate = DateTime.Now });
+            var res = await se.GetByIdAsync(id, new ExchangeRateModel() { CurrencyId = 0, Rate = 0, Date = DateTime.Now });
             return Response<ExchangeRateModel>.Ok(res);
         }
 
@@ -262,7 +262,7 @@ namespace RGBA.Optio.UI.Controllers
         [MapToApiVersion("1.0")]
         public async Task<Response<bool>> SoftDelete([FromRoute] long id)
         {
-            var res = await se.SoftDeleteAsync(id, new ExchangeRateModel() { CurrencyId = 0, ExchangeRate = 0, DateOfExchangeRate = DateTime.Now });
+            var res = await se.SoftDeleteAsync(id, new ExchangeRateModel() { CurrencyId = 0, Rate = 0, Date = DateTime.Now });
             if (res)
             {
                 return Response<bool>.Ok(res);

@@ -1,31 +1,36 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
+﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AGRB.Optio.Persistance.Reflections
 {
-    public static class RefrectionRepositories
+    public static class ReflectionRepositories
     {
-        public static void AddInjectRepositories(this IServiceCollection collection, Assembly assembly, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+        public static void AddInjectRepositories(this IServiceCollection collection, Assembly interfaceAssembly, Assembly implementationAssembly, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
-            if (assembly is null)
+            if (interfaceAssembly is null)
             {
-                throw new ArgumentNullException(nameof(assembly), "Assembly cannot be null");
+                throw new ArgumentNullException(nameof(interfaceAssembly), "Interface assembly cannot be null");
             }
-            var types = assembly.GetTypes().Where(i =>
-            i is { IsInterface: false, IsAbstract: false, IsGenericTypeDefinition: false } &&
-            i.Name.Contains("Repos", StringComparison.OrdinalIgnoreCase)
-            );
 
-            foreach (var type in types)
+            if (implementationAssembly is null)
             {
-                var interfaces = type.GetInterfaces().ToList();
-                if (interfaces.Count == 0)
+                throw new ArgumentNullException(nameof(implementationAssembly), "Implementation assembly cannot be null");
+            }
+
+            var interfaceTypes = interfaceAssembly.GetTypes().Where(i =>
+                i.IsInterface && i.Name.Contains("Repos", StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+
+            var implementationTypes = implementationAssembly.GetTypes().Where(i =>
+                !i.IsInterface && !i.IsAbstract && !i.IsGenericTypeDefinition && i.Name.Contains("Repos", StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+
+            foreach (var interfaceType in interfaceTypes)
+            {
+                var implementationType = implementationTypes.FirstOrDefault(impl => interfaceType.IsAssignableFrom(impl));
+                if (implementationType != null)
                 {
-                    continue;
-                }
-                foreach (var item in interfaces)
-                {
-                    collection.AddScoped(item, type);
+                    collection.Add(new ServiceDescriptor(interfaceType, implementationType, serviceLifetime));
                 }
             }
         }

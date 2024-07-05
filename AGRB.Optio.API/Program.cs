@@ -5,25 +5,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Domain.Interfaces;
 using AGRB.Optio.Infrastructure.Repositories;
-using AGRB.Optio.Application.Services;
 using AGRB.Optio.Infrastructure.PerformanceImprovmentServices;
 using AGRB.Optio.Domain.Entities;
-using AGRB.Optio.Application.Services.TransactionRelated;
-using AGRB.Optio.Application.Services.StatisticServices;
 using AGRB.Optio.Application.Mapper;
-using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
 using AGRB.Optio.Domain.Services.Outer_Services;
 using AGRB.Optio.Persistance.LoggerFiles;
 using AGRB.Optio.Domain.Data;
 using AGRB.Optio.API.CustomMiddlwares;
 using AGRB.Optio.API.CustomMiddlwares.AGRB.Optio.API.CustomMiddlwares;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using AGRB.Optio.Persistance.Reflections;
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
@@ -117,34 +112,29 @@ builder.Services.AddScoped<RoleManager<IdentityRole>>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 builder.Services.AddScoped<IUniteOfWork, UniteOfWork>();
-builder.Services.AddScoped<IFeadbackService, FeadbackService>();
-builder.Services.AddScoped<IFeadbackRepository,FeadbackRepository>();
-#region addScoppedManually
-builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
-builder.Services.AddScoped<IChannelRepo, ChannelRepos>();
-builder.Services.AddScoped<ILocationRepo, LocationRepos>();
-builder.Services.AddScoped<IMerchantRepo, MerchantRepos>();
-builder.Services.AddScoped<ITransactionRepo, TransactionRepos>();
-builder.Services.AddScoped<ITypeOfTransactionRepo, TypeOfTransactionRepos>();
-
-
-builder.Services.AddScoped<IAdminPanelService, AdminPanelService>();
-builder.Services.AddScoped<IStatisticMerchantRelatedService, StatisticMerchantRelatedService>();
-builder.Services.AddScoped<IStatisticTransactionRelatedService, StatisticTransactionRelatedService>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<ICurrencyRelatedService,CurrencyRelatedService>();
-builder.Services.AddScoped<IMerchantRelatedService, MerchantRelatedService>();
-builder.Services.AddScoped<ITransactionRelatedService, TransactionRelatedService>();
-builder.Services.AddScoped<ILocationToMerchantRepository,LocationToMerchantRepos>();
-
-#endregion
 builder.Services.AddSingleton<CacheService>();
 builder.Services.AddSingleton<SmtpService>();
-//var domainAssemblyServices = Assembly.Load("RGBA.Optio.Domain");
-//builder.Services.AddInjectServices(domainAssemblyServices);
 
-//var domainAssemblyRepos = Assembly.Load("RGBA.Optio.Core");
-//builder.Services.AddInjectRepositories(domainAssemblyRepos);
+#region addScoppedManually
+//builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
+//builder.Services.AddScoped<IChannelRepo, ChannelRepos>();
+//builder.Services.AddScoped<ILocationRepo, LocationRepos>();
+//builder.Services.AddScoped<IMerchantRepo, MerchantRepos>();
+//builder.Services.AddScoped<ITransactionRepo, TransactionRepos>();
+//builder.Services.AddScoped<ITypeOfTransactionRepo, TypeOfTransactionRepos>();
+//builder.Services.AddScoped<ILocationToMerchantRepository,LocationToMerchantRepos>();
+//builder.Services.AddScoped<IFeadbackRepository, FeadbackRepository>();
+#endregion
+
+
+
+var applicatinoAssemblyServices = Assembly.Load("AGRB.Optio.Application");
+builder.Services.AddInjectServices(applicatinoAssemblyServices);
+
+
+var interfaceAssembly = Assembly.Load("AGRB.Optio.Domain");
+var implementationAssembly = Assembly.Load("AGRB.Optio.Infrastructure");
+builder.Services.AddInjectRepositories(interfaceAssembly, implementationAssembly);
 #endregion
 
 builder.Services.AddMemoryCache();

@@ -300,7 +300,7 @@ namespace AGRB.Optio.StreamTest.SeedServices
                     {
 
                         string sqlQuery = @"
-                        INSERT INTO Transactions (Date_Of_Transaction, Amount, Amount_Equivalent,Transaction_Status, CurrencyId, CategoryId, MerchantId, ChannelId)
+                        INSERT INTO Transactions (Date_Of_Transaction, Total_Amount, Amount_Equivalent,Transaction_Status, CurrencyId, CategoryId, MerchantId, ChannelId)
                         VALUES (@Date, @Amount, @AmountEquivalent,@IsActive, @CurrencyId, @CategoryId, @MerchantId, @ChannelId)";
                         await db.ExecuteAsync(sqlQuery, trans);
                     }

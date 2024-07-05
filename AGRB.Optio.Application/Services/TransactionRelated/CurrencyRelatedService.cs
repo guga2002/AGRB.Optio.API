@@ -1,13 +1,11 @@
 ﻿using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Application.Models;
-using AGRB.Optio.Application.Services;
 using AGRB.Optio.Domain.Entities;
 using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using AGRB.Optio.Domain.Custom_Exceptions;
 using AGRB.Optio.Application.StaticFiles;
-using Microsoft.VisualBasic;
 
 namespace AGRB.Optio.Application.Services.TransactionRelated
 {
@@ -41,7 +39,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
         {
             try
             {
-                if (entity is null || entity.CurrencyId < 0 || entity.ExchangeRate < 0 || string.IsNullOrEmpty(entity.DateOfExchangeRate.ToString()))
+                if (entity is null || entity.CurrencyId < 0 || entity.Rate < 0 || string.IsNullOrEmpty(entity.Date.ToString()))
                 {
                     throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
@@ -262,7 +260,7 @@ namespace AGRB.Optio.Application.Services.TransactionRelated
         {
             try
             {
-                if (entity == null || string.IsNullOrWhiteSpace(entity.DateOfExchangeRate.ToString()) || entity.CurrencyId < 0 || entity.ExchangeRate < 0)
+                if (entity == null || string.IsNullOrWhiteSpace(entity.Date.ToString()) || entity.CurrencyId < 0 || entity.Rate < 0)
                 {
                     throw new OptioGeneralException(ErrorKeys.currencyrelated);
                 }

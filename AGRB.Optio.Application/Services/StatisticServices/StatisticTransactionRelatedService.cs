@@ -20,7 +20,7 @@ namespace AGRB.Optio.Application.Services.StatisticServices
         {
             try
             {
-                var transactions = await work.TransactionRepository.GetAllWithDetailsAsync();
+                var transactions = await work.TransactionRepository.GetAllAsync();
                 if (transactions is null || !transactions.Any())
                 {
                     throw new OptioGeneralException(ErrorKeys.NotFound);
@@ -44,29 +44,40 @@ namespace AGRB.Optio.Application.Services.StatisticServices
         {
             try
             {
-                var transactions = await work.TransactionRepository.GetAllWithDetailsAsync();
+                var transactions = await work.TransactionRepository.GetAllAsync();
                 if (!transactions.Any())
                 {
                     throw new OptioGeneralException(ErrorKeys.NotFound);
                 }
 
                 var filteredTransactions = transactions.Where(t => t.IsActive && t.Date >= start && t.Date <= end).ToList();
-                var groupedByCategory = filteredTransactions
-                    .GroupBy(t => t.Category)
-                    .Select(g =>
-                    {
-                        if (g.Key != null)
-                            return new CategoryResponseModel
-                            {
-                                TransactionTypeId = g.Key.TransactionTypeId,
-                                TransactionCategory = g.Key.TransactionCategory,
-                                TransactionCount = g.Count(),
-                                TransactionVolume = g.Sum(t => t.AmountEquivalent)
-                            };
-                        return null;
-                    }).ToList();
+                var category = from i in filteredTransactions
+                               group i by i.CategoryId
+                             into groupCategory
+                               select new
+                               {
+                                   categoryId = groupCategory.Key,
+                                   categoryCount = groupCategory.Count(),
+                                   volume = groupCategory.Sum(i => i.AmountEquivalent)
+                               };
 
-                return groupedByCategory;
+                List<CategoryResponseModel> lst = new List<CategoryResponseModel>();
+                var categoryList = category.ToList();
+                foreach (var item in categoryList)
+                {
+                    var categoryDetails = await work.CategoryOfTransactionRepository.GetByIdAsync(item.categoryId);
+                    var res = new CategoryResponseModel
+                    {
+                        TransactionCategory = categoryDetails.TransactionCategory,
+                        TransactionCount = item.categoryCount,
+                        TransactionVolume = item.volume,
+                        Average = item.volume / item.categoryCount,
+
+                    };
+                    lst.Add(res);
+                }
+
+                return lst;
             }
             catch (Exception ex)
             {
@@ -81,7 +92,7 @@ namespace AGRB.Optio.Application.Services.StatisticServices
         {
             try
             {
-                var transactions = await work.TransactionRepository.GetAllWithDetailsAsync();
+                var transactions = await work.TransactionRepository.GetAllAsync();
 
                 if (!transactions.Any())
                 {
