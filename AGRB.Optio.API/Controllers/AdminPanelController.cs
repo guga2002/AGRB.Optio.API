@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AGRB.Optio.Domain.Custom_Exceptions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AGRB.Optio.API.Controllers
 {
@@ -17,6 +18,7 @@ namespace AGRB.Optio.API.Controllers
     [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{v:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AdminPanelController : ControllerBase
     {
         private readonly IAdminPanelService panel;

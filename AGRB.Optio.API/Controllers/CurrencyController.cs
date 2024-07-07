@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AGRB.Optio.Domain.Custom_Exceptions;
 using AGRB.Optio.Application.StaticFiles;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -17,6 +18,7 @@ namespace RGBA.Optio.UI.Controllers
     [ApiVersion("1.0",Deprecated =true)]
     [ApiVersion("2.0")]
     [Route("api/v{v:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CurrencyController: ControllerBase 
     {
 

@@ -1,19 +1,17 @@
 ﻿using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Application.Models;
 using AGRB.Optio.Application.Models.RequestModels;
-using AGRB.Optio.Application.Models.ResponseModels;
 using AGRB.Optio.Domain.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using AGRB.Optio.Domain.Custom_Exceptions;
 using AGRB.Optio.Domain.Services.Outer_Services;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using AGRB.Optio.Application.Interfaces.Identity;
+using AGRB.Optio.Infrastructure.Identity.HelperModels;
 
 namespace AGRB.Optio.Application.Services
 {
@@ -23,6 +21,7 @@ namespace AGRB.Optio.Application.Services
         SignInManager<User> signin,
         UserManager<User> userManager,
         RoleManager<IdentityRole> role,
+        IJwtService JwtService,
         SmtpService smtp)
         : IAdminPanelService
     {
@@ -206,40 +205,25 @@ namespace AGRB.Optio.Application.Services
 
         #region RefreshToken
 
-        public async Task<bool> RefreshToken(string username, string token)
+        public async Task<AuthResult> RefreshToken(TokenRequest tok)
         {
-            var user = await userManager.FindByNameAsync(username);
-            if (user == null)
+            var ver = await JwtService.VerifyToken(tok);
+            if (!ver.Success)
             {
-                return false;
+                throw new UnauthorizedAccessException("Refresh token failed");
             }
 
-            var isValidToken = await signin.UserManager.VerifyUserTokenAsync(user,
-                userManager.Options.Tokens.PasswordResetTokenProvider, "RefreshToken", token);
-            if (!isValidToken)
-            {
-                return false;
-            }
+            var tokenUser = await userManager.FindByIdAsync(ver.UserId);
+            AuthResult authResult = await JwtService.GenerateToken(tokenUser.UserName);
 
-            var result = await signin.UpdateExternalAuthenticationTokensAsync(
-                new ExternalLoginInfo(new ClaimsPrincipal(), "JWT Bearer",
-                    "65E255FF-F399-42D4-9C7F-D5D08B0EC285", "Auth")
-                {
-                    ProviderKey = user.Id,
-                    AuthenticationTokens =
-                    [
-                        new AuthenticationToken { Name = "access_token", Value = token },
-                    ]
-                });
-
-            return result.Succeeded;
+            return authResult;
         }
 
         #endregion
 
         #region RegisterUserAsync
 
-        public async Task<IdentityResult> RegisterUserAsync(UserModel user, string password)
+        public async Task<AuthResult> RegisterUserAsync(UserModel user, string password)
         {
             if (await userManager.FindByEmailAsync(user.Email) is not null)
                 throw new ArgumentException(" User already exist in db");
@@ -320,9 +304,8 @@ namespace AGRB.Optio.Application.Services
 ";
 
             smtp.SendMessage(user.Email, "Welcome to RGBASOLUTION! Get Started Today", body);
-
-
-            return res;
+            var JwtToken = await JwtService.GenerateToken(user.Username);
+            return JwtToken;
         }
 
         #endregion
@@ -341,7 +324,7 @@ namespace AGRB.Optio.Application.Services
         #endregion
 
         #region SignInAsync
-        public async Task<SignInResponse> SignInAsync(SignInModel mod)
+        public async Task<AuthResult> SignInAsync(SignInModel mod)
         {
             if (string.IsNullOrEmpty(mod.Username) || string.IsNullOrEmpty(mod.Password))
             {
@@ -353,14 +336,12 @@ namespace AGRB.Optio.Application.Services
             if (result.Succeeded)
             {
                 await SetPersistentCookieAsync(_httpContextAccessor.HttpContext.User);
-                var accessToken = GenerateJwtToken(mod.Username);
-                var refreshToken = GenerateRefreshToken();
 
 
-                var usr = await userManager.FindByNameAsync(mod.Username);
-                if (usr == null) return new SignInResponse() { AuthToken = accessToken, RefreshToken = refreshToken.Token, ValidateTill = refreshToken.ExpiryDate };
+                var usr = await userManager.FindByNameAsync(mod.Username) ??
+                    throw new UnauthorizedAccessException("User is unauthorized!");
 
-                SaveRefreshToken(usr.Id, refreshToken);
+                var res = await JwtService.GenerateToken(usr.UserName);
 
                 var recipientName = usr.Name + ' ' + usr.Surname;
                 var emailContent = $@"
@@ -377,52 +358,13 @@ namespace AGRB.Optio.Application.Services
                 smtp.SendMessage(usr.Email,
                     $"Security Alert: New Sign-in to Your RGBASOLUTION Account {DateTime.Now.ToShortTimeString()}",
                     emailContent);
-
-                return new SignInResponse() { AuthToken = accessToken, RefreshToken = refreshToken.Token, ValidateTill = refreshToken.ExpiryDate };
+                return res;
             }
 
             throw new ArgumentException("sign in was not succesfully");
         }
 
-        private string GenerateJwtToken(string username)
-        {
-            var claims = new[]
-            {
-            new Claim(ClaimTypes.Name, username),
-                };
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E"));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                // issuer: "https://localhost:7116",
-                //  audience: "https://localhost:7116",
-                claims: claims,
-                expires: DateTime.Now.AddHours(6),
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        private RefreshTokenModel GenerateRefreshToken()
-        {
-            var refreshToken = new RefreshTokenModel
-            {
-                Token = Guid.NewGuid().ToString(),
-                ExpiryDate = DateTime.UtcNow.AddDays(30)
-            };
-
-            return refreshToken;
-        }
-
-        private Dictionary<string, RefreshTokenModel> _refreshTokens = new Dictionary<string, RefreshTokenModel>();
-
-        private void SaveRefreshToken(string userId, RefreshTokenModel refreshToken)
-        {
-            _refreshTokens[userId] = refreshToken;
-        }
 
         #endregion
 

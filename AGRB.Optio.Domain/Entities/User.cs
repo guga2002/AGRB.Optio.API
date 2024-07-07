@@ -26,6 +26,8 @@ namespace AGRB.Optio.Domain.Entities
 
         public virtual IEnumerable<Feadback> Feadbacks { get; set; }
 
+        public virtual IEnumerable<RefreshToken> RefreshTokens { get; set; }
+
         public User()
         {
             Feadbacks = new List<Feadback>();

@@ -16,5 +16,6 @@ namespace AGRB.Optio.Domain.Data
         public virtual DbSet<ExchangeRate> ExchangeRates { get; set; }
         public virtual DbSet<Currency> Currencies { get; set; }
         public virtual DbSet<Feadback> Feadbacks { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }

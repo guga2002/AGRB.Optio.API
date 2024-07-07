@@ -10,6 +10,8 @@ using AGRB.Optio.Application.Interfaces;
 using AGRB.Optio.Domain.Services.Outer_Services;
 using AGRB.Optio.Domain.Custom_Exceptions;
 using AGRB.Optio.Application.StaticFiles;
+using AGRB.Optio.Infrastructure.Identity.HelperModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -21,6 +23,7 @@ namespace RGBA.Optio.UI.Controllers
     [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{v:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CustomerController: ControllerBase
     {
 
@@ -76,7 +79,7 @@ namespace RGBA.Optio.UI.Controllers
         [Route("[action]")]
         [AllowAnonymous]
         [MapToApiVersion("2.0")]
-        public async Task<Response<SignInResponse>> SignIn([FromBody] SignInModel mod)
+        public async Task<Response<AuthResult>> SignIn([FromBody] SignInModel mod)
         {
             if (!ModelState.IsValid)
             {
@@ -85,9 +88,9 @@ namespace RGBA.Optio.UI.Controllers
             var res = await se.SignInAsync(mod);
             if (res is not null)
             {
-                return Response<SignInResponse>.Ok(res);
+                return Response<AuthResult>.Ok(res);
             }
-            return Response<SignInResponse>.Error("Sign in  wailed");
+            return Response<AuthResult>.Error("Sign in  wailed");
         }
 
         /// <summary>
@@ -101,7 +104,7 @@ namespace RGBA.Optio.UI.Controllers
         [Route(nameof(Registration))]
         [AllowAnonymous]
         [MapToApiVersion("2.0")]
-        public async Task<Response<IdentityResult>> Registration([FromBody] UserModel user)
+        public async Task<Response<AuthResult>> Registration([FromBody] UserModel user)
         {
 
             if (!ModelState.IsValid)
@@ -109,7 +112,7 @@ namespace RGBA.Optio.UI.Controllers
                 throw new OptioGeneralException(user.Username);
             }
             var res = await se.RegisterUserAsync(user, user.Password);
-            return Response<IdentityResult>.Ok(res);
+            return Response<AuthResult>.Ok(res);
         }
 
         /// <summary>
@@ -123,20 +126,20 @@ namespace RGBA.Optio.UI.Controllers
         [Route("[action]")]
         [ApiExplorerSettings(IgnoreApi = true)]
         [MapToApiVersion("1.0")]
-        public async Task<Response<bool>> RefreshToken([FromQuery] string token)
+        public async Task<Response<AuthResult>> RefreshToken([FromBody]TokenRequest req)
         {
             if (!ModelState.IsValid)
             {
-                throw new OptioGeneralException(token);
+                throw new OptioGeneralException(req.ToString());
             }
             if (User.Identity is { Name: not null, IsAuthenticated: true })
             {
-                var res = await se.RefreshToken(User.Identity.Name, token);
-                return Response<bool>.Ok(res);
+                var res = await se.RefreshToken(req);
+                return Response<AuthResult>.Ok(res);
             }
             else
             {
-                return Response<bool>.Error(ErrorKeys.BadRequest);
+                return Response<AuthResult>.Error(ErrorKeys.BadRequest);
             }
         }
 

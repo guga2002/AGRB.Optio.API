@@ -5,6 +5,8 @@ using AGRB.Optio.Application.Models.ResponseModels;
 using AGRB.Optio.Application.Models.RequestModels;
 using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
 using AGRB.Optio.Application.StaticFiles;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RGBA.Optio.UI.Controllers
 {
@@ -15,6 +17,7 @@ namespace RGBA.Optio.UI.Controllers
     [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{v:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class StatisticController: ControllerBase
     {
         private readonly IStatisticTransactionRelatedService transactionRelatedStatistic;

@@ -1,6 +1,7 @@
 ﻿using AGRB.Optio.Application.Models;
 using AGRB.Optio.Application.Models.RequestModels;
 using AGRB.Optio.Application.Models.ResponseModels;
+using AGRB.Optio.Infrastructure.Identity.HelperModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace AGRB.Optio.Application.Interfaces
@@ -10,9 +11,9 @@ namespace AGRB.Optio.Application.Interfaces
         Task<IdentityResult> DeleteRole(string role);
         Task<UserModel> Info(string username);
         Task<bool> ForgetPassword(string email, string newPassword);
-        Task<bool> RefreshToken(string username, string token);
-        Task<IdentityResult> RegisterUserAsync(UserModel user, string password);
-        Task<SignInResponse> SignInAsync(SignInModel mod);
+        Task<AuthResult> RefreshToken(TokenRequest tok);
+        Task<AuthResult> RegisterUserAsync(UserModel user, string password);
+        Task<AuthResult> SignInAsync(SignInModel mod);
         Task<IdentityResult> AddRolesAsync(string roleName);
         Task<IdentityResult> AssignRoleToUserAsync(string userId, string role);
         Task<IdentityResult> ResetPasswordAsync(PasswordResetModel arg, string username);

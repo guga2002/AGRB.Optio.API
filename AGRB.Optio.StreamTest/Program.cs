@@ -1,148 +1,213 @@
+#region Usings
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using AGRB.Optio.Domain.Interfaces;
 using AGRB.Optio.Infrastructure.Repositories;
 using AGRB.Optio.Infrastructure.PerformanceImprovmentServices;
 using AGRB.Optio.Domain.Entities;
-using AGRB.Optio.Domain.Interfaces;
-using AGRB.Optio.Application.Services;
-using AGRB.Optio.Application.Services.TransactionRelated;
-using AGRB.Optio.Application.Services.StatisticServices;
 using AGRB.Optio.Application.Mapper;
-using AGRB.Optio.Application.Interfaces;
-using AGRB.Optio.Application.Interfaces.StatisticInterfaces;
-using AGRB.Optio.StreamTest.SeedServices;
-using AGRB.Optio.StreamTest.Interfaces;
-using AGRB.Optio.Domain.Data;
 using AGRB.Optio.Domain.Services.Outer_Services;
 using AGRB.Optio.Persistance.LoggerFiles;
+using AGRB.Optio.Domain.Data;
+using System.Reflection;
+using AGRB.Optio.Persistance.Reflections;
+using AGRB.Optio.Application.Interfaces.Identity;
+using AGRB.Optio.Application.Interfaces;
+using AGRB.Optio.StreamTest.SeedServices;
+using AGRB.Optio.StreamTest.Interfaces;
+#endregion
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+});
 builder.Services.AddEndpointsApiExplorer();
+
+
+#region Swagger config
 builder.Services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "OptioManagmentSolution", Version = "v1" });
+    opt.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "AGRB.Optio.API",
+        Description = "AGRB.Optio.API is a powerful RESTful API project developed for the optimization and management of Bank Transactions.\r\nThis API provides multi-functional operations and facilitates the automation of data management and analysis processes.",
+        TermsOfService = new Uri("https://github.com/guga2002/AGRB.Optio.API/blob/master/README.md"),
+        Contact = new OpenApiContact
+        {
+            Name = "Contact Me",
+            Url = new Uri("https://www.linkedin.com/in/guga-apkhazava-938a40237/")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "License, Source Code",
+            Url = new Uri("https://github.com/guga2002/AGRB.Optio.API.git")
+        }
+    });
+
+
     opt.AddSecurityDefinition("auth", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.ApiKey,
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Description = "Enter  You token there, 'Bearer {token}'"
+        Description = "Enter token here"
     });
-    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
-{
-    {
-        new OpenApiSecurityScheme
-        {
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.SecurityScheme,
-                Id = "Auth"
-            }
-        },
-        new string[] { }
-    }
-});
-});
 
-builder.Services.AddScoped<IMerchantRelatedSer,MerchantRelatedSer>();
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "auth"
+                }
+            },
+            Array.Empty<string>()
+                }
+            });
+});
+#endregion
+
+#region Services Lifetime
 builder.Services.AddScoped<RoleManager<IdentityRole>>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 builder.Services.AddScoped<IUniteOfWork, UniteOfWork>();
+builder.Services.AddSingleton<CacheService>();
+builder.Services.AddSingleton<SmtpService>();
 
-#region AddScopedManually
-builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
-builder.Services.AddScoped<IChannelRepo, ChannelRepos>();
-builder.Services.AddScoped<ILocationRepo, LocationRepos>();
-builder.Services.AddScoped<IMerchantRepo, MerchantRepos>();
-builder.Services.AddScoped<ITransactionRepo, TransactionRepos>();
-builder.Services.AddScoped<ITypeOfTransactionRepo, TypeOfTransactionRepos>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
-
-builder.Services.AddScoped<IAdminPanelService, AdminPanelService>();
-builder.Services.AddScoped<IStatisticMerchantRelatedService, StatisticMerchantRelatedService>();
-builder.Services.AddScoped<IStatisticTransactionRelatedService, StatisticTransactionRelatedService>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<ICurrencyRelatedService, CurrencyRelatedService>();
-builder.Services.AddScoped<IMerchantRelatedService, MerchantRelatedService>();
-builder.Services.AddScoped<ITransactionRelatedService, TransactionRelatedService>();
+builder.Services.AddScoped<IMerchantRelatedSer, MerchantRelatedSer>();
 builder.Services.AddScoped<ITransactionRelatedSer, TransactionRelatedSer>();
-builder.Services.AddScoped<ILocationToMerchantRepository, LocationToMerchantRepos>();
+#region addScoppedManually
+//builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
+//builder.Services.AddScoped<IChannelRepo, ChannelRepos>();
+//builder.Services.AddScoped<ILocationRepo, LocationRepos>();
+//builder.Services.AddScoped<IMerchantRepo, MerchantRepos>();
+//builder.Services.AddScoped<ITransactionRepo, TransactionRepos>();
+//builder.Services.AddScoped<ITypeOfTransactionRepo, TypeOfTransactionRepos>();
+//builder.Services.AddScoped<ILocationToMerchantRepository,LocationToMerchantRepos>();
+//builder.Services.AddScoped<IFeadbackRepository, FeadbackRepository>();
 #endregion
 
-//var domainAssemblyServices = Assembly.Load("RGBA.Optio.Domain");
-//builder.Services.AddInjectServices(domainAssemblyServices);
 
-//var domainAssemblyRepos = Assembly.Load("RGBA.Optio.Core");
-//builder.Services.AddInjectRepositories(domainAssemblyRepos);
 
-builder.Services.AddSingleton<CacheService>();
+var applicatinoAssemblyServices = Assembly.Load("AGRB.Optio.Application");
+builder.Services.AddInjectServices(applicatinoAssemblyServices);
 
-builder.Services.AddSingleton<SmtpService>();
+
+var interfaceAssembly = Assembly.Load("AGRB.Optio.Domain");
+var implementationAssembly = Assembly.Load("AGRB.Optio.Infrastructure");
+builder.Services.AddInjectRepositories(interfaceAssembly, implementationAssembly);
+#endregion
 
 builder.Services.AddMemoryCache();
 
 builder.Services.AddHttpContextAccessor();
 
+#region Mapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+#endregion
 
+#region DbContext
 builder.Services.AddDbContext<OptioDB>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("OptiosString"));
 });
+#endregion
 
+#region Identity
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<OptioDB>()
     .AddDefaultTokenProviders();
+#endregion
+
+#region Authentification
+var tokenValidator = new TokenValidationParameters
+{
+    ValidateIssuer = false,
+    ValidateAudience = false,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Secret").Value ?? throw new ArgumentException("Security key can not be null"))),
+};
 
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = "http://localhost:42130",
-            ValidAudience = "http://localhost:42130",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("65E255FF-F399-42D4-9C7F-D5D08B0EC285")),
-        };
-    });
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(jwt =>
+{
 
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = tokenValidator;
+});
+#endregion
+
+builder.Services.AddSingleton(tokenValidator);
+#region Logger Configuration
 builder.Logging.AddConsole();
 builder.Logging.AddProvider(new LoggerProvider());
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
+#endregion
+
+#region Cookies
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.Name = "OptioSOlutionCookie";
+    options.LoginPath = "/Customer/SignIn";
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+});
+#endregion
+
+#region Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("RequestPipeline",
+        builder =>
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            builder.WithOrigins("https://localhost:44359")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+#endregion
 
 var app = builder.Build();
 
-//if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI(io =>
-//    {
-//        io.SwaggerEndpoint("/swagger/v1/swagger.json", "OptioManagmentSolution");
-//    });
-//}
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "AGRB.Optio.API v1");
+        c.RoutePrefix = "swagger";
+    });
 };
 
-app.UseHttpsRedirection();
 app.UseRouting();
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors("RequestPipeline");
 app.MapControllers();
 
 app.Run();

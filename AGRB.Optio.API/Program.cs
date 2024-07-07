@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using System.Reflection;
 using AGRB.Optio.Persistance.Reflections;
+using AGRB.Optio.Application.Interfaces.Identity;
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
@@ -115,6 +116,8 @@ builder.Services.AddScoped<IUniteOfWork, UniteOfWork>();
 builder.Services.AddSingleton<CacheService>();
 builder.Services.AddSingleton<SmtpService>();
 
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 #region addScoppedManually
 //builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
 //builder.Services.AddScoped<IChannelRepo, ChannelRepos>();
@@ -159,22 +162,30 @@ builder.Services.AddIdentity<User, IdentityRole>()
 #endregion
 
 #region Authentification
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = "http://localhost:42130",
-            ValidAudience = "http://localhost:42130",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KkQl/Fp7eupD0YdLsK+ynGpEZ6g/Y0N6/J4I2V57E8E")),
-        };
-    });
+var tokenValidator =new TokenValidationParameters
+{
+    ValidateIssuer = false,
+    ValidateAudience = false,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Secret").Value??throw new ArgumentException("Security key can not be null"))),
+};
+
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(jwt =>
+{
+
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = tokenValidator;
+});
 #endregion
 
+builder.Services.AddSingleton(tokenValidator);
 #region Logger Configuration
 builder.Logging.AddConsole();
 builder.Logging.AddProvider(new LoggerProvider());

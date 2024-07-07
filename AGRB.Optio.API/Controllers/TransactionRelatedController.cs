@@ -3,6 +3,8 @@ using AGRB.Optio.Application.Models;
 using AGRB.Optio.Application.Responses;
 using AGRB.Optio.Application.StaticFiles;
 using AGRB.Optio.Domain.Custom_Exceptions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RGBA.Optio.UI.Controllers
@@ -14,6 +16,7 @@ namespace RGBA.Optio.UI.Controllers
     [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{v:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TransactionRelatedController : ControllerBase
     {
         private readonly ITransactionRelatedService se;
