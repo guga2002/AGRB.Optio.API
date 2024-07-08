@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using AGRB.Optio.Application.Models.ResponseModels;
 using AGRB.Optio.Domain.Entities;
 using AGRB.Optio.Application.Responses;
 using AGRB.Optio.Application.Models;

@@ -40,5 +40,11 @@ namespace AGRB.Optio.Domain.Entities
         public long ChannelId { get; set; }
         public virtual Channels Channel { get; set; }
 
+        [Column("Fraudable_Or_Not")]
+        public bool Fraudable { get; set; } = false;
+
+        [Column("SuspecisiousStatus")]
+        public bool IsSuspecisious { get; set; } = false;
+
     }
 }

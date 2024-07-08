@@ -117,6 +117,7 @@ builder.Services.AddSingleton<CacheService>();
 builder.Services.AddSingleton<SmtpService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAiRepository,AiRepository>();
 
 #region addScoppedManually
 //builder.Services.AddScoped<ICategoryRepo, CategoryOfTransactionRepos>();
