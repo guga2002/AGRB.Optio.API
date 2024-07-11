@@ -35,6 +35,8 @@ namespace AGRB.Optio.Infrastructure.Repositories
 
         public IFeadbackRepository FeadbackRepository => new FeadbackRepository(db);
 
+        public IAiRepository AiRepository => new AiRepository(db);
+
         public async Task CheckAndCommitAsync()
         {
             try

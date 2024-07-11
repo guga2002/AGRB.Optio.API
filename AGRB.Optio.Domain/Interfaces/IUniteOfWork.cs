@@ -22,6 +22,8 @@
 
         IFeadbackRepository FeadbackRepository { get; }
 
+        IAiRepository AiRepository { get; }
+
         Task CheckAndCommitAsync();
     }
 }

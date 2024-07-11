@@ -14,6 +14,7 @@ namespace AGRB.Optio.Application.Services
         {
         }
 
+        #region AddAsync
         public async Task<long> AddAsync(FeadbackModel entity)
         {
             ArgumentNullException.ThrowIfNull(entity, nameof(entity));
@@ -24,7 +25,9 @@ namespace AGRB.Optio.Application.Services
             }
             throw new ArgumentNullException(ErrorKeys.InternalServerError);
         }
+        #endregion
 
+        #region GetAllActiveAsync
         public async Task<IEnumerable<FeadbackModel>> GetAllActiveAsync(FeadbackModel identify)
         {
             var ser =  await work.FeadbackRepository.GetAllAsync();
@@ -36,6 +39,9 @@ namespace AGRB.Optio.Application.Services
             }
             throw new ArgumentNullException(ErrorKeys.NotFound);
         }
+        #endregion
+
+        #region GetAllAsync
 
         public async Task<IEnumerable<FeadbackModel>> GetAllAsync(FeadbackModel identify)
         {
@@ -48,7 +54,10 @@ namespace AGRB.Optio.Application.Services
             throw new ArgumentNullException(ErrorKeys.NotFound);
         }
 
-        public  async Task<FeadbackModel> GetByIdAsync(long id, FeadbackModel identify)
+        #endregion
+
+        #region GetByIdAsync
+        public async Task<FeadbackModel> GetByIdAsync(long id, FeadbackModel identify)
         {
             var ser = await work.FeadbackRepository.GetByIdAsync(id);
             if (ser is not null)
@@ -58,7 +67,9 @@ namespace AGRB.Optio.Application.Services
             }
             throw new ArgumentNullException(ErrorKeys.NotFound);
         }
+        #endregion
 
+        #region RemoveAsync
         public async Task<bool> RemoveAsync(long id, FeadbackModel identity)
         {
             var feadbback = await work.FeadbackRepository.GetByIdAsync(id);
@@ -68,11 +79,15 @@ namespace AGRB.Optio.Application.Services
             }
             throw new ArgumentNullException(ErrorKeys.NotFound);
         }
+        #endregion
 
-        public  async Task<bool> SoftDeleteAsync(long id, FeadbackModel identify)
+        #region SoftDeleteAsync
+
+        public async Task<bool> SoftDeleteAsync(long id, FeadbackModel identify)
         {
             var feadbback = await work.FeadbackRepository.SoftDeleteAsync(id);
             return feadbback;
         }
+        #endregion
     }
 }
