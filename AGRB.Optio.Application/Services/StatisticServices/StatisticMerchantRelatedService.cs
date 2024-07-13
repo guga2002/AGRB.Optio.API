@@ -4,16 +4,23 @@ using AGRB.Optio.Application.StaticFiles;
 using AGRB.Optio.Domain.Custom_Exceptions;
 using AGRB.Optio.Domain.Interfaces;
 using AutoMapper;
+using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver.Core.Configuration;
 
 namespace AGRB.Optio.Application.Services.StatisticServices
 {
     public class StatisticMerchantRelatedService(
         IUniteOfWork work,
         IMapper map,
+        IConfiguration Configure,
         ILogger<StatisticMerchantRelatedService> log)
         : AbstractService<StatisticMerchantRelatedService>(work, map, log), IStatisticMerchantRelatedService
     {
+
+       
         #region GetMostPopularChannelAsync
         public async Task<IEnumerable<ChannelResponseModel>> GetMostPopularChannelAsync(DateTime start, DateTime end)
         {
@@ -67,19 +74,33 @@ namespace AGRB.Optio.Application.Services.StatisticServices
         #region GetMostPopularLocationAsync
         public async Task<IEnumerable<LocationResponseModel>> GetMostPopularLocationAsync(DateTime start, DateTime end)
         {
+            var connectionstring = Configure.GetConnectionString("OptiosString");
+            using (var dbConnection = new SqlConnection(connectionstring))
+            {
+                await dbConnection.OpenAsync();
+                var query = @"SELECT 
+                            l.Location_Name AS Location,
+                         SUM(CASE WHEN t.Date_Of_Transaction >= @start AND t.Date_Of_Transaction <= @end THEN 1 ELSE 0 END) AS Quantity
+                          FROM 
+                           LocationToMerchants ltm
+                          INNER JOIN 
+                            Locations l ON ltm.LocationId = l.Id
+                           INNER JOIN 
+                                 Merchants m ON ltm.MerchantId = m.Id
+                             INNER JOIN 
+                           Transactions t ON m.Id = t.MerchantId
+                        GROUP BY 
+                        l.Location_Name
+                         ORDER BY 
+                         Quantity DESC;";
 
-            var locationToMerchant = await work.LocationToMerchantRepository.GetAllLocationToMerchant();
-
-            await Console.Out.WriteLineAsync(locationToMerchant.Count().ToString());
-            var grouped = from location in locationToMerchant
-                          group location by location.Location into g
-                          select new LocationResponseModel
-                          {
-                              Location = g.Key.LocationName,
-                              Quantity = g.Sum(i => i.Merchant.Transactions.Count(i => i.Date >= start && i.Date <= end))
-                          };
-
-            return grouped.OrderByDescending(i => i.Quantity);
+                var LocationResponse = await dbConnection.QueryAsync<LocationResponseModel>(query,new
+                {
+                    start=start,
+                    end=end
+                });
+                return LocationResponse;
+            }
         }
 
         #endregion

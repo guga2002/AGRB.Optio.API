@@ -46,9 +46,7 @@ namespace AGRB.Optio.Infrastructure.Repositories
         #region GetAll
         public async Task<IEnumerable<LocationToMerchant>> GetAllLocationToMerchant()
         {
-            return await Dbset.Include(i => i.Merchant)
-                .ThenInclude(i => i.Transactions)
-                .Include(i => i.Location)
+            return await Dbset
                 .ToListAsync();
         }
         #endregion
